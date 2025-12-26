@@ -1,0 +1,168 @@
+﻿This document represents the Functional & Technical Software Requirements Specification(SRS) for Mentora.It is written from the perspective of a Senior Technical Lead with 20 + years of industry experience, adhering to clean architecture principles and enterprise - grade scalability standards.
+
+📘 Project Mentora: Master Software Requirements Specification
+
+Version: 1.0(Initialization Phase)
+Tech Stack Context: .NET 9 Web API(Monolithic Modular), PostgreSQL / SQL Server, Entity Framework Core 9, OpenAI Integration.
+
+1. Module: Identity, Authentication & Security
+
+High - Level Requirement: The system shall provide a secure, scalable, and stateless authentication mechanism enabling robust user identity management.
+
+1.1 User Registration(Onboarding)
+
+1.1.1 Credential Validation: The system must validate user inputs via Regex before database interaction(Email format, Password complexity: min 8 chars, 1 uppercase, 1 special char).
+
+1.1.2 Uniqueness Check: The system shall query the Users entity to ensure the provided email does not already exist, returning a 409 Conflict error if found.
+
+1.1.3 Cryptographic Hashing: The system shall use an industry - standard hashing algorithm(BCrypt) to hash passwords before persistence.No plaintext passwords shall ever be stored.
+
+1.2 Authentication & Session Management
+
+1.2.1 Token Issuance: Upon successful credential verification, the system shall generate a signed JSON Web Token(JWT)(Access Token) containing Claims(UserId, Role, Email) with a short expiration(e.g., 60 minutes).
+
+1.2.2 Persistent Sessions(Refresh Tokens): The system shall create and store a RefreshToken entity(cryptographically secure random string) linked to the user and device info to allow silent re - authentication when the Access Token expires.
+
+1.2.3 Token Revocation Strategy: The system shall support a "Logout All Devices" feature by flagging all active RefreshTokens for a specific user as Revoked.
+
+2. Module: User Profile & Personalization
+
+High - Level Requirement: The system shall maintain a detailed digital persona for the student to tailor AI responses and track academic progression.
+
+2.1 Academic Attributes Management
+
+2.1.1 Structured Data Storage: The system shall persist structured academic data in the UserProfile entity, specifically: University, Major, and ExpectedGraduationYear for timeline calculations.
+
+2.1.2 Study Level Logic: The system shall implement an enum-based logic(Freshman through Graduate) to allow the AI engine to adjust the complexity of generated career roadmaps.
+
+2.2 System Configurations
+
+2.2.1 Timezone Synchronization: The system shall detect and store the user’s Timezone(IANA format) to ensure notifications and task schedules align with the user’s local time, not the server's UTC time.
+
+3. Module: AI Career Builder(The Strategist)
+
+High - Level Requirement: The system shall leverage Generative AI(OpenAI) to analyze user context and produce deep, hierarchical career roadmaps, persisting them as structured relational data.
+
+3.1 AI Career Assessment Interface
+
+3.1.1 Dynamic Diagnostics: The system shall present dynamic diagnostic questions based on the user's major.
+
+3.1.2 Data Serialization: The system shall aggregate user responses into a simplified JSON context to be injected into the AI Prompt.
+
+3.2 Plan Generation Engine
+
+3.2.1 Prompt Engineering & JSON Injection: The system shall construct a rigid System Prompt enforcing a JSON output schema.It must inject specific user constraints(e.g., "I have 2 years until graduation") to tailor the output.
+
+3.2.2 Relational Parsing Strategy: The system shall parse the AI response into multiple relational entities:
+
+The Container: CareerPlan(Title, Summary).
+
+The Milestones: CareerSteps(Description, OrderIndex).
+
+The Granular Actions: StepCheckpoints(Micro - steps like "Install VS Code").
+
+3.2.3 Resource Extraction: The system shall extract recommended learning links from the AI response and populate the LearningResources entity.
+
+3.3 Skill Gap Analysis
+
+3.3.1 Many - to - Many Mapping: The system shall identify required skills(e.g., "Python") and map them to the CareerPlan via the CareerPlanSkill associative table, setting a TargetProficiency for each.
+
+3.3.2 Shared Skill Repository: The system shall query the Skill entity to check if a skill exists; if not, create it.This ensures analytics capability(e.g., "Top requested skills system-wide").
+
+4. Module: Intelligent Study Planner(The Executor)
+
+High - Level Requirement: The system shall provide an execution environment that transforms long - term goals into time - bound daily actions using availability-aware scheduling algorithms.
+
+4.1 Constraints & Availability Configuration
+
+4.1.1 Granular Slots Definition: The system shall allow users to define specific AvailabilitySlots(Entity) per day of the week(e.g., Monday: 08:00–10:00 & 18:00–20:00).
+
+4.1.2 Energy Level Tagging: Each slot must include an EnergyLevel attribute(High / Low) to guide the scheduler in placing high - cognitive tasks(Math / Coding) during High - Energy slots.
+
+4.2 Dynamic Scheduling Algorithm
+
+4.2.1 Constraint Satisfaction Logic: The system shall invoke an allocation service that fits StudyTasks into available slots based on:
+
+DurationMinutes of the task vs.Slot capacity.
+
+Priority of the task.
+
+4.2.2 Conflict Detection: The system must prevent overlapping tasks and validate that EndTime does not exceed the defined slot limits.
+
+4.3 Task Execution & Session Tracking
+
+4.3.1 Micro - Interaction Tracking: The system shall record real - time StudySessions linked to tasks.
+
+4.3.2 Focus Score Calculation: Upon session completion, the system shall calculate a heuristic FocusScore(1 - 100) based on pause frequency and total duration variance.
+
+4.3.3 Feedback Loop Integration: If a task is marked Skipped or Failed, the system shall force the creation of a TaskFeedbackLog entry to capture the FailureReason, serving as training data for future schedule optimization.
+
+5. Module: Deep Integration(Core Logic)
+
+High - Level Requirement: The system must enforce strong coupling between the "Macro"(Career Steps) and "Micro"(Study Tasks) layers to demonstrate progress causality.
+
+5.1 Relational Linking
+
+5.1.1 Task - Step Association: The StudyTask entity shall hold a nullable foreign key CareerStepId.This enables a task to act as a "child" of a career milestone.
+
+5.1.2 Checkpoint Synchronization: Completing a task should optionally toggle the completion of a linked StepCheckpoint automatically.
+
+5.2 Progress Propagation Logic
+
+5.2.1 Upward Bubbling: The system shall implement an Event or Trigger:
+
+IF a StudyTask is completed ->
+
+    CALCULATE linked CareerStep progress percentage ->
+
+        UPDATE parent CareerPlan total progress.
+
+5.2.2 Impact Visualization: The system shall serve endpoints allowing the frontend to display metrics like "Studying for this exam contributes 2% to your Software Engineer Goal."
+
+6. Module: Gamification & Engagement Strategy
+
+High - Level Requirement: The system shall utilize psychological triggers via data entities to increase user retention and session frequency.
+
+6.1 XP & Leveling Engine
+
+6.1.1 Event - Based Experience: The system shall facilitate an internal event bus where specific actions(Task Done, Plan Created) dispatch XP awards to the UserStats table.
+
+6.1.2 Streak Maintenance: The system must calculate CurrentStreak by checking consecutive daily activity logs.A logic must exist to reset the streak if LastLogin > 24 hours + offset.
+
+6.2 Achievement System
+
+6.2.1 Trigger Conditions: The system shall define a flexible Achievement table with triggers(e.g., "7_day_streak").A background worker or in -request logic must evaluate these conditions to create UserAchievement records.
+
+6.3 Emotional Reflection
+
+6.3.1 Journaling: The system shall support DailyReflection entries allowing qualitative data collection(Satisfaction Score) alongside quantitative data(Hours Logged), enabling sentiment analysis over time.
+
+7. Module: System Monitoring & Admin Ops
+
+High - Level Requirement: The system shall provide audit capabilities for AI usage and operational costs.
+
+7.1 AI Audit Trail
+
+7.1.1 Request Logging: Every call to the OpenAI API must be logged in AiRequestLog capturing:
+
+TokenUsage(Prompt + Completion).
+
+    Latency(ms).
+
+    RequestType(Career Gen / Task Breakdown).
+
+This data is non - functional for the user but critical for Business Logic(billing & optimization).
+
+8. Data Integrity & Naming Standards(Non - Functional)
+
+8.1 GUID Utilization: All primary keys for transactional entities(Users, Tasks, Plans) shall use GUID / UUID to ensure global uniqueness and prevent ID enumeration attacks.
+
+8.2 Soft Deletes: Critical entities(Plans, User Histories) should support soft - delete (IsDeleted flags) rather than hard database deletes where analysis is required.
+
+8.3 Delete Cascades: The system shall configure specific Entity Framework deletion behaviors:
+
+Cascade: For parent - child strong ownership(Plan -> Steps).
+
+    SetNull: For history preservation(CareerStep Deleted -> Linked StudyTasks remain but disconnected).
+
+End of Specification.Prepared for the "Mentora" Development Team.

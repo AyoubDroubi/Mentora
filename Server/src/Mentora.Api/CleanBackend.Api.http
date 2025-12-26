@@ -1,0 +1,6 @@
+@Mentora.Api_HostAddress = http://localhost:5037
+
+GET {{Mentora.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
