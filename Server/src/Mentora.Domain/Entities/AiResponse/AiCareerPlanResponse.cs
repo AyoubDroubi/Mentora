@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanBackend.Domain.Entitie
+namespace Mentora.Domain.Entitie
 {
     public class AiCareerPlanResponse
     {

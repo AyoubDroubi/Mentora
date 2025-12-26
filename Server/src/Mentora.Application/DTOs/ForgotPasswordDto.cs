@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanBackend.Application.DTOs
+namespace Mentora.Application.DTOs
 {
     public class ForgotPasswordDto
     {

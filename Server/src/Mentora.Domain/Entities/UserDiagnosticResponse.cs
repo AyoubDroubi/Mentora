@@ -1,11 +1,11 @@
-﻿using CleanBackend.Domain.Common;
+﻿using Mentora.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanBackend.Domain.Entities
+namespace Mentora.Domain.Entities
 {
     public class UserDiagnosticResponse : BaseEntity
     {

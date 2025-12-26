@@ -1,5 +1,5 @@
-﻿using CleanBackend.Domain.Common;
-using CleanBackend.Domain.Entities.Auth;
+﻿using Mentora.Domain.Common;
+using Mentora.Domain.Entities.Auth;
 using Mentora.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanBackend.Domain.Entities
+namespace Mentora.Domain.Entities
 {
     public class UserSkill : BaseEntity
     {

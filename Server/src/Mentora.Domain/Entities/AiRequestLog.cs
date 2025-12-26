@@ -1,5 +1,4 @@
-﻿using CleanBackend.Domain.Common;
-using System.ComponentModel.DataAnnotations;
+﻿using Mentora.Domain.Common;
 
 namespace Mentora.Domain.Entities
 {

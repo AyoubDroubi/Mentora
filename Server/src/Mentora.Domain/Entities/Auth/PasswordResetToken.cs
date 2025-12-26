@@ -1,6 +1,6 @@
-﻿using CleanBackend.Domain.Common;
+﻿using Mentora.Domain.Common;
 
-namespace CleanBackend.Domain.Entities.Auth
+namespace Mentora.Domain.Entities.Auth
 {
     public class PasswordResetToken : BaseEntity
     {

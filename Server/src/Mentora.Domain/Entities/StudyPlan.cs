@@ -1,5 +1,5 @@
-﻿using CleanBackend.Domain.Common;
-using CleanBackend.Domain.Entities.Auth;
+﻿using Mentora.Domain.Common;
+using Mentora.Domain.Entities.Auth;
 
 namespace Mentora.Domain.Entities
 {

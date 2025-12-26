@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
-namespace CleanBackend.Domain.Entities.Auth
+namespace Mentora.Domain.Entities.Auth
 {
     public class User : IdentityUser
     {

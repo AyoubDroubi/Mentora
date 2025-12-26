@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CleanBackend.Application\Mentora.Application.csproj" />
-    <ProjectReference Include="..\CleanBackend.Domain\Mentora.Domain.csproj" />
+    <ProjectReference Include="..\Mentora.Application\Mentora.Application.csproj" />
+    <ProjectReference Include="..\Mentora.Domain\Mentora.Domain.csproj" />
   </ItemGroup>
 
 </Project>

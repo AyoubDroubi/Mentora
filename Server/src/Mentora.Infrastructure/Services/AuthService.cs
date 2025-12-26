@@ -1,6 +1,6 @@
-﻿using CleanBackend.Application.DTOs;
-using CleanBackend.Application.Interfaces;
-using CleanBackend.Domain.Entities.Auth;
+﻿using Mentora.Application.DTOs;
+using Mentora.Application.Interfaces;
+using Mentora.Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace CleanBackend.Infrastructure.Services
+namespace Mentora.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanBackend.Domain.Common
+namespace Mentora.Domain.Common
 {
     public abstract class BaseEntity
     {

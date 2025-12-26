@@ -1,6 +1,6 @@
-﻿using CleanBackend.Domain.Common;
-using CleanBackend.Domain.Entities;
-using CleanBackend.Domain.Entities.Auth;
+﻿using Mentora.Domain.Common;
+using Mentora.Domain.Entities;
+using Mentora.Domain.Entities.Auth;
 using Mentora.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿using CleanBackend.Domain.Entities.Auth;
+﻿using Mentora.Domain.Entities.Auth;
 using Mentora.Application.Interfaces;
 using Mentora.Domain.Entities;
 using Mentora.Infrastructure.Persistence;
