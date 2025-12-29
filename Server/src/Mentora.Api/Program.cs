@@ -1,5 +1,10 @@
+using Mentora.Application.Interfaces;
+using Mentora.Domain.Entities.Auth;
+using Mentora.Infrastructure.Persistence;
+using Mentora.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -33,11 +38,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 4. Dependency Injection (DI) Container - ??? ???
-// ???? ??????????? ???????? ?????? ??????? ?? Infrastructure Application
-builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
-builder.Services.AddScoped<ICareerService, CareerService>(); // ??????? ???? ????? ????? ????????
-builder.Services.AddScoped<IAuthService, AuthService>();
+
+//builder.Services.AddScoped<ICareerPlanRepository, ICareerPlanRepository>();
+//builder.Services.AddScoped<ICareerService, CareerService>(); 
+//builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

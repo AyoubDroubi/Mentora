@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Mentora.Domain.DTOs.Auth;
+using Mentora.Application.Interfaces;
+using Mentora.Application.DTOs;
 
 namespace Mentora.Api.Controllers
 {
