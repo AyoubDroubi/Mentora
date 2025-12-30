@@ -2,18 +2,16 @@
 
 namespace Mentora.Domain.Entities
 {
-    public class Skill : BaseEntity
+    public class Skill : BaseEntity // حذفنا int Id لأن BaseEntity يعطيه Guid تلقائياً
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
 
     public class CareerPlanSkill : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid CareerPlanId { get; set; }
         public CareerPlan CareerPlan { get; set; } = null!;
-        public int SkillId { get; set; }
+        public Guid SkillId { get; set; } // تم التغيير من int لـ Guid
         public Skill Skill { get; set; } = null!;
         public SkillLevel TargetLevel { get; set; } = SkillLevel.Beginner;
     }

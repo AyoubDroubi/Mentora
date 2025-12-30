@@ -71,13 +71,14 @@ namespace Mentora.Infrastructure.Services
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "super_secret_key_123456789_must_be_long"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("userId", user.Id) // claim خاص
-            };
+{
+    // أضفنا .ToString() هنا
+    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+    new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+    // وأيضاً هنا
+    new Claim("userId", user.Id.ToString())
+};
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
