@@ -1,0 +1,114 @@
+### Mentora API - Authentication Tests
+### Per SRS Module 1: Identity, Authentication & Security
+
+@baseUrl = https://localhost:7001/api
+@accessToken = 
+@refreshToken = 
+
+### 1. Register New User (SRS 1.1)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Mohammed",
+  "email": "ahmed.test@mentora.com",
+  "password": "Test@1234",
+  "confirmPassword": "Test@1234"
+}
+
+### 2. Login (SRS 1.2.1 & 1.2.2)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ahmed.test@mentora.com",
+  "password": "Test@1234",
+  "deviceInfo": "Chrome/Windows 11"
+}
+
+### Extract tokens from login response
+@accessToken = {{login.response.body.$.accessToken}}
+@refreshToken = {{login.response.body.$.refreshToken}}
+
+### 3. Get Current User Info (Protected Route)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 4. Refresh Access Token (SRS 1.2.2)
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 5. Forgot Password (SRS 1.2)
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "ahmed.test@mentora.com"
+}
+
+### 6. Reset Password (SRS 1.2)
+# Note: You need the token from the database after forgot-password
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "ahmed.test@mentora.com",
+  "token": "YOUR_RESET_TOKEN_HERE",
+  "newPassword": "NewTest@1234",
+  "confirmPassword": "NewTest@1234"
+}
+
+### 7. Logout from Current Device (SRS 1.2.3)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 8. Logout from All Devices (SRS 1.2.3)
+POST {{baseUrl}}/auth/logout-all
+Authorization: Bearer {{accessToken}}
+
+### 9. Test Duplicate Email (SRS 1.1.2 - Should return 409 Conflict)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Mohammed",
+  "email": "ahmed.test@mentora.com",
+  "password": "Test@1234",
+  "confirmPassword": "Test@1234"
+}
+
+### 10. Test Invalid Password (SRS 1.1.1 - Should fail validation)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test@example.com",
+  "password": "weak",
+  "confirmPassword": "weak"
+}
+
+### 11. Test Invalid Email Format (SRS 1.1.1)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "invalid-email",
+  "password": "Test@1234",
+  "confirmPassword": "Test@1234"
+}

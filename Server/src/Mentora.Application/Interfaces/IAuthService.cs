@@ -1,23 +1,25 @@
 ﻿using Mentora.Application.DTOs;
+using Mentora.Domain.Entities.Auth;
 
 namespace Mentora.Application.Interfaces
 {
+    /// <summary>
+    /// Authentication service interface per SRS 1.1 and 1.2
+    /// </summary>
     public interface IAuthService
     {
         Task<AuthResponseDto> RegisterAsync(SignupDTO dto);
 
-        Task<string> LoginAsync(LoginDTO dto);
+        Task<AuthResponseDto> LoginAsync(LoginDTO dto, string? ipAddress);
 
-        Task<bool> ForgotPasswordAsync(string email);
+        Task<AuthResponseDto> RefreshTokenAsync(string refreshToken, string? ipAddress);
 
-        Task<string> ResetPasswordAsync(ResetPasswordDto dto);
-    }
+        Task<bool> LogoutAsync(string refreshToken);
 
-    // AuthResponseDto بسيط جداً (ضعيه في مجلد الـ DTOs)
-    public class AuthResponseDto
-    {
-        public bool IsSuccess { get; set; }
-        public string Message { get; set; }
-        public IEnumerable<string> Errors { get; set; }
+        Task<bool> LogoutAllDevicesAsync(Guid userId);
+
+        Task<bool> ForgotPasswordAsync(ForgotPasswordDto dto);
+
+        Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto);
     }
 }
