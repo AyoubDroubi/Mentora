@@ -95,14 +95,14 @@ namespace Mentora.Infrastructure.Persistence
                 .HasOne(t => t.FeedbackLog)
                 .WithOne(f => f.StudyTask)
                 .HasForeignKey<TaskFeedbackLog>(f => f.StudyTaskId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // StudyTask -> CareerStep (Many-to-One) per SRS 5.1.1
             builder.Entity<StudyTask>()
                 .HasOne(t => t.CareerStep)
                 .WithMany(s => s.LinkedStudyTasks)
                 .HasForeignKey(t => t.CareerStepId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Soft Delete Query Filter per SRS 8.2
             foreach (var entityType in builder.Model.GetEntityTypes())
