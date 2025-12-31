@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Mentora.Application.DTOs
 {
+    /// <summary>
+    /// User login DTO per SRS 1.2.1: Token Issuance
+    /// </summary>
     public class LoginDTO
     {
-        [Required, EmailAddress]
-        public string Email { get; set; }
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = string.Empty;
 
-        [Required, MinLength(8), MaxLength(60)]
-        public string Password { get; set; }
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
+        public string Password { get; set; } = string.Empty;
+        
+        // Optional device tracking
+        public string? DeviceInfo { get; set; }
     }
 }

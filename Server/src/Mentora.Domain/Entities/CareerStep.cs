@@ -11,7 +11,8 @@ namespace Mentora.Domain.Entities
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int OrderIndex { get; set; }
-        public StepStatus Status { get; set; } = StepStatus.Locked;
+        public int DurationWeeks { get; set; } = 4;
+        public CareerStepStatus Status { get; set; } = CareerStepStatus.NotStarted;
         public string ResourcesLinks { get; set; } = "[]";
         public ICollection<StudyTask> LinkedStudyTasks { get; set; } = new List<StudyTask>();
     }

@@ -9,11 +9,17 @@ namespace Mentora.Domain.Entities
     {
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
+        public string Bio { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public DateTime? DateOfBirth { get; set; }
         public string University { get; set; } = string.Empty;
         public string Major { get; set; } = string.Empty;
+        public int? GraduationYear { get; set; }
+        public string LinkedInUrl { get; set; } = string.Empty;
+        public string GitHubUrl { get; set; } = string.Empty;
         public StudyLevel CurrentLevel { get; set; } = StudyLevel.Freshman;
         public int ExpectedGraduationYear { get; set; }
-        public string Bio { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
     }
 }

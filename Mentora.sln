@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36616.10 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{DAD03CFC-D5FA-AC94-41C7-9ABAB326F09E}"
 EndProject
@@ -31,6 +31,26 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{F786865B-B5F7-4218-B837-753AC7E3CBEB}"
 	ProjectSection(SolutionItems) = preProject
 		Software Requirements.txt = Software Requirements.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A1B2C3D4-E5F6-4718-8901-234567890ABC}"
+	ProjectSection(SolutionItems) = preProject
+		Server\docs\API-QUICK-REFERENCE.md = Server\docs\API-QUICK-REFERENCE.md
+		Server\docs\CHANGES-SUMMARY.md = Server\docs\CHANGES-SUMMARY.md
+		Server\docs\DATABASE-SEEDER.md = Server\docs\DATABASE-SEEDER.md
+		Server\docs\DATABASE-SETUP-SUMMARY.md = Server\docs\DATABASE-SETUP-SUMMARY.md
+		Server\docs\MODULE-1-AUTHENTICATION.md = Server\docs\MODULE-1-AUTHENTICATION.md
+		Server\docs\QUICK-START-AR.md = Server\docs\QUICK-START-AR.md
+		Server\docs\SWAGGER-AUTO-ENABLE.md = Server\docs\SWAGGER-AUTO-ENABLE.md
+		Server\docs\SWAGGER-COMPLETE.md = Server\docs\SWAGGER-COMPLETE.md
+		Server\docs\SWAGGER-GUIDE-AR.md = Server\docs\SWAGGER-GUIDE-AR.md
+		Server\docs\SWAGGER-INTEGRATION-SUMMARY.md = Server\docs\SWAGGER-INTEGRATION-SUMMARY.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B2C3D4E5-F6A7-4829-9012-345678901BCD}"
+	ProjectSection(SolutionItems) = preProject
+		Server\scripts\health-check.ps1 = Server\scripts\health-check.ps1
+		Server\scripts\health-check.sh = Server\scripts\health-check.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mentora.Api", "Server\src\Mentora.Api\Mentora.Api.csproj", "{FC9D7EAD-7012-B015-92DD-23521C30ED8F}"

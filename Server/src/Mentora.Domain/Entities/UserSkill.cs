@@ -11,10 +11,9 @@ namespace Mentora.Domain.Entities
 {
     public class UserSkill : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
-        public int SkillId { get; set; }
+        public Guid SkillId { get; set; }
         public Skill Skill { get; set; } = null!;
         public SkillLevel CurrentLevel { get; set; } = SkillLevel.Beginner;
     }

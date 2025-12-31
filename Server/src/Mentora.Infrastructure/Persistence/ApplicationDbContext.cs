@@ -1,13 +1,16 @@
 ﻿using Mentora.Domain.Common;
 using Mentora.Domain.Entities;
 using Mentora.Domain.Entities.Auth;
-using Microsoft.AspNetCore.Identity; // ضروري للأدوار
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mentora.Infrastructure.Persistence
 {
-    // التعديل الجوهري هنا: حددنا User و IdentityRole<Guid> و النوع الثالث هو Guid
+    /// <summary>
+    /// Application DbContext with Identity integration per SRS Module 1
+    /// Supports GUID primary keys and soft delete per SRS 8.1 and 8.2
+    /// </summary>
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -41,57 +44,82 @@ namespace Mentora.Infrastructure.Persistence
         public DbSet<DailyReflection> DailyReflections { get; set; }
         public DbSet<AiRequestLog> AiRequestLogs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        
+        // Authentication Module per SRS 1.2
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // تحويل الـ Enums لنصوص في قاعدة البيانات لسهولة القراءة
+            // Enums as strings for readability
             builder.Entity<StudyTask>().Property(t => t.Status).HasConversion<string>();
             builder.Entity<StudyTask>().Property(t => t.Priority).HasConversion<string>();
             builder.Entity<CareerStep>().Property(s => s.Status).HasConversion<string>();
             builder.Entity<UserSkill>().Property(s => s.CurrentLevel).HasConversion<string>();
             builder.Entity<CareerPlanSkill>().Property(s => s.TargetLevel).HasConversion<string>();
 
-            // العلاقات
+            // User Relationships
+            
+            // User -> CareerPlans (One-to-Many) per SRS
             builder.Entity<User>()
-                .HasOne(u => u.CareerPlans) // تأكد من توافق اسم الخاصية في ملف الـ User
-                .WithOne()
-                .HasForeignKey<CareerPlan>(cp => cp.UserId);
+                .HasMany(u => u.CareerPlans)
+                .WithOne(cp => cp.User)
+                .HasForeignKey(cp => cp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // إصلاح علاقة UserProfile (One-to-One)
-            builder.Entity<UserProfile>()
-                .HasOne(p => p.User)
-                .WithOne()
-                .HasForeignKey<UserProfile>(p => p.UserId);
+            // User -> RefreshTokens (One-to-Many) per SRS 1.2.2
+            builder.Entity<User>()
+                .HasMany(u => u.RefreshTokens)
+                .WithOne(rt => rt.User)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // إصلاح علاقة UserStats
+            // User -> UserProfile (One-to-One) per SRS 2.1
+            builder.Entity<User>()
+                .HasOne(u => u.UserProfile)
+                .WithOne(p => p.User)
+                .HasForeignKey<UserProfile>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // User -> UserStats (One-to-One)
             builder.Entity<UserStats>()
                 .HasOne(s => s.User)
                 .WithOne()
-                .HasForeignKey<UserStats>(s => s.UserId);
+                .HasForeignKey<UserStats>(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // StudyTask -> FeedbackLog (One-to-One)
             builder.Entity<StudyTask>()
                 .HasOne(t => t.FeedbackLog)
                 .WithOne(f => f.StudyTask)
-                .HasForeignKey<TaskFeedbackLog>(f => f.StudyTaskId);
+                .HasForeignKey<TaskFeedbackLog>(f => f.StudyTaskId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            // StudyTask -> CareerStep (Many-to-One) per SRS 5.1.1
             builder.Entity<StudyTask>()
                 .HasOne(t => t.CareerStep)
                 .WithMany(s => s.LinkedStudyTasks)
                 .HasForeignKey(t => t.CareerStepId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
-            // فلتر البحث التلقائي للـ Soft Delete
+            // Soft Delete Query Filter per SRS 8.2
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 {
                     var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
-                    var propertyMethodInfo = typeof(EF).GetMethod("Property")?.MakeGenericMethod(typeof(DateTime?));
-                    var deletedAtProperty = System.Linq.Expressions.Expression.Call(propertyMethodInfo!, parameter, System.Linq.Expressions.Expression.Constant("DeletedAt"));
-                    var compareExpression = System.Linq.Expressions.Expression.Equal(deletedAtProperty, System.Linq.Expressions.Expression.Constant(null));
+                    var propertyMethodInfo = typeof(EF).GetMethod("Property")?.MakeGenericMethod(typeof(bool));
+                    var isDeletedProperty = System.Linq.Expressions.Expression.Call(
+                        propertyMethodInfo!, 
+                        parameter, 
+                        System.Linq.Expressions.Expression.Constant("IsDeleted")
+                    );
+                    var compareExpression = System.Linq.Expressions.Expression.Equal(
+                        isDeletedProperty, 
+                        System.Linq.Expressions.Expression.Constant(false)
+                    );
                     var lambda = System.Linq.Expressions.Expression.Lambda(compareExpression, parameter);
 
                     builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
@@ -115,8 +143,8 @@ namespace Mentora.Infrastructure.Persistence
                         break;
 
                     case EntityState.Deleted:
-                        entry.State = EntityState.Modified; // منع الحذف الفعلي
-                        entry.Entity.DeletedAt = DateTime.UtcNow; // تفعيل الحذف الناعم
+                        entry.State = EntityState.Modified;
+                        entry.Entity.DeletedAt = DateTime.UtcNow;
                         entry.Entity.IsDeleted = true;
                         break;
                 }
