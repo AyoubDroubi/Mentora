@@ -35,8 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mentora.Domain", "Server\sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mentora.Infrastructure", "Server\src\Mentora.Infrastructure\Mentora.Infrastructure.csproj", "{4935F083-3314-1608-00B0-26295271299D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mentora.Documentation", "Mentora.Documentation\Mentora.Documentation.csproj", "{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,18 +105,6 @@ Global
 		{4935F083-3314-1608-00B0-26295271299D}.Release|x64.Build.0 = Release|Any CPU
 		{4935F083-3314-1608-00B0-26295271299D}.Release|x86.ActiveCfg = Release|Any CPU
 		{4935F083-3314-1608-00B0-26295271299D}.Release|x86.Build.0 = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|x64.Build.0 = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Debug|x86.Build.0 = Debug|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|x64.ActiveCfg = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|x64.Build.0 = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|x86.ActiveCfg = Release|Any CPU
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -129,7 +115,6 @@ Global
 		{0F7255C2-539C-254A-E0D3-181954B647DF} = {2132E9AA-A8A6-6DB3-1CCB-FE240A8CB002}
 		{C9A4EB3B-81CE-45F8-A4E1-6B5335C30EF4} = {2132E9AA-A8A6-6DB3-1CCB-FE240A8CB002}
 		{4935F083-3314-1608-00B0-26295271299D} = {2132E9AA-A8A6-6DB3-1CCB-FE240A8CB002}
-		{66C5CE7A-C264-4CBF-9E0C-82EE3AF2901E} = {2132E9AA-A8A6-6DB3-1CCB-FE240A8CB002}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {557CCDE3-AFFB-4ADD-96F1-7BC2D0A613A2}
