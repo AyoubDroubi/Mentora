@@ -56,29 +56,27 @@ namespace Mentora.Infrastructure.Services
                 };
             }
 
-            // إضافة رول افتراضي إذا لزم
             // await _userManager.AddToRoleAsync(user, "User");
 
             return new AuthResponseDto { IsSuccess = true, Message = "User registered successfully!" };
         }
 
-        // --- (أضفت الدوال الباقية كـ Mocking عشان نمشي الكود، ممكن تكملهم لاحقاً) ---
-        public async Task<bool> ForgotPasswordAsync(string email) { return true; /* Implement Logic Here Later */ }
-        public async Task<string> ResetPasswordAsync(ResetPasswordDto dto) { return "Success"; /* Implement Logic Here Later */ }
+        public async Task<bool> ForgotPasswordAsync(string email)
+        { return true; }
 
-        // --- Helper: JWT Generator ---
+        public async Task<string> ResetPasswordAsync(ResetPasswordDto dto)
+        { return "Success"; }
+
         private string GenerateToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "super_secret_key_123456789_must_be_long"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
-{
-    // أضفنا .ToString() هنا
-    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-    new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-    // وأيضاً هنا
-    new Claim("userId", user.Id.ToString())
-};
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                new Claim("userId", user.Id.ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],

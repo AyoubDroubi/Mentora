@@ -4,18 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mentora.Domain.Common;
-
-public abstract class BaseEntity
+namespace Mentora.Domain.Common
 {
-    // توحيد النوع ليكون Guid
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    // حقول التدقيق (Audit Fields) حسب الطلب في الـ Checklist
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
-
-    // لدعم الـ Soft Delete إذا احتجناه لاحقاً
-    public bool IsDeleted { get; set; } = false;
-    public DateTime? DeletedAt { get; set; }
+    public abstract class BaseEntity
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? DeletedAt { get; set; } = null;
+    }
 }
