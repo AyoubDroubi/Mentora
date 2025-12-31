@@ -81,6 +81,22 @@ builder.Services.AddSwaggerDocumentation();
 // 9. CORS (if needed for frontend)
 builder.Services.AddCors(options =>
 {
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",  // Vite default dev server
+                "http://localhost:3000",  // Alternative React dev server
+                "http://localhost:5174",  // Alternative Vite port
+                "https://localhost:5173",
+                "https://localhost:3000",
+                "https://localhost:5174"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // Important for cookies/auth headers
+    });
+
+    // Keep AllowAll for development/testing
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
@@ -117,7 +133,8 @@ app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+// Use the specific CORS policy for frontend
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication(); // Must come before UseAuthorization
 app.UseAuthorization();
