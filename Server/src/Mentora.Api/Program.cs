@@ -1,6 +1,8 @@
+using Mentora.Api.Configuration;
 using Mentora.Application.Interfaces;
 using Mentora.Domain.Entities.Auth;
 using Mentora.Infrastructure.BackgroundServices;
+using Mentora.Infrastructure.Data;
 using Mentora.Infrastructure.Persistence;
 using Mentora.Infrastructure.Repositories;
 using Mentora.Infrastructure.Services;
@@ -72,38 +74,11 @@ builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
 
 // 7. Controllers and API
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "Mentora API", Version = "v1" });
-    
-    // Add JWT Authentication to Swagger
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-    
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
 
-// 8. CORS (if needed for frontend)
+// 8. Swagger Documentation (Always enabled)
+builder.Services.AddSwaggerDocumentation();
+
+// 9. CORS (if needed for frontend)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -116,12 +91,29 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+// ? Seed Database with initial data
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        logger.LogInformation("Attempting to seed database...");
+        await DatabaseSeeder.SeedAsync(services);
+        logger.LogInformation("Database seeding completed successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while seeding the database");
+    }
 }
+
+// ? Swagger enabled in ALL environments (Development & Production)
+app.UseSwaggerDocumentation();
+
+// Enable static files for custom Swagger CSS
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

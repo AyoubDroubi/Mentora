@@ -1,0 +1,148 @@
+/* Mentora API - Swagger UI Custom Styles */
+
+/* Color Scheme */
+:root {
+    --mentora-primary: #6B9080;
+    --mentora-secondary: #A4C3B2;
+    --mentora-bg: #F6FFF8;
+    --mentora-text: #2C3E3F;
+}
+
+/* Top Bar */
+.swagger-ui .topbar {
+    background-color: var(--mentora-primary) !important;
+    padding: 15px 0;
+}
+
+.swagger-ui .topbar .download-url-wrapper {
+    display: none;
+}
+
+/* Info Section */
+.swagger-ui .info {
+    margin: 30px 0;
+}
+
+.swagger-ui .info .title {
+    color: var(--mentora-primary) !important;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.swagger-ui .info .description {
+    color: var(--mentora-text);
+}
+
+/* Authorize Button */
+.swagger-ui .btn.authorize {
+    background-color: var(--mentora-primary) !important;
+    border-color: var(--mentora-primary) !important;
+    color: white !important;
+}
+
+.swagger-ui .btn.authorize:hover {
+    background-color: var(--mentora-secondary) !important;
+    border-color: var(--mentora-secondary) !important;
+}
+
+.swagger-ui .btn.authorize svg {
+    fill: white !important;
+}
+
+/* Operation Blocks */
+.swagger-ui .opblock.opblock-post {
+    background: rgba(73, 204, 144, 0.1);
+    border-color: #49cc90;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: #49cc90;
+}
+
+.swagger-ui .opblock.opblock-get {
+    background: rgba(97, 175, 254, 0.1);
+    border-color: #61affe;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background: #61affe;
+}
+
+/* Try it out button */
+.swagger-ui .btn.try-out__btn {
+    background-color: var(--mentora-primary) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.swagger-ui .btn.try-out__btn:hover {
+    background-color: var(--mentora-secondary) !important;
+}
+
+/* Execute button */
+.swagger-ui .btn.execute {
+    background-color: var(--mentora-primary) !important;
+    color: white !important;
+    border-color: var(--mentora-primary) !important;
+}
+
+.swagger-ui .btn.execute:hover {
+    background-color: var(--mentora-secondary) !important;
+    border-color: var(--mentora-secondary) !important;
+}
+
+/* Response Section */
+.swagger-ui .responses-inner h4 {
+    color: var(--mentora-primary);
+}
+
+/* Models Section */
+.swagger-ui .model-box {
+    background-color: var(--mentora-bg);
+}
+
+.swagger-ui section.models h4 {
+    color: var(--mentora-primary);
+    font-weight: bold;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--mentora-primary);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mentora-secondary);
+}
+
+/* Success Responses */
+.swagger-ui .response-col_status {
+    color: var(--mentora-primary) !important;
+    font-weight: bold;
+}
+
+/* Add some spacing */
+.swagger-ui .wrapper {
+    padding: 20px;
+}
+
+/* Footer branding */
+.swagger-ui .information-container:after {
+    content: "Powered by Mentora Team ??";
+    display: block;
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    color: var(--mentora-primary);
+    font-weight: bold;
+    border-top: 2px solid var(--mentora-secondary);
+}

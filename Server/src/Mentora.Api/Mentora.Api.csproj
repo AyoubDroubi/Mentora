@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +16,31 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Mentora.Application\Mentora.Application.csproj" />
     <ProjectReference Include="..\Mentora.Domain\Mentora.Domain.csproj" />
     <ProjectReference Include="..\Mentora.Infrastructure\Mentora.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <!-- Include documentation and utility files in Solution Explorer -->
+  <ItemGroup>
+    <!-- Root README -->
+    <None Include="..\..\README.md" Link="README.md">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    
+    <!-- Documentation folder -->
+    <None Include="..\..\docs\**\*" Link="docs\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    
+    <!-- Scripts folder -->
+    <None Include="..\..\scripts\**\*" Link="scripts\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

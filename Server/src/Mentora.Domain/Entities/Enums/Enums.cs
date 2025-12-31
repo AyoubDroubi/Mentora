@@ -12,6 +12,9 @@
     public enum StepStatus
     { Locked, NotStarted, InProgress, Completed, Skipped }
 
+    public enum CareerStepStatus
+    { NotStarted, InProgress, Completed }
+
     public enum TaskPriority
     { Low, Medium, High }
 
