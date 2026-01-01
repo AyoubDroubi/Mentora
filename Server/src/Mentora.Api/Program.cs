@@ -14,9 +14,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Database Configuration
+// 1. Database Configuration - Support Multiple Providers
+var activeDatabase = builder.Configuration["ActiveDatabase"] ?? "Local";
+var connectionString = builder.Configuration.GetConnectionString(activeDatabase);
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException($"Connection string '{activeDatabase}' not found. Check appsettings.json");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
+
+// Log active database
+Console.WriteLine($"? Using Database: {activeDatabase}");
+Console.WriteLine($"? Connection: {connectionString.Substring(0, Math.Min(50, connectionString.Length))}...");
 
 // 2. Identity Configuration with GUID and BCrypt
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
@@ -113,7 +125,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ? Seed Database with initial data
+// Seed Database with initial data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -131,7 +143,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ? Swagger enabled in ALL environments (Development & Production)
+// Swagger enabled in ALL environments (Development & Production)
 app.UseSwaggerDocumentation();
 
 // Enable static files for custom Swagger CSS
