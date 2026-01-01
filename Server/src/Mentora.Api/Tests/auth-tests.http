@@ -1,12 +1,13 @@
 ### Mentora API - Authentication Tests
 ### Per SRS Module 1: Identity, Authentication & Security
+### UPDATED TO PORT 7000
 
-@baseUrl = https://localhost:7001/api
+@baseUrl = https://localhost:7000/api
 @accessToken = 
 @refreshToken = 
 
 ### 1. Register New User (SRS 1.1)
-POST {{baseUrl}}/auth/register
+POST {{baseUrl}}/Auth/register
 Content-Type: application/json
 
 {

@@ -14,9 +14,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Database Configuration
+// 1. Database Configuration - Support Multiple Providers
+var activeDatabase = builder.Configuration["ActiveDatabase"] ?? "Local";
+var connectionString = builder.Configuration.GetConnectionString(activeDatabase);
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException($"Connection string '{activeDatabase}' not found. Check appsettings.json");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
+
+// Log active database
+Console.WriteLine($"? Using Database: {activeDatabase}");
+Console.WriteLine($"? Connection: {connectionString.Substring(0, Math.Min(50, connectionString.Length))}...");
 
 // 2. Identity Configuration with GUID and BCrypt
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
@@ -71,25 +83,31 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>(); // Module 2: User Profile
 
 // 7. Controllers and API
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Support UTF-8 for Arabic text
+        options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    });
 
 // 8. Swagger Documentation (Always enabled)
 builder.Services.AddSwaggerDocumentation();
 
-// 9. CORS (if needed for frontend)
+// 9. CORS - Updated for port 8000
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:5173",  // Vite default dev server
-                "http://localhost:3000",  // Alternative React dev server
-                "http://localhost:5174",  // Alternative Vite port
+                "http://localhost:8000",   // Main Vite dev server (NEW PORT)
+                "https://localhost:8000",  // HTTPS version
+                "http://localhost:5173",   // Alternative Vite port
+                "http://localhost:3000",   // Alternative React dev server
                 "https://localhost:5173",
-                "https://localhost:3000",
-                "https://localhost:5174"
+                "https://localhost:3000"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -107,7 +125,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ? Seed Database with initial data
+// Seed Database with initial data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -125,7 +143,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ? Swagger enabled in ALL environments (Development & Production)
+// Swagger enabled in ALL environments (Development & Production)
 app.UseSwaggerDocumentation();
 
 // Enable static files for custom Swagger CSS

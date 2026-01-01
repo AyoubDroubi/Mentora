@@ -1,0 +1,315 @@
+### UserProfile Tests - Module 2: User Profile & Personalization
+### Base URL - UPDATED TO PORT 7000
+@baseUrl = https://localhost:7000/api
+@contentType = application/json
+
+### Variables (Update after login)
+@accessToken = your-access-token-here
+
+### ===========================================
+### 1. Get Suggested Timezones (No Auth Required)
+### ===========================================
+GET {{baseUrl}}/UserProfile/timezones
+Content-Type: {{contentType}}
+
+### 2. Get Timezones for Jordan
+GET {{baseUrl}}/UserProfile/timezones?location=Jordan
+Content-Type: {{contentType}}
+
+### 3. Get Timezones for UAE
+GET {{baseUrl}}/UserProfile/timezones?location=UAE
+Content-Type: {{contentType}}
+
+### 4. Validate Timezone - Valid
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Asia/Amman
+Content-Type: {{contentType}}
+
+### 5. Validate Timezone - Invalid
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Invalid/Zone
+Content-Type: {{contentType}}
+
+### ===========================================
+### Authenticated Endpoints (Require Login First)
+### ===========================================
+
+### 6. Login as Saad (Copy accessToken to variable above)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "saad@mentora.com",
+  "password": "Saad@123",
+  "deviceInfo": "UserProfile Tests/Postman"
+}
+
+### 7. Get Current User Profile
+GET {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 8. Check if Profile Exists
+GET {{baseUrl}}/UserProfile/exists
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 9. Get Profile Completion Percentage
+GET {{baseUrl}}/UserProfile/completion
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 10. Update Profile - Complete Update (SRS 2.1.1, 2.1.2, 2.2.1)
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "Passionate Computer Science student focused on Full Stack Development",
+  "location": "Amman, Jordan",
+  "phoneNumber": "+962791234567",
+  "dateOfBirth": "2000-05-15",
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "https://linkedin.com/in/saad-ahmad",
+  "gitHubUrl": "https://github.com/saadahmad",
+  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Saad"
+}
+
+### 11. Update Profile - Partial Update (Only Required Fields)
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Updated University Name",
+  "major": "Software Engineering",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 12. Login as Maria
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "maria@mentora.com",
+  "password": "Maria@123",
+  "deviceInfo": "UserProfile Tests/Postman"
+}
+
+### 13. Get Maria's Profile
+GET {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### 14. Update Maria's Profile with Different Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "Data Science enthusiast with focus on Machine Learning",
+  "location": "Dubai, UAE",
+  "university": "American University of Dubai",
+  "major": "Data Science",
+  "expectedGraduationYear": 2023,
+  "currentLevel": "Graduate",
+  "timezone": "Asia/Dubai"
+}
+
+### ===========================================
+### Validation Tests (Should Return 400 Bad Request)
+### ===========================================
+
+### 15. Invalid Timezone Format
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Test Major",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Freshman",
+  "timezone": "InvalidTimezone"
+}
+
+### 16. Missing Required Field (University)
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Freshman",
+  "timezone": "Asia/Amman"
+}
+
+### 17. Invalid Graduation Year (Too Far in Future)
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2060,
+  "currentLevel": "Freshman",
+  "timezone": "Asia/Amman"
+}
+
+### 18. Invalid URL Format
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Freshman",
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "not-a-valid-url"
+}
+
+### 19. Invalid Study Level
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "InvalidLevel",
+  "timezone": "Asia/Amman"
+}
+
+### ===========================================
+### Test All Study Levels (SRS 2.1.2)
+### ===========================================
+
+### 20. Update to Freshman
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2027,
+  "currentLevel": "Freshman",
+  "timezone": "Asia/Amman"
+}
+
+### 21. Update to Sophomore
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Sophomore",
+  "timezone": "Asia/Amman"
+}
+
+### 22. Update to Junior
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 23. Update to Senior
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "Asia/Amman"
+}
+
+### 24. Update to Graduate
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2023,
+  "currentLevel": "Graduate",
+  "timezone": "Asia/Amman"
+}
+
+### ===========================================
+### Test Different Timezones (SRS 2.2.1)
+### ===========================================
+
+### 25. Middle East Timezones
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "Asia/Riyadh"
+}
+
+### 26. US Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "America/New_York"
+}
+
+### 27. Europe Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "Europe/London"
+}
+
+### 28. Asia Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": "Senior",
+  "timezone": "Asia/Tokyo"
+}
