@@ -32,7 +32,7 @@ namespace Mentora.Api.Controllers
         /// <returns>Registration result with success status</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/register
         ///     {
         ///        "firstName": "أحمد",
@@ -40,7 +40,7 @@ namespace Mentora.Api.Controllers
         ///        "email": "ahmed@example.com",
         ///        "password": "Test@123"
         ///     }
-        /// 
+        ///
         /// Password Requirements (SRS 1.1.1):
         /// - Minimum 8 characters
         /// - At least 1 uppercase letter
@@ -59,10 +59,10 @@ namespace Mentora.Api.Controllers
                 return BadRequest(ModelState);
 
             var result = await _authService.RegisterAsync(dto);
-            
+
             if (!result.IsSuccess)
-                return result.Message == "User already exists" 
-                    ? Conflict(result) 
+                return result.Message == "User already exists"
+                    ? Conflict(result)
                     : BadRequest(result);
 
             return Ok(result);
@@ -75,14 +75,14 @@ namespace Mentora.Api.Controllers
         /// <returns>JWT access token and refresh token</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/login
         ///     {
         ///        "email": "ahmed@example.com",
         ///        "password": "Test@123",
         ///        "deviceInfo": "Chrome/Windows"
         ///     }
-        /// 
+        ///
         /// Returns:
         /// - Access Token: JWT token valid for 60 minutes (SRS 1.2.1)
         /// - Refresh Token: Token valid for 7 days (SRS 1.2.2)
@@ -115,12 +115,12 @@ namespace Mentora.Api.Controllers
         /// <returns>New access token and refresh token</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/refresh-token
         ///     {
         ///        "refreshToken": "your-refresh-token-here"
         ///     }
-        /// 
+        ///
         /// Implements token rotation: old refresh token is revoked and new one is issued (SRS 1.2.2)
         /// </remarks>
         /// <response code="200">Token refreshed successfully</response>
@@ -151,13 +151,13 @@ namespace Mentora.Api.Controllers
         /// <returns>Success message</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/logout
         ///     Authorization: Bearer {your-access-token}
         ///     {
         ///        "refreshToken": "your-refresh-token-here"
         ///     }
-        /// 
+        ///
         /// Revokes the specified refresh token (SRS 1.2.3)
         /// </remarks>
         /// <response code="200">Logout successful</response>
@@ -183,10 +183,10 @@ namespace Mentora.Api.Controllers
         /// <returns>Success message</returns>
         /// <remarks>
         /// Sample request:
-        /// 
-        ///     POST /api/auth/logout-all
+        ///
+        ///     POST /api/Auth/logout-all
         ///     Authorization: Bearer {your-access-token}
-        /// 
+        ///
         /// Revokes all refresh tokens for the current user across all devices (SRS 1.2.3)
         /// </remarks>
         /// <response code="200">Logged out from all devices successfully</response>
@@ -212,12 +212,12 @@ namespace Mentora.Api.Controllers
         /// <returns>Success message</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/forgot-password
         ///     {
         ///        "email": "ahmed@example.com"
         ///     }
-        /// 
+        ///
         /// Always returns success for security reasons (doesn't reveal if email exists).
         /// If email exists, a reset token is generated and stored (SRS 1.2)
         /// </remarks>
@@ -232,7 +232,7 @@ namespace Mentora.Api.Controllers
                 return BadRequest(ModelState);
 
             await _authService.ForgotPasswordAsync(dto);
-            
+
             // Always return success for security (don't reveal user existence)
             return Ok(new { message = "If the email exists, a password reset link has been sent" });
         }
@@ -244,7 +244,7 @@ namespace Mentora.Api.Controllers
         /// <returns>Success or error message</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     POST /api/auth/reset-password
         ///     {
         ///        "email": "ahmed@example.com",
@@ -252,7 +252,7 @@ namespace Mentora.Api.Controllers
         ///        "newPassword": "NewPass@123",
         ///        "confirmPassword": "NewPass@123"
         ///     }
-        /// 
+        ///
         /// Token is valid for 1 hour. After successful reset, all refresh tokens are revoked (SRS 1.2)
         /// </remarks>
         /// <response code="200">Password reset successfully</response>
@@ -279,10 +279,10 @@ namespace Mentora.Api.Controllers
         /// <returns>User information from JWT token claims</returns>
         /// <remarks>
         /// Sample request:
-        /// 
+        ///
         ///     GET /api/auth/me
         ///     Authorization: Bearer {your-access-token}
-        /// 
+        ///
         /// Returns user information extracted from the JWT token
         /// </remarks>
         /// <response code="200">User information retrieved successfully</response>
