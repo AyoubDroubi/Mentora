@@ -157,8 +157,8 @@ namespace Mentora.Infrastructure.Data
                 UserName = "saad@mentora.com",
                 Email = "saad@mentora.com",
                 EmailConfirmed = true,
-                FirstName = "???",
-                LastName = "??????",
+                FirstName = "Saad",
+                LastName = "Ahmad",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow.AddMonths(-2)
             };

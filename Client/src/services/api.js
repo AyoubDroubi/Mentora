@@ -1,13 +1,15 @@
 import axios from 'axios';
 
-// API Base URL - Update this based on your backend URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7263/api';
+// API Base URL - Updated to port 7000
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7000/api';
 
 // Create axios instance with default config
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json',
+        'Accept-Language': 'en,ar'
     },
     timeout: 10000, // 10 seconds timeout
 });

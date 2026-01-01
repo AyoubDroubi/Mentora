@@ -1,6 +1,6 @@
 ### UserProfile Tests - Module 2: User Profile & Personalization
-### Base URL
-@baseUrl = https://localhost:7001/api
+### Base URL - UPDATED TO PORT 7000
+@baseUrl = https://localhost:7000/api
 @contentType = application/json
 
 ### Variables (Update after login)
@@ -9,23 +9,23 @@
 ### ===========================================
 ### 1. Get Suggested Timezones (No Auth Required)
 ### ===========================================
-GET {{baseUrl}}/userprofile/timezones
+GET {{baseUrl}}/UserProfile/timezones
 Content-Type: {{contentType}}
 
 ### 2. Get Timezones for Jordan
-GET {{baseUrl}}/userprofile/timezones?location=Jordan
+GET {{baseUrl}}/UserProfile/timezones?location=Jordan
 Content-Type: {{contentType}}
 
 ### 3. Get Timezones for UAE
-GET {{baseUrl}}/userprofile/timezones?location=UAE
+GET {{baseUrl}}/UserProfile/timezones?location=UAE
 Content-Type: {{contentType}}
 
 ### 4. Validate Timezone - Valid
-GET {{baseUrl}}/userprofile/validate-timezone?timezone=Asia/Amman
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Asia/Amman
 Content-Type: {{contentType}}
 
 ### 5. Validate Timezone - Invalid
-GET {{baseUrl}}/userprofile/validate-timezone?timezone=Invalid/Zone
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Invalid/Zone
 Content-Type: {{contentType}}
 
 ### ===========================================
@@ -43,22 +43,22 @@ Content-Type: {{contentType}}
 }
 
 ### 7. Get Current User Profile
-GET {{baseUrl}}/userprofile
+GET {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 ### 8. Check if Profile Exists
-GET {{baseUrl}}/userprofile/exists
+GET {{baseUrl}}/UserProfile/exists
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 ### 9. Get Profile Completion Percentage
-GET {{baseUrl}}/userprofile/completion
+GET {{baseUrl}}/UserProfile/completion
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 ### 10. Update Profile - Complete Update (SRS 2.1.1, 2.1.2, 2.2.1)
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -78,7 +78,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 11. Update Profile - Partial Update (Only Required Fields)
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -101,12 +101,12 @@ Content-Type: {{contentType}}
 }
 
 ### 13. Get Maria's Profile
-GET {{baseUrl}}/userprofile
+GET {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
 ### 14. Update Maria's Profile with Different Timezone
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -125,7 +125,7 @@ Authorization: Bearer {{accessToken}}
 ### ===========================================
 
 ### 15. Invalid Timezone Format
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -138,7 +138,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 16. Missing Required Field (University)
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -150,7 +150,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 17. Invalid Graduation Year (Too Far in Future)
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -163,7 +163,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 18. Invalid URL Format
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -177,7 +177,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 19. Invalid Study Level
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -194,7 +194,7 @@ Authorization: Bearer {{accessToken}}
 ### ===========================================
 
 ### 20. Update to Freshman
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -207,7 +207,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 21. Update to Sophomore
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -220,7 +220,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 22. Update to Junior
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -233,7 +233,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 23. Update to Senior
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -246,7 +246,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 24. Update to Graduate
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -263,7 +263,7 @@ Authorization: Bearer {{accessToken}}
 ### ===========================================
 
 ### 25. Middle East Timezones
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -276,7 +276,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 26. US Timezone
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -289,7 +289,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 27. Europe Timezone
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
@@ -302,7 +302,7 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### 28. Asia Timezone
-PUT {{baseUrl}}/userprofile
+PUT {{baseUrl}}/UserProfile
 Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 

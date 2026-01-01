@@ -1,0 +1,109 @@
+### Profile Update - Quick Test
+### Test Arabic Text Support
+@baseUrl = https://localhost:7000/api
+@accessToken = your-token-here
+
+### 1. Login First
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "saad@mentora.com",
+  "password": "Saad@123",
+  "deviceInfo": "Test"
+}
+
+### 2. Test with English Only
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "Passionate Computer Science student",
+  "location": "Amman, Jordan",
+  "phoneNumber": "+962791234567",
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 3. Test with Arabic Text
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "???? ???? ????? ???? ???????",
+  "location": "?????? ??????",
+  "phoneNumber": "+962791234567",
+  "university": "??????? ????????",
+  "major": "???? ???????",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 4. Test with Mixed (English + Arabic)
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "CS Student | ???? ???? ?????",
+  "location": "Amman - ?????",
+  "phoneNumber": "+962791234567",
+  "university": "University of Jordan - ??????? ????????",
+  "major": "Computer Science - ???? ???????",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "https://linkedin.com/in/test",
+  "gitHubUrl": "https://github.com/test"
+}
+
+### 5. Test with UTC Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "Test user",
+  "location": "Test City",
+  "university": "Test University",
+  "major": "Test Major",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Freshman",
+  "timezone": "UTC"
+}
+
+### 6. Get Profile (Verify Arabic Text)
+GET {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+
+### 7. Test Validation Error (Missing Required Field)
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "bio": "Test",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 8. Test Invalid Timezone
+PUT {{baseUrl}}/UserProfile
+Content-Type: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{
+  "university": "Test University",
+  "major": "Test Major",
+  "expectedGraduationYear": 2025,
+  "currentLevel": "Junior",
+  "timezone": "Invalid/Timezone"
+}

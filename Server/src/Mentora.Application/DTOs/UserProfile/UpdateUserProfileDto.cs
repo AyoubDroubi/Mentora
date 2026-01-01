@@ -37,9 +37,10 @@ namespace Mentora.Application.DTOs.UserProfile
         public StudyLevel CurrentLevel { get; set; }
 
         // Timezone per SRS 2.2.1
+        // Accept UTC or IANA format (e.g., Asia/Amman, America/New_York)
         [Required(ErrorMessage = "Timezone is required")]
-        [RegularExpression(@"^[A-Za-z_]+/[A-Za-z_]+$", 
-            ErrorMessage = "Timezone must be in IANA format (e.g., Asia/Amman)")]
+        [RegularExpression(@"^(UTC|[A-Za-z_]+/[A-Za-z_]+)$", 
+            ErrorMessage = "Timezone must be UTC or in IANA format (e.g., Asia/Amman)")]
         public string Timezone { get; set; } = "UTC";
 
         // Social Links

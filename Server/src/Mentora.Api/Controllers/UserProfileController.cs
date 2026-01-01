@@ -91,7 +91,7 @@ namespace Mentora.Api.Controllers
         /// - CurrentLevel: Freshman, Sophomore, Junior, Senior, or Graduate
         ///
         /// Timezone (SRS 2.2.1):
-        /// - IANA format required (e.g., Asia/Amman, America/New_York)
+        /// - IANA format required (e.g., Asia/Amman, America/New_York) or UTC
         /// - Used for notification and schedule synchronization
         /// </remarks>
         /// <response code="200">Profile updated successfully</response>
@@ -104,7 +104,20 @@ namespace Mentora.Api.Controllers
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                
+                return BadRequest(new 
+                { 
+                    message = "Validation failed",
+                    errors = errors
+                });
+            }
 
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
@@ -118,6 +131,10 @@ namespace Mentora.Api.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating profile", details = ex.Message });
             }
         }
 
