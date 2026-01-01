@@ -178,8 +178,15 @@ namespace Mentora.Infrastructure.Data
                 Location = "?????? ??????",
                 PhoneNumber = "+962791234567",
                 DateOfBirth = new DateTime(2000, 5, 15),
+                // Academic Attributes per SRS 2.1.1
                 University = "??????? ????????",
                 Major = "???? ???????",
+                ExpectedGraduationYear = 2024,
+                // Study Level per SRS 2.1.2
+                CurrentLevel = StudyLevel.Senior,
+                // Timezone per SRS 2.2.1
+                Timezone = "Asia/Amman",
+                // Social Links
                 GraduationYear = 2024,
                 LinkedInUrl = "https://linkedin.com/in/saad-ahmad",
                 GitHubUrl = "https://github.com/saadahmad"
@@ -358,8 +365,15 @@ namespace Mentora.Infrastructure.Data
                 Location = "???? ????????",
                 PhoneNumber = "+971501234567",
                 DateOfBirth = new DateTime(1999, 8, 20),
+                // Academic Attributes per SRS 2.1.1
                 University = "??????? ????????? ?? ???",
                 Major = "????? ?????????",
+                ExpectedGraduationYear = 2023,
+                // Study Level per SRS 2.1.2
+                CurrentLevel = StudyLevel.Graduate,
+                // Timezone per SRS 2.2.1
+                Timezone = "Asia/Dubai",
+                // Social Links
                 GraduationYear = 2023,
                 LinkedInUrl = "https://linkedin.com/in/maria-haddad",
                 GitHubUrl = "https://github.com/mariahaddad"

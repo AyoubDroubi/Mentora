@@ -71,6 +71,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>(); // Module 2: User Profile
 
 // 7. Controllers and API
 builder.Services.AddControllers();
