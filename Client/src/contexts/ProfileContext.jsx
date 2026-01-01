@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import userProfileService from '../services/userProfileService';
 import { useAuth } from './AuthContext';
 
@@ -23,9 +23,8 @@ export const ProfileProvider = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated) {
       loadProfile();
-      checkProfileExists();
     } else {
-      // Clear profile on logout
+      // Clear state on logout
       setProfile(null);
       setHasProfile(false);
       setCompletion(0);
@@ -33,17 +32,21 @@ export const ProfileProvider = ({ children }) => {
   }, [isAuthenticated]);
 
   /**
-   * Load user profile from API
+   * Load user profile
    */
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       const profileData = await userProfileService.getProfile();
-      setProfile(profileData);
       
       if (profileData) {
+        setProfile(profileData);
         setHasProfile(true);
         await loadCompletion();
+      } else {
+        setProfile(null);
+        setHasProfile(false);
+        setCompletion(0);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -52,22 +55,10 @@ export const ProfileProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   /**
-   * Check if profile exists
-   */
-  const checkProfileExists = async () => {
-    try {
-      const exists = await userProfileService.hasProfile();
-      setHasProfile(exists);
-    } catch (error) {
-      console.error('Error checking profile:', error);
-    }
-  };
-
-  /**
-   * Load profile completion percentage
+   * Load completion percentage
    */
   const loadCompletion = async () => {
     try {
@@ -79,22 +70,50 @@ export const ProfileProvider = ({ children }) => {
   };
 
   /**
-   * Update user profile
-   * @param {Object} profileData - Profile data to update
+   * Update profile with proper error handling
    */
   const updateProfile = async (profileData) => {
     try {
       setLoading(true);
       const updatedProfile = await userProfileService.updateProfile(profileData);
+      
       setProfile(updatedProfile);
       setHasProfile(true);
       await loadCompletion();
+      
       return { success: true, data: updatedProfile };
     } catch (error) {
-      console.error('Error updating profile:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Failed to update profile' 
+      // Extract error details
+      const errorData = error.response?.data;
+      let errorMessage = 'Failed to update profile';
+      let validationErrors = null;
+
+      if (errorData) {
+        if (errorData.errors) {
+          // Format validation errors
+          validationErrors = errorData.errors;
+          const errorList = Object.entries(errorData.errors)
+            .map(([field, messages]) => {
+              const msgs = Array.isArray(messages) ? messages : [messages];
+              return `${field}: ${msgs.join(', ')}`;
+            })
+            .join('\n');
+          errorMessage = `Validation failed:\n${errorList}`;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      }
+
+      console.error('Error updating profile:', {
+        message: errorMessage,
+        validationErrors,
+        originalError: error
+      });
+
+      return {
+        success: false,
+        error: errorMessage,
+        validationErrors
       };
     } finally {
       setLoading(false);
@@ -102,21 +121,19 @@ export const ProfileProvider = ({ children }) => {
   };
 
   /**
-   * Get suggested timezones
-   * @param {string} location - Optional location
+   * Get timezones
    */
   const getTimezones = async (location = null) => {
     try {
       return await userProfileService.getTimezones(location);
     } catch (error) {
       console.error('Error getting timezones:', error);
-      return [];
+      return ['UTC', 'Asia/Amman'];
     }
   };
 
   /**
    * Validate timezone
-   * @param {string} timezone - Timezone to validate
    */
   const validateTimezone = async (timezone) => {
     try {
@@ -127,23 +144,15 @@ export const ProfileProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Refresh profile data
-   */
-  const refreshProfile = async () => {
-    await loadProfile();
-  };
-
   const value = {
     profile,
     loading,
     completion,
     hasProfile,
     updateProfile,
-    refreshProfile,
+    refreshProfile: loadProfile,
     getTimezones,
     validateTimezone,
-    // Helper getters
     needsOnboarding: isAuthenticated && !hasProfile,
     isProfileComplete: completion === 100,
   };

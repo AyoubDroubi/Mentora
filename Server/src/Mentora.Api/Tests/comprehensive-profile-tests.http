@@ -1,0 +1,622 @@
+###############################################
+# Comprehensive User Profile Tests
+# Testing all scenarios: Success, Validation, Edge Cases
+###############################################
+
+### Variables
+@baseUrl = https://localhost:7000/api
+@contentType = application/json; charset=utf-8
+
+### Step 1: Register New User
+# POST {{baseUrl}}/Auth/register
+POST {{baseUrl}}/Auth/register
+Content-Type: {{contentType}}
+
+{
+  "firstName": "????",
+  "lastName": "????",
+  "email": "test.profile@mentora.com",
+  "password": "Test@123456",
+  "confirmPassword": "Test@123456"
+}
+
+### Step 2: Login
+# POST {{baseUrl}}/Auth/login
+POST {{baseUrl}}/Auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test.profile@mentora.com",
+  "password": "Test@123456",
+  "deviceInfo": "Postman/Windows"
+}
+
+### Save the access token from response
+# Copy accessToken from the response above and paste it below
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+###############################################
+# Test Group 1: Profile Retrieval
+###############################################
+
+### Test 1.1: Get Profile (Should be 404 - Not Found)
+# GET {{baseUrl}}/UserProfile
+GET {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+
+### Test 1.2: Check Profile Exists (Should return false)
+# GET {{baseUrl}}/UserProfile/exists
+GET {{baseUrl}}/UserProfile/exists
+Authorization: Bearer {{accessToken}}
+
+### Test 1.3: Get Profile Completion (Should return 0%)
+# GET {{baseUrl}}/UserProfile/completion
+GET {{baseUrl}}/UserProfile/completion
+Authorization: Bearer {{accessToken}}
+
+###############################################
+# Test Group 2: Valid Profile Creation
+###############################################
+
+### Test 2.1: Create Complete Profile (All Fields - Should Succeed)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "bio": "???? ???? ????? ???? ???????? ??????? ?????????",
+  "location": "????? ??????",
+  "phoneNumber": "+962791234567",
+  "dateOfBirth": "2000-05-15",
+  "university": "??????? ????????",
+  "major": "???? ???????",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "https://linkedin.com/in/test-user",
+  "gitHubUrl": "https://github.com/test-user"
+}
+
+### Test 2.2: Create Minimal Profile (Required Fields Only - Should Succeed)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 2.3: Create Profile with Arabic Text (Should Succeed)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "bio": "???? ?????? ????????? ????????? ??????? ??",
+  "location": "??????? ??????? ??????? ????????",
+  "university": "????? ????? ????",
+  "major": "????? ?????????",
+  "expectedGraduationYear": 2025,
+  "currentLevel": 3,
+  "timezone": "Asia/Riyadh"
+}
+
+###############################################
+# Test Group 3: Profile Updates
+###############################################
+
+### Test 3.1: Update Profile (Partial Update - Should Succeed)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "bio": "Updated bio with new information",
+  "university": "Updated University",
+  "major": "Updated Major",
+  "expectedGraduationYear": 2027,
+  "currentLevel": 3,
+  "timezone": "Europe/London"
+}
+
+### Test 3.2: Update Study Level (Should Succeed)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Test Major",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 4,
+  "timezone": "UTC"
+}
+
+###############################################
+# Test Group 4: Validation Tests (Should Fail)
+###############################################
+
+### Test 4.1: Missing University (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.2: Missing Major (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.3: Invalid Graduation Year - Too Low (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2020,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.4: Invalid Graduation Year - Too High (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2055,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.5: Invalid Study Level - Too Low (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": -1,
+  "timezone": "UTC"
+}
+
+### Test 4.6: Invalid Study Level - Too High (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 5,
+  "timezone": "UTC"
+}
+
+### Test 4.7: Invalid Timezone (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "Invalid/Timezone"
+}
+
+### Test 4.8: Empty Timezone (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": ""
+}
+
+### Test 4.9: Invalid Phone Number Format (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "phoneNumber": "123-456-7890",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.10: Invalid LinkedIn URL (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "linkedInUrl": "not-a-valid-url",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.11: Invalid GitHub URL (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "gitHubUrl": "github.com/user",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.12: University Too Short (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "A",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 4.13: Bio Too Long (Should Return 400)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+###############################################
+# Test Group 5: Edge Cases
+###############################################
+
+### Test 5.1: All Study Levels - Freshman (0)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2028,
+  "currentLevel": 0,
+  "timezone": "UTC"
+}
+
+### Test 5.2: All Study Levels - Sophomore (1)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2027,
+  "currentLevel": 1,
+  "timezone": "UTC"
+}
+
+### Test 5.3: All Study Levels - Junior (2)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 5.4: All Study Levels - Senior (3)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2025,
+  "currentLevel": 3,
+  "timezone": "UTC"
+}
+
+### Test 5.5: All Study Levels - Graduate (4)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": 4,
+  "timezone": "UTC"
+}
+
+### Test 5.6: Minimum Valid Graduation Year (2024)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2024,
+  "currentLevel": 4,
+  "timezone": "UTC"
+}
+
+### Test 5.7: Maximum Valid Graduation Year (2050)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2050,
+  "currentLevel": 0,
+  "timezone": "UTC"
+}
+
+### Test 5.8: Various Timezones - Middle East
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "Asia/Dubai"
+}
+
+### Test 5.9: Various Timezones - Europe
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "Europe/Paris"
+}
+
+### Test 5.10: Various Timezones - Americas
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "America/New_York"
+}
+
+### Test 5.11: Valid Phone Formats
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "phoneNumber": "+962791234567",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 5.12: Special Characters in Bio
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "bio": "Passionate about tech ?? | AI enthusiast ?? | Full-stack developer ??",
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+###############################################
+# Test Group 6: Profile Retrieval After Creation
+###############################################
+
+### Test 6.1: Get Profile (Should Return 200 with Data)
+# GET {{baseUrl}}/UserProfile
+GET {{baseUrl}}/UserProfile
+Authorization: Bearer {{accessToken}}
+
+### Test 6.2: Check Profile Exists (Should Return true)
+# GET {{baseUrl}}/UserProfile/exists
+GET {{baseUrl}}/UserProfile/exists
+Authorization: Bearer {{accessToken}}
+
+### Test 6.3: Get Profile Completion (Should Return > 0%)
+# GET {{baseUrl}}/UserProfile/completion
+GET {{baseUrl}}/UserProfile/completion
+Authorization: Bearer {{accessToken}}
+
+###############################################
+# Test Group 7: Timezone Utilities
+###############################################
+
+### Test 7.1: Get All Timezones
+# GET {{baseUrl}}/UserProfile/timezones
+GET {{baseUrl}}/UserProfile/timezones
+
+### Test 7.2: Get Timezones for Jordan
+# GET {{baseUrl}}/UserProfile/timezones?location=Jordan
+GET {{baseUrl}}/UserProfile/timezones?location=Jordan
+
+### Test 7.3: Get Timezones for Saudi Arabia
+# GET {{baseUrl}}/UserProfile/timezones?location=Saudi
+GET {{baseUrl}}/UserProfile/timezones?location=Saudi
+
+### Test 7.4: Get Timezones for UAE
+# GET {{baseUrl}}/UserProfile/timezones?location=Dubai
+GET {{baseUrl}}/UserProfile/timezones?location=Dubai
+
+### Test 7.5: Get Timezones for USA
+# GET {{baseUrl}}/UserProfile/timezones?location=USA
+GET {{baseUrl}}/UserProfile/timezones?location=USA
+
+### Test 7.6: Get Timezones for UK
+# GET {{baseUrl}}/UserProfile/timezones?location=London
+GET {{baseUrl}}/UserProfile/timezones?location=London
+
+### Test 7.7: Validate Valid Timezone
+# GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Asia/Amman
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Asia/Amman
+
+### Test 7.8: Validate Invalid Timezone
+# GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Invalid/Timezone
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=Invalid/Timezone
+
+### Test 7.9: Validate UTC
+# GET {{baseUrl}}/UserProfile/validate-timezone?timezone=UTC
+GET {{baseUrl}}/UserProfile/validate-timezone?timezone=UTC
+
+###############################################
+# Test Group 8: Authorization Tests
+###############################################
+
+### Test 8.1: Get Profile Without Token (Should Return 401)
+# GET {{baseUrl}}/UserProfile
+GET {{baseUrl}}/UserProfile
+
+### Test 8.2: Update Profile Without Token (Should Return 401)
+# PUT {{baseUrl}}/UserProfile
+PUT {{baseUrl}}/UserProfile
+Content-Type: {{contentType}}
+
+{
+  "university": "Test University",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "UTC"
+}
+
+### Test 8.3: Get Profile with Invalid Token (Should Return 401)
+# GET {{baseUrl}}/UserProfile
+GET {{baseUrl}}/UserProfile
+Authorization: Bearer invalid.token.here
+
+###############################################
+# Test Results Summary
+###############################################
+
+### Expected Results:
+# Group 1 (Profile Retrieval - Before Creation):
+#   - All should return 404 or empty results
+#
+# Group 2 (Valid Profile Creation):
+#   - All should return 200 OK with profile data
+#
+# Group 3 (Profile Updates):
+#   - All should return 200 OK with updated data
+#
+# Group 4 (Validation Tests):
+#   - All should return 400 Bad Request with error details
+#
+# Group 5 (Edge Cases):
+#   - All should return 200 OK
+#
+# Group 6 (Profile Retrieval - After Creation):
+#   - All should return 200 OK with data
+#
+# Group 7 (Timezone Utilities):
+#   - All should return 200 OK with timezone lists/validation
+#
+# Group 8 (Authorization Tests):
+#   - All should return 401 Unauthorized
+
+###############################################
+# End of Comprehensive Tests
+###############################################
