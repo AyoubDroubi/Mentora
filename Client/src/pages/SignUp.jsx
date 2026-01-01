@@ -63,6 +63,7 @@ export default function SignUp() {
           lastName,
           email,
           password,
+          confirmPassword,
         });
 
         if (result.success) {

@@ -1,0 +1,68 @@
+### Update Profile - Full Test
+PUT https://localhost:7000/api/UserProfile
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "bio": "Passionate Computer Science student",
+  "location": "Amman, Jordan",
+  "phoneNumber": "+962791234567",
+  "dateOfBirth": "2000-01-15",
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 2,
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "https://linkedin.com/in/username",
+  "gitHubUrl": "https://github.com/username"
+}
+
+### Update Profile - String Level (should work too)
+PUT https://localhost:7000/api/UserProfile
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### Update Profile - Minimal Required
+PUT https://localhost:7000/api/UserProfile
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": 0,
+  "timezone": "UTC"
+}
+
+### Validate Timezone - Valid
+GET https://localhost:7000/api/UserProfile/validate-timezone?timezone=Asia/Amman
+
+### Validate Timezone - Invalid
+GET https://localhost:7000/api/UserProfile/validate-timezone?timezone=Invalid/Timezone
+
+### Get Timezones - No Location
+GET https://localhost:7000/api/UserProfile/timezones
+
+### Get Timezones - With Location
+GET https://localhost:7000/api/UserProfile/timezones?location=Jordan
+
+### Get Profile
+GET https://localhost:7000/api/UserProfile
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Check Profile Exists
+GET https://localhost:7000/api/UserProfile/exists
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Get Completion
+GET https://localhost:7000/api/UserProfile/completion
+Authorization: Bearer YOUR_TOKEN_HERE

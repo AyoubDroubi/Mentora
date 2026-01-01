@@ -1,0 +1,349 @@
+Software Requirements (SWR)
+Study Planner Module
+
+1. Overview
+The Study Planner module provides tools that help users organize, track, and improve their study habits. It
+consists of six core features: Pomodoro Timer, ToDo List, Planner (Calendar & Events), Attendance &
+Overall Progress, Notes, and Study Quiz.
+
+2. General Rules
+All endpoints require JWT authentication. Data is user-scoped, persisted using GUIDs, and timestamps
+are stored in UTC.
+
+3. Pomodoro Timer
+Completed Pomodoro sessions are stored in the database and used to calculate total studied time.
+Studied time is aggregated in minutes and displayed as hours and minutes (e.g., 124h 15m).
+
+4. ToDo List
+Users can create, complete, filter, and delete ToDo items. Tasks are stored per user and reflected
+immediately in progress calculations.
+
+5. Planner (Calendar & Events)
+Users can create events with a title and date/time, view events by calendar day, see upcoming events, and
+mark events as attended.
+
+6. Attendance & Progress
+Overall progress (0–100%) is calculated based on completed ToDo tasks (50%) and attended planner
+events (50%).
+
+7. Notes
+Users can create, view, and delete personal study notes which are stored persistently.
+
+8. Study Quiz
+A diagnostic quiz helps understand user study behavior and generates a personalized study plan based on
+answers.
+
+9. Backend Summary
+The backend must implement persistence, aggregation logic, JWT scoping, and clean APIs for all Study
+Planner features.
+
+
+
+
+
+-------------
+
+Software Requirements (SWR)
+Module: Study Planner
+1. Overview
+
+The Study Planner module provides tools that help users organize, track, and improve their study habits.
+It consists of six core features:
+
+Pomodoro Timer
+
+ToDo List
+
+Planner (Calendar & Events)
+
+Attendance & Overall Progress Percentage
+
+Notes
+
+Study Quiz (Diagnostic)
+
+All features are user-specific, persisted in the database, and accessed through authenticated APIs.
+
+2. General Rules (Applies to All Features)
+2.1 Authentication
+
+All endpoints must require JWT authentication.
+
+UserId must be extracted from the token.
+
+Users may only access their own data.
+
+2.2 Data & Persistence
+
+All entities use GUID as primary key.
+
+Store timestamps in UTC.
+
+Soft delete (IsDeleted) is recommended for user-generated content.
+
+3. Feature 1 — Pomodoro Timer (Study Sessions)
+3.1 Objective
+
+Allow users to study using a Pomodoro timer and track total studied time based on completed sessions.
+
+3.2 Functional Requirements
+
+FR-PT-01
+The system shall allow the user to start a Pomodoro session.
+
+FR-PT-02
+When a session is completed, the system shall store a Study Session record in the database.
+
+FR-PT-03
+Only completed sessions shall contribute to the total studied time.
+
+FR-PT-04
+Cancelled or interrupted sessions shall not be counted.
+
+FR-PT-05
+Studied time shall be calculated in minutes, aggregated across all completed sessions.
+
+FR-PT-06
+The total studied time shall be displayed as:
+{hours}h {minutes}m
+Example: 124h 15m
+
+3.3 Data Model — StudySession
+Field	Type
+Id	Guid
+UserId	Guid
+DurationMinutes	int
+CreatedAtUtc	DateTime
+3.4 API Endpoints
+
+POST /api/study-sessions
+Saves a completed Pomodoro session.
+
+GET /api/study-sessions/summary
+Returns:
+
+{
+  "totalMinutes": 7455,
+  "formatted": "124h 15m"
+}
+
+3.5 Acceptance Criteria
+
+Completing a Pomodoro session updates the studied time on the Study Planner main page.
+
+Studied time persists across refresh and login sessions.
+
+4. Feature 2 — ToDo List
+4.1 Objective
+
+Allow users to manage a personal task list.
+
+4.2 Functional Requirements
+
+FR-TD-01
+The system shall allow users to create ToDo items.
+
+FR-TD-02
+Each ToDo item shall be displayed with a checkbox.
+
+FR-TD-03
+Users shall be able to mark ToDo items as completed.
+
+FR-TD-04
+Users shall be able to filter ToDo items by:
+
+All
+
+Active
+
+Completed
+
+FR-TD-05
+Users shall be able to delete ToDo items, which removes them from the database.
+
+4.3 Data Model — TodoItem
+Field	Type
+Id	Guid
+UserId	Guid
+Title	string
+IsCompleted	bool
+CreatedAtUtc	DateTime
+IsDeleted	bool
+4.4 API Endpoints
+
+POST /api/todos
+
+GET /api/todos?filter=all|active|completed
+
+PATCH /api/todos/{id}
+
+DELETE /api/todos/{id}
+
+5. Feature 3 — Planner (Calendar & Events)
+5.1 Objective
+
+Allow users to plan and view study-related events using a calendar.
+
+5.2 Functional Requirements
+
+FR-PL-01
+The system shall allow users to create events with:
+
+Title
+
+Date & Time
+
+FR-PL-02
+Events shall be stored and retrieved from the database.
+
+FR-PL-03
+Clicking a day in the calendar shall display events for that day.
+
+FR-PL-04
+An “Upcoming Events” list shall display all future events.
+
+FR-PL-05
+Users shall be able to mark an event as Attended.
+
+FR-PL-06
+Attended events shall contribute to the overall progress percentage.
+
+5.3 Data Model — PlannerEvent
+Field	Type
+Id	Guid
+UserId	Guid
+Title	string
+EventDateTimeUtc	DateTime
+IsAttended	bool
+IsDeleted	bool
+5.4 API Endpoints
+
+POST /api/planner/events
+
+GET /api/planner/events?date=YYYY-MM-DD
+
+GET /api/planner/events/upcoming
+
+PATCH /api/planner/events/{id}/attend
+
+DELETE /api/planner/events/{id}
+
+6. Feature 4 — Attendance & Overall Progress Percentage
+6.1 Objective
+
+Provide a summary of user activity and display an overall progress percentage (0–100).
+
+6.2 Progress Calculation Logic
+
+Completed ToDo Tasks ? 50%
+
+Attended Planner Events ? 50%
+
+progress =
+round(
+  (completedTasks / totalTasks) * 50 +
+  (attendedEvents / totalPastEvents) * 50
+)
+
+6.3 Functional Requirements
+
+FR-AT-01
+The system shall calculate progress as an integer between 0 and 100.
+
+FR-AT-02
+Progress shall update immediately when:
+
+A task is completed
+
+An event is marked as attended
+
+6.4 API Endpoint
+
+GET /api/study-planner/attendance/summary
+
+Returns:
+
+{
+  "totalTasks": 10,
+  "completedTasks": 6,
+  "totalEvents": 4,
+  "attendedEvents": 3,
+  "progressPercentage": 70
+}
+
+7. Feature 5 — Notes
+7.1 Objective
+
+Allow users to save personal study notes.
+
+7.2 Functional Requirements
+
+FR-NO-01
+Users shall be able to create notes with a title and content.
+
+FR-NO-02
+Users shall be able to view all saved notes.
+
+FR-NO-03
+Users shall be able to delete notes.
+
+7.3 Data Model — UserNote
+Field	Type
+Id	Guid
+UserId	Guid
+Title	string
+Content	string
+CreatedAtUtc	DateTime
+IsDeleted	bool
+7.4 API Endpoints
+
+POST /api/notes
+
+GET /api/notes
+
+GET /api/notes/{id}
+
+DELETE /api/notes/{id}
+
+8. Feature 6 — Study Quiz (Diagnostic)
+8.1 Objective
+
+Understand the user’s study habits and provide a personalized study plan.
+
+8.2 Functional Requirements
+
+FR-QZ-01
+The quiz shall consist of standardized questions (same for all users).
+
+FR-QZ-02
+Quiz answers shall be saved in the database.
+
+FR-QZ-03
+Based on the answers, the system shall generate a personalized study plan.
+
+8.3 Data Model — StudyQuizAttempt
+Field	Type
+Id	Guid
+UserId	Guid
+AnswersJson	string
+GeneratedPlan	string
+CreatedAtUtc	DateTime
+8.4 API Endpoints
+
+GET /api/study-quiz/questions
+
+POST /api/study-quiz/submit
+
+GET /api/study-quiz/latest
+
+9. Summary for Senior Backend Developer
+
+This module requires:
+
+New entities: TodoItem, PlannerEvent, UserNote, StudyQuizAttempt
+
+Aggregation logic for studied time and progress percentage
+
+JWT-based user scoping on all queries
+
+Clear separation between tracking (Timer/ToDo/Event) and analytics (Progress)

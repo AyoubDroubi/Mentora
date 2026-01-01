@@ -2,12 +2,11 @@ using Mentora.Application.DTOs.UserProfile;
 using Mentora.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Mentora.Api.Controllers
 {
     /// <summary>
-    /// User Profile Management API
+    /// User Profile Management API - Professional implementation
     /// Implements SRS Module 2: User Profile & Personalization
     /// </summary>
     [Route("api/[controller]")]
@@ -17,10 +16,12 @@ namespace Mentora.Api.Controllers
     public class UserProfileController : ControllerBase
     {
         private readonly IUserProfileService _profileService;
+        private readonly ILogger<UserProfileController> _logger;
 
-        public UserProfileController(IUserProfileService profileService)
+        public UserProfileController(IUserProfileService profileService, ILogger<UserProfileController> logger)
         {
             _profileService = profileService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -49,12 +50,12 @@ namespace Mentora.Api.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized();
+                return Unauthorized(new { message = "User not authenticated" });
 
             var profile = await _profileService.GetProfileAsync(userId);
 
             if (profile == null)
-                return NotFound(new { message = "Profile not found" });
+                return NotFound(new { message = "Profile not found. Please complete your profile." });
 
             return Ok(profile);
         }
@@ -88,7 +89,7 @@ namespace Mentora.Api.Controllers
         /// - ExpectedGraduationYear: Required, 2024-2050
         ///
         /// Study Level (SRS 2.1.2):
-        /// - CurrentLevel: Freshman, Sophomore, Junior, Senior, or Graduate
+        /// - CurrentLevel: Freshman, Sophomore, Junior, Senior, or Graduate (can be string or int)
         ///
         /// Timezone (SRS 2.2.1):
         /// - IANA format required (e.g., Asia/Amman, America/New_York) or UTC
@@ -103,38 +104,72 @@ namespace Mentora.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto dto)
         {
+            // Check authentication
+            var userId = GetCurrentUserId();
+            if (userId == Guid.Empty)
+                return Unauthorized(new { message = "User not authenticated" });
+
+            // Validate model
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
                     .Where(x => x.Value?.Errors.Count > 0)
                     .ToDictionary(
                         kvp => kvp.Key,
-                        kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+                        kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
                     );
-                
-                return BadRequest(new 
-                { 
+
+                _logger.LogWarning(
+                    "Profile update validation failed for user {UserId}. Errors: {@Errors}",
+                    userId,
+                    errors
+                );
+
+                return BadRequest(new
+                {
                     message = "Validation failed",
                     errors = errors
                 });
             }
 
-            var userId = GetCurrentUserId();
-            if (userId == Guid.Empty)
-                return Unauthorized();
+            // Additional timezone validation
+            if (!_profileService.IsValidTimezone(dto.Timezone))
+            {
+                return BadRequest(new
+                {
+                    message = "Validation failed",
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Timezone"] = new[] { $"Invalid timezone '{dto.Timezone}'. Use IANA format (e.g., Asia/Amman, UTC)." }
+                    }
+                });
+            }
 
             try
             {
                 var profile = await _profileService.CreateOrUpdateProfileAsync(userId, dto);
+                _logger.LogInformation("Profile updated successfully for user {UserId}", userId);
                 return Ok(profile);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogWarning(ex, "Validation error for user {UserId}", userId);
+                return BadRequest(new
+                {
+                    message = "Validation error",
+                    errors = new Dictionary<string, string[]>
+                    {
+                        ["Validation"] = new[] { ex.Message }
+                    }
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while updating profile", details = ex.Message });
+                _logger.LogError(ex, "Unexpected error updating profile for user {UserId}", userId);
+                return StatusCode(500, new
+                {
+                    message = "An unexpected error occurred while updating your profile. Please try again."
+                });
             }
         }
 
@@ -151,7 +186,7 @@ namespace Mentora.Api.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized();
+                return Unauthorized(new { message = "User not authenticated" });
 
             var exists = await _profileService.HasProfileAsync(userId);
             return Ok(new { exists });
@@ -175,14 +210,14 @@ namespace Mentora.Api.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized();
+                return Unauthorized(new { message = "User not authenticated" });
 
             var completion = await _profileService.GetProfileCompletionAsync(userId);
             return Ok(new { completionPercentage = completion });
         }
 
         /// <summary>
-        /// Get suggested timezones
+        /// Get suggested timezones based on location
         /// </summary>
         /// <param name="location">Optional location to get relevant suggestions</param>
         /// <returns>List of suggested IANA timezone identifiers</returns>
@@ -205,7 +240,7 @@ namespace Mentora.Api.Controllers
         }
 
         /// <summary>
-        /// Validate timezone format
+        /// Validate timezone format (IANA)
         /// </summary>
         /// <param name="timezone">Timezone to validate</param>
         /// <returns>Boolean indicating validity</returns>
@@ -222,6 +257,9 @@ namespace Mentora.Api.Controllers
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public IActionResult ValidateTimezone([FromQuery] string timezone)
         {
+            if (string.IsNullOrWhiteSpace(timezone))
+                return BadRequest(new { message = "Timezone parameter is required" });
+
             var isValid = _profileService.IsValidTimezone(timezone);
             return Ok(new { isValid, timezone });
         }
@@ -229,10 +267,7 @@ namespace Mentora.Api.Controllers
         private Guid GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst("userId")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                return Guid.Empty;
-
-            return userId;
+            return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
         }
     }
 }
