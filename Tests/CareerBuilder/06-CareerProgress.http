@@ -1,0 +1,545 @@
+###############################################################################
+# Career Builder Module - Career Progress Tests
+# Description: ????? ?????? ??????????? (Progress Tracking & Analytics)
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@careerPlanId = {{createPlan.response.body.$.id}}
+@stepId = {{createStep.response.body.$.id}}
+
+###############################################################################
+# 1. ?????? ??? ???? ??? ??????? (Get Career Plan Progress)
+###############################################################################
+
+### Get Overall Career Plan Progress
+# @name getOverallProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Get Career Plan Progress - Detailed View
+# @name getDetailedProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/detailed
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Summary
+# @name getProgressSummary
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/summary
+Authorization: Bearer {{accessToken}}
+
+### Get Progress - Invalid Plan ID (Negative Test)
+# @name getProgressInvalidPlan
+GET {{baseUrl}}/careerprogress/plans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 2. ?????? ??? ???? ??????? (Get Steps Progress)
+###############################################################################
+
+### Get All Steps Progress for Plan
+# @name getStepsProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+
+### Get Completed Steps
+# @name getCompletedSteps
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps?status=Completed
+Authorization: Bearer {{accessToken}}
+
+### Get In Progress Steps
+# @name getInProgressSteps
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps?status=InProgress
+Authorization: Bearer {{accessToken}}
+
+### Get Not Started Steps
+# @name getNotStartedSteps
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps?status=NotStarted
+Authorization: Bearer {{accessToken}}
+
+### Get Blocked Steps
+# @name getBlockedSteps
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps?status=Blocked
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 3. ????? ??? ?????? (Update Progress Log)
+###############################################################################
+
+### Log Progress Update - Daily Check-in
+# @name logDailyProgress
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "date": "2025-01-15T10:00:00Z",
+  "description": "Completed React Hooks tutorial, started working on Context API",
+  "hoursSpent": 3.5,
+  "achievements": [
+    "Mastered useState and useEffect",
+    "Built a custom hook",
+    "Started Context API learning"
+  ],
+  "challenges": [
+    "Understanding useReducer complexity",
+    "Context API best practices"
+  ],
+  "nextSteps": [
+    "Complete Context API exercises",
+    "Build a mini project using hooks"
+  ],
+  "mood": "Productive"
+}
+
+### Log Progress Update - Weekly Summary
+# @name logWeeklyProgress
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "date": "2025-01-20T18:00:00Z",
+  "description": "Week 1 Summary: Completed React fundamentals and started state management",
+  "hoursSpent": 20,
+  "achievements": [
+    "Completed React fundamentals course",
+    "Built 3 small projects",
+    "Started Redux toolkit",
+    "Passed React quiz with 90%"
+  ],
+  "challenges": [
+    "Redux middleware concepts",
+    "Async actions handling"
+  ],
+  "nextSteps": [
+    "Complete Redux course",
+    "Build a full CRUD app with Redux",
+    "Learn Redux Saga"
+  ],
+  "mood": "Accomplished",
+  "weekNumber": 1
+}
+
+### Log Progress - Missing Required Fields (Negative Test)
+# @name logProgressInvalid
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "description": "Missing date field"
+}
+
+###############################################################################
+# 4. ?????? ??? ????? ?????? (Get Progress Logs)
+###############################################################################
+
+### Get All Progress Logs
+# @name getAllProgressLogs
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+
+### Get Logs - Date Range Filter
+# @name getLogsByDateRange
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs?startDate=2025-01-01&endDate=2025-01-31
+Authorization: Bearer {{accessToken}}
+
+### Get Logs - This Week
+# @name getLogsThisWeek
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs/this-week
+Authorization: Bearer {{accessToken}}
+
+### Get Logs - This Month
+# @name getLogsThisMonth
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs/this-month
+Authorization: Bearer {{accessToken}}
+
+### Get Latest Log
+# @name getLatestLog
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs/latest
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 5. ???????? ?????? (Progress Statistics)
+###############################################################################
+
+### Get Progress Statistics - Overall
+# @name getProgressStatistics
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics
+Authorization: Bearer {{accessToken}}
+
+### Get Time Statistics
+# @name getTimeStatistics
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics/time
+Authorization: Bearer {{accessToken}}
+
+### Get Completion Rate
+# @name getCompletionRate
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics/completion-rate
+Authorization: Bearer {{accessToken}}
+
+### Get Average Time per Step
+# @name getAverageTime
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics/average-time
+Authorization: Bearer {{accessToken}}
+
+### Get Productivity Metrics
+# @name getProductivityMetrics
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics/productivity
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 6. ?????? ?????? (Progress Charts)
+###############################################################################
+
+### Get Progress Timeline
+# @name getProgressTimeline
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/timeline
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Chart Data - Daily
+# @name getDailyProgressChart
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/chart?period=daily
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Chart Data - Weekly
+# @name getWeeklyProgressChart
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/chart?period=weekly
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Chart Data - Monthly
+# @name getMonthlyProgressChart
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/chart?period=monthly
+Authorization: Bearer {{accessToken}}
+
+### Get Skills Progress Chart
+# @name getSkillsProgressChart
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/chart/skills
+Authorization: Bearer {{accessToken}}
+
+### Get Steps Progress Chart
+# @name getStepsProgressChart
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/chart/steps
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 7. ????? ?????? (Progress Milestones)
+###############################################################################
+
+### Get All Milestones
+# @name getAllMilestones
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/milestones
+Authorization: Bearer {{accessToken}}
+
+### Get Completed Milestones
+# @name getCompletedMilestones
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/milestones?status=Completed
+Authorization: Bearer {{accessToken}}
+
+### Get Upcoming Milestones
+# @name getUpcomingMilestones
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/milestones/upcoming
+Authorization: Bearer {{accessToken}}
+
+### Mark Milestone as Completed
+# @name completeMilestone
+PATCH {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/milestones/{{milestoneId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "Completed",
+  "completionDate": "2025-01-15T14:00:00Z",
+  "notes": "Successfully completed all requirements"
+}
+
+###############################################################################
+# 8. ?????? ?????? (Progress Comparison)
+###############################################################################
+
+### Compare Progress with Similar Plans
+# @name compareProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/compare
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Benchmarks
+# @name getProgressBenchmarks
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/benchmarks
+Authorization: Bearer {{accessToken}}
+
+### Compare with Average User
+# @name compareWithAverage
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/compare/average
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 9. ?????? ?????? (Progress Reports)
+###############################################################################
+
+### Generate Progress Report - Weekly
+# @name generateWeeklyReport
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/weekly
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "weekStart": "2025-01-13T00:00:00Z",
+  "weekEnd": "2025-01-19T23:59:59Z"
+}
+
+### Generate Progress Report - Monthly
+# @name generateMonthlyReport
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/monthly
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "month": 1,
+  "year": 2025
+}
+
+### Generate Custom Report
+# @name generateCustomReport
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/custom
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "startDate": "2025-01-01T00:00:00Z",
+  "endDate": "2025-01-31T23:59:59Z",
+  "includeSteps": true,
+  "includeSkills": true,
+  "includeQuizzes": true,
+  "includeLogs": true
+}
+
+### Get Latest Report
+# @name getLatestReport
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/latest
+Authorization: Bearer {{accessToken}}
+
+### Get All Reports
+# @name getAllReports
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports
+Authorization: Bearer {{accessToken}}
+
+### Download Report as PDF
+# @name downloadReportPDF
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/{{reportId}}/pdf
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 10. ??????? ???????? (Reminders & Notifications)
+###############################################################################
+
+### Get Progress Notifications
+# @name getProgressNotifications
+GET {{baseUrl}}/careerprogress/notifications
+Authorization: Bearer {{accessToken}}
+
+### Mark Notification as Read
+# @name markNotificationRead
+PATCH {{baseUrl}}/careerprogress/notifications/{{notificationId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "isRead": true
+}
+
+### Get Overdue Items
+# @name getOverdueItems
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/overdue
+Authorization: Bearer {{accessToken}}
+
+### Get Upcoming Deadlines
+# @name getUpcomingDeadlines
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/deadlines
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 11. ????? ?????? (Progress Goals)
+###############################################################################
+
+### Set Progress Goal
+# @name setProgressGoal
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/goals
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "goalType": "WeeklyHours",
+  "targetValue": 15,
+  "startDate": "2025-01-15T00:00:00Z",
+  "endDate": "2025-01-21T23:59:59Z",
+  "description": "Study 15 hours this week"
+}
+
+### Get Progress Goals
+# @name getProgressGoals
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/goals
+Authorization: Bearer {{accessToken}}
+
+### Get Active Goals
+# @name getActiveGoals
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/goals?status=Active
+Authorization: Bearer {{accessToken}}
+
+### Update Goal Progress
+# @name updateGoalProgress
+PATCH {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/goals/{{goalId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentValue": 12,
+  "notes": "3 more hours to reach the goal"
+}
+
+### Mark Goal as Completed
+# @name completeGoal
+PATCH {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/goals/{{goalId}}/complete
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "completionDate": "2025-01-21T20:00:00Z",
+  "finalValue": 16,
+  "notes": "Exceeded the goal by 1 hour!"
+}
+
+###############################################################################
+# 12. ???? ?????? (Dashboard)
+###############################################################################
+
+### Get Progress Dashboard
+# @name getProgressDashboard
+GET {{baseUrl}}/careerprogress/dashboard
+Authorization: Bearer {{accessToken}}
+
+### Get Plan-Specific Dashboard
+# @name getPlanDashboard
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/dashboard
+Authorization: Bearer {{accessToken}}
+
+### Get Today's Summary
+# @name getTodaySummary
+GET {{baseUrl}}/careerprogress/today
+Authorization: Bearer {{accessToken}}
+
+### Get This Week's Summary
+# @name getWeekSummary
+GET {{baseUrl}}/careerprogress/this-week
+Authorization: Bearer {{accessToken}}
+
+### Get This Month's Summary
+# @name getMonthSummary
+GET {{baseUrl}}/careerprogress/this-month
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 13. ??????? ?????????? (Motivation & Achievements)
+###############################################################################
+
+### Get Achievements
+# @name getAchievements
+GET {{baseUrl}}/careerprogress/achievements
+Authorization: Bearer {{accessToken}}
+
+### Get Recent Achievements
+# @name getRecentAchievements
+GET {{baseUrl}}/careerprogress/achievements/recent
+Authorization: Bearer {{accessToken}}
+
+### Get Unlocked Badges
+# @name getUnlockedBadges
+GET {{baseUrl}}/careerprogress/badges
+Authorization: Bearer {{accessToken}}
+
+### Get Streak Information
+# @name getStreakInfo
+GET {{baseUrl}}/careerprogress/streak
+Authorization: Bearer {{accessToken}}
+
+### Get Motivational Insights
+# @name getMotivationalInsights
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/insights
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 14. ????? ???????? (Export Data)
+###############################################################################
+
+### Export Progress Data - JSON
+# @name exportProgressJSON
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/export?format=json
+Authorization: Bearer {{accessToken}}
+
+### Export Progress Data - CSV
+# @name exportProgressCSV
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/export?format=csv
+Authorization: Bearer {{accessToken}}
+
+### Export Detailed Report
+# @name exportDetailedReport
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/export/detailed
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 15. ?????? ??????? ??????? (Time Period Comparison)
+###############################################################################
+
+### Compare This Week vs Last Week
+# @name compareWeeks
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/compare/weeks
+Authorization: Bearer {{accessToken}}
+
+### Compare This Month vs Last Month
+# @name compareMonths
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/compare/months
+Authorization: Bearer {{accessToken}}
+
+### Get Progress Trends
+# @name getProgressTrends
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/trends
+Authorization: Bearer {{accessToken}}
+
+### Get Performance Analysis
+# @name getPerformanceAnalysis
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/analysis
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# Testing Scenarios:
+# -----------------------------------------------------------------------------
+# ? Scenario 1: Daily Progress Tracking
+#    1. Log Daily Progress ? View Summary ? Check Statistics
+#
+# ? Scenario 2: Weekly Review
+#    1. Get Week's Progress ? Generate Weekly Report ? Compare with Last Week
+#
+# ? Scenario 3: Goal Setting and Tracking
+#    1. Set Weekly Goal ? Update Daily ? Complete Goal ? View Achievement
+#
+# ? Scenario 4: Comprehensive Analytics
+#    1. View Dashboard ? Check Timeline ? Compare Progress ? Export Data
+#
+# ? Scenario 5: Motivation Tracking
+#    1. View Achievements ? Check Streak ? Get Insights ? Unlock Badges
+#
+# Expected Results:
+# - GET /progress: 200 OK with comprehensive progress data
+# - POST /logs: 201 Created with log entry
+# - GET /statistics: 200 OK with detailed metrics
+# - GET /timeline: 200 OK with visual timeline data
+# - GET /dashboard: 200 OK with all dashboard widgets
+# - POST /reports: 201 Created with generated report
+# - GET /achievements: 200 OK with earned achievements
+# - All endpoints return proper error codes for invalid requests
+###############################################################################

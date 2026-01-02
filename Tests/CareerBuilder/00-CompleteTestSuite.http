@@ -1,0 +1,647 @@
+###############################################################################
+# Career Builder Module - Complete Test Suite
+# Description: ?????? ????? ????? ???? ???? ????????????
+# Base URL: https://localhost:7134/api
+# 
+# IMPORTANT: ?? ?????? ??? ????? ???????? ????? ???? ???? ???????
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# PHASE 1: AUTHENTICATION & USER SETUP
+###############################################################################
+
+### 1.1 Register Test User
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "career.complete@mentora.com",
+  "password": "CompleteTest@123",
+  "firstName": "Complete",
+  "lastName": "Tester",
+  "institution": "Mentora University",
+  "fieldOfStudy": "Software Engineering"
+}
+
+### 1.2 Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "career.complete@mentora.com",
+  "password": "CompleteTest@123"
+}
+
+@accessToken = {{login.response.body.$.accessToken}}
+
+### 1.3 Verify Authentication
+# @name verifyAuth
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 2: CREATE CAREER PLAN MANUALLY
+###############################################################################
+
+### 2.1 Create Career Plan
+# @name createPlan
+POST {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Full-Stack Developer Career Path",
+  "targetRole": "Senior Full-Stack Developer",
+  "targetCompany": "Top Tech Company",
+  "currentLevel": "Junior",
+  "targetLevel": "Senior",
+  "estimatedDuration": 24,
+  "description": "Complete roadmap to become a senior full-stack developer"
+}
+
+@careerPlanId = {{createPlan.response.body.$.id}}
+
+### 2.2 Verify Plan Created
+# @name verifyPlan
+GET {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 3: CREATE SKILLS
+###############################################################################
+
+### 3.1 Create Skill - React
+# @name createSkillReact
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "React",
+  "category": "Frontend Framework",
+  "description": "JavaScript library for building user interfaces",
+  "proficiencyLevel": "Intermediate",
+  "tags": ["JavaScript", "Frontend", "UI"]
+}
+
+@skillReactId = {{createSkillReact.response.body.$.id}}
+
+### 3.2 Create Skill - Node.js
+# @name createSkillNode
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Node.js",
+  "category": "Backend Framework",
+  "description": "JavaScript runtime for server-side development",
+  "proficiencyLevel": "Beginner",
+  "tags": ["JavaScript", "Backend", "Server"]
+}
+
+@skillNodeId = {{createSkillNode.response.body.$.id}}
+
+### 3.3 Create Skill - PostgreSQL
+# @name createSkillDB
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "PostgreSQL",
+  "category": "Database",
+  "description": "Relational database management system",
+  "proficiencyLevel": "Beginner",
+  "tags": ["Database", "SQL"]
+}
+
+@skillDBId = {{createSkillDB.response.body.$.id}}
+
+### 3.4 Link Skills to Career Plan
+# @name linkSkills
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/skills/bulk
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "skills": [
+    {
+      "skillId": "{{skillReactId}}",
+      "targetProficiencyLevel": "Expert",
+      "priority": "High"
+    },
+    {
+      "skillId": "{{skillNodeId}}",
+      "targetProficiencyLevel": "Advanced",
+      "priority": "High"
+    },
+    {
+      "skillId": "{{skillDBId}}",
+      "targetProficiencyLevel": "Advanced",
+      "priority": "Medium"
+    }
+  ]
+}
+
+### 3.5 Verify Skills Linked
+# @name verifySkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 4: CREATE CAREER STEPS
+###############################################################################
+
+### 4.1 Create Step 1 - React Fundamentals
+# @name createStep1
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Master React Fundamentals",
+  "description": "Learn React basics including components, hooks, and state management",
+  "order": 1,
+  "estimatedDuration": 4,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "React Documentation",
+      "url": "https://react.dev",
+      "type": "Documentation"
+    }
+  ],
+  "milestones": [
+    "Understand JSX",
+    "Master hooks",
+    "Build todo app"
+  ]
+}
+
+@step1Id = {{createStep1.response.body.$.id}}
+
+### 4.2 Create Step 2 - State Management
+# @name createStep2
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Learn State Management",
+  "description": "Master Redux and Context API",
+  "order": 2,
+  "estimatedDuration": 3,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "Redux Toolkit",
+      "url": "https://redux-toolkit.js.org",
+      "type": "Documentation"
+    }
+  ],
+  "milestones": [
+    "Understand Redux",
+    "Implement Redux Toolkit",
+    "Build shopping cart"
+  ]
+}
+
+@step2Id = {{createStep2.response.body.$.id}}
+
+### 4.3 Create Step 3 - Backend Development
+# @name createStep3
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Master Node.js and Express",
+  "description": "Build RESTful APIs with Node.js",
+  "order": 3,
+  "estimatedDuration": 5,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "Node.js Guide",
+      "url": "https://nodejs.org/docs",
+      "type": "Documentation"
+    }
+  ],
+  "milestones": [
+    "Setup Express server",
+    "Build REST API",
+    "Implement authentication"
+  ]
+}
+
+@step3Id = {{createStep3.response.body.$.id}}
+
+### 4.4 Verify All Steps Created
+# @name verifySteps
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 5: CREATE QUIZZES
+###############################################################################
+
+### 5.1 Create Quiz for Step 1
+# @name createQuiz1
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "React Fundamentals Quiz",
+  "description": "Test your React knowledge",
+  "passingScore": 70,
+  "timeLimit": 30,
+  "questions": [
+    {
+      "questionText": "What is JSX?",
+      "questionType": "MultipleChoice",
+      "order": 1,
+      "points": 20,
+      "options": [
+        {
+          "optionText": "JavaScript XML",
+          "isCorrect": true,
+          "explanation": "Correct!"
+        },
+        {
+          "optionText": "Java Syntax",
+          "isCorrect": false,
+          "explanation": "Incorrect"
+        }
+      ]
+    },
+    {
+      "questionText": "Which hook manages state?",
+      "questionType": "MultipleChoice",
+      "order": 2,
+      "points": 20,
+      "options": [
+        {
+          "optionText": "useState",
+          "isCorrect": true,
+          "explanation": "Correct!"
+        },
+        {
+          "optionText": "useEffect",
+          "isCorrect": false,
+          "explanation": "Incorrect"
+        }
+      ]
+    }
+  ]
+}
+
+@quiz1Id = {{createQuiz1.response.body.$.id}}
+
+### 5.2 Verify Quiz Created
+# @name verifyQuiz
+GET {{baseUrl}}/careerquizzes/{{quiz1Id}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 6: COMPLETE STEP 1 WORKFLOW
+###############################################################################
+
+### 6.1 Start Step 1
+# @name startStep1
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "InProgress",
+  "startDate": "2025-01-15T10:00:00Z"
+}
+
+### 6.2 Update Progress 25%
+# @name updateProgress25
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 25,
+  "notes": "Completed JSX basics"
+}
+
+### 6.3 Update Progress 50%
+# @name updateProgress50
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 50,
+  "notes": "Mastered hooks"
+}
+
+### 6.4 Update Progress 75%
+# @name updateProgress75
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 75,
+  "notes": "Built todo app"
+}
+
+### 6.5 Complete Milestone 1
+# @name completeMilestone1
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/milestones
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "milestoneIndex": 0,
+  "isCompleted": true
+}
+
+### 6.6 Complete Milestone 2
+# @name completeMilestone2
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/milestones
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "milestoneIndex": 1,
+  "isCompleted": true
+}
+
+### 6.7 Complete Step 1
+# @name completeStep1
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step1Id}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "Completed",
+  "completionDate": "2025-01-25T18:00:00Z"
+}
+
+###############################################################################
+# PHASE 7: TAKE QUIZ
+###############################################################################
+
+### 7.1 Start Quiz Attempt
+# @name startQuizAttempt
+POST {{baseUrl}}/careerquizzes/{{quiz1Id}}/attempts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "startTime": "2025-01-25T19:00:00Z"
+}
+
+@attemptId = {{startQuizAttempt.response.body.$.id}}
+
+### 7.2 Submit Quiz
+# @name submitQuiz
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "endTime": "2025-01-25T19:25:00Z"
+}
+
+### 7.3 Get Quiz Results
+# @name getQuizResults
+GET {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/results
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 8: LOG PROGRESS
+###############################################################################
+
+### 8.1 Log Daily Progress
+# @name logProgress
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "date": "2025-01-25T20:00:00Z",
+  "description": "Completed React fundamentals and passed the quiz!",
+  "hoursSpent": 4,
+  "achievements": [
+    "Completed React fundamentals",
+    "Passed quiz with 90%",
+    "Built todo app"
+  ],
+  "challenges": [],
+  "nextSteps": [
+    "Start state management",
+    "Learn Redux"
+  ],
+  "mood": "Accomplished"
+}
+
+###############################################################################
+# PHASE 9: UPDATE SKILL PROFICIENCY
+###############################################################################
+
+### 9.1 Update React Proficiency
+# @name updateSkillProficiency
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skillReactId}}/proficiency
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentProficiencyLevel": "Advanced",
+  "lastAssessmentDate": "2025-01-25T20:00:00Z",
+  "notes": "Completed fundamentals course"
+}
+
+###############################################################################
+# PHASE 10: VIEW PROGRESS & STATISTICS
+###############################################################################
+
+### 10.1 Get Overall Progress
+# @name getOverallProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### 10.2 Get Progress Dashboard
+# @name getProgressDashboard
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/dashboard
+Authorization: Bearer {{accessToken}}
+
+### 10.3 Get Steps Progress
+# @name getStepsProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+
+### 10.4 Get Skills Progress
+# @name getSkillsProgress
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/progress
+Authorization: Bearer {{accessToken}}
+
+### 10.5 Get Statistics
+# @name getStatistics
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/statistics
+Authorization: Bearer {{accessToken}}
+
+### 10.6 Get Timeline
+# @name getTimeline
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/timeline
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 11: GENERATE REPORTS
+###############################################################################
+
+### 11.1 Generate Weekly Report
+# @name generateWeeklyReport
+POST {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/weekly
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "weekStart": "2025-01-20T00:00:00Z",
+  "weekEnd": "2025-01-26T23:59:59Z"
+}
+
+### 11.2 Get Latest Report
+# @name getLatestReport
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/reports/latest
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 12: AI GENERATION TEST (Alternative Flow)
+###############################################################################
+
+### 12.1 Generate Career Plan with AI
+# @name generateWithAI
+POST {{baseUrl}}/careerplans/generate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Data Scientist",
+  "currentSkills": ["Python", "Statistics", "SQL"],
+  "experienceLevel": "Entry",
+  "timeframe": 24,
+  "preferences": "Focus on machine learning and deep learning"
+}
+
+@aiPlanId = {{generateWithAI.response.body.$.id}}
+
+### 12.2 Verify AI Generated Plan
+# @name verifyAIPlan
+GET {{baseUrl}}/careerplans/{{aiPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### 12.3 Get AI Generated Steps
+# @name getAISteps
+GET {{baseUrl}}/careerplans/{{aiPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+
+### 12.4 Get AI Generated Skills
+# @name getAISkills
+GET {{baseUrl}}/careerplans/{{aiPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 13: EXPORT DATA
+###############################################################################
+
+### 13.1 Export Progress Data
+# @name exportProgress
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/export?format=json
+Authorization: Bearer {{accessToken}}
+
+### 13.2 Export Skills Data
+# @name exportSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/export
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 14: GET ALL USER DATA
+###############################################################################
+
+### 14.1 Get All Career Plans
+# @name getAllPlans
+GET {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+
+### 14.2 Get All Skills
+# @name getAllSkills
+GET {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+
+### 14.3 Get All Progress Logs
+# @name getAllLogs
+GET {{baseUrl}}/careerprogress/plans/{{careerPlanId}}/logs
+Authorization: Bearer {{accessToken}}
+
+### 14.4 Get User Dashboard
+# @name getUserDashboard
+GET {{baseUrl}}/careerprogress/dashboard
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# PHASE 15: CLEANUP (Optional)
+###############################################################################
+
+### 15.1 Delete Career Plan
+# @name deletePlan
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### 15.2 Delete AI Generated Plan
+# @name deleteAIPlan
+DELETE {{baseUrl}}/careerplans/{{aiPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### 15.3 Logout
+# @name logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{login.response.body.$.refreshToken}}"
+}
+
+###############################################################################
+# TESTING SUMMARY
+###############################################################################
+#
+# ? PHASE 1: Authentication (3 requests)
+# ? PHASE 2: Career Plan Creation (2 requests)
+# ? PHASE 3: Skills Management (5 requests)
+# ? PHASE 4: Career Steps Creation (5 requests)
+# ? PHASE 5: Quiz Creation (2 requests)
+# ? PHASE 6: Step Completion Workflow (7 requests)
+# ? PHASE 7: Quiz Taking (3 requests)
+# ? PHASE 8: Progress Logging (1 request)
+# ? PHASE 9: Skill Updates (1 request)
+# ? PHASE 10: Progress Viewing (6 requests)
+# ? PHASE 11: Report Generation (2 requests)
+# ? PHASE 12: AI Generation (4 requests)
+# ? PHASE 13: Data Export (2 requests)
+# ? PHASE 14: User Data Retrieval (4 requests)
+# ? PHASE 15: Cleanup (3 requests)
+#
+# TOTAL: 50 requests covering all major features
+#
+# Expected Results:
+# - All POST requests: 201 Created
+# - All GET requests: 200 OK
+# - All PATCH/PUT requests: 200 OK
+# - All DELETE requests: 204 No Content
+# - No 400/500 errors in normal flow
+#
+###############################################################################

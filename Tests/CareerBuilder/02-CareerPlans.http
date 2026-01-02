@@ -1,0 +1,393 @@
+###############################################################################
+# Career Builder Module - Career Plans Tests
+# Description: ????? ??? ??????? (CRUD + AI Generation)
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables - ??? ????? Authentication ?????
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@careerPlanId = {{createPlan.response.body.$.id}}
+@aiGeneratedPlanId = {{generateWithAI.response.body.$.id}}
+
+###############################################################################
+# 1. ????? ??? ????? ?????? (Create Career Plan Manually)
+###############################################################################
+
+### Create Career Plan - Software Engineer
+# @name createPlan
+POST {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "My Software Engineering Career Path",
+  "targetRole": "Senior Full-Stack Developer",
+  "targetCompany": "Microsoft",
+  "currentLevel": "Junior",
+  "targetLevel": "Senior",
+  "estimatedDuration": 24,
+  "description": "Path to become a senior full-stack developer at a top tech company"
+}
+
+### Create Career Plan - Data Scientist
+# @name createPlan2
+POST {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Data Science Career Roadmap",
+  "targetRole": "Senior Data Scientist",
+  "targetCompany": "Google",
+  "currentLevel": "Entry",
+  "targetLevel": "Senior",
+  "estimatedDuration": 36,
+  "description": "Complete roadmap to become a senior data scientist"
+}
+
+### Create Career Plan - DevOps Engineer
+# @name createPlan3
+POST {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "DevOps Engineering Path",
+  "targetRole": "Lead DevOps Engineer",
+  "targetCompany": "Amazon",
+  "currentLevel": "Mid",
+  "targetLevel": "Lead",
+  "estimatedDuration": 18,
+  "description": "Advance to lead DevOps engineer position"
+}
+
+### Create Career Plan - Missing Required Fields (Negative Test)
+# @name createPlanInvalid
+POST {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Incomplete Plan"
+}
+
+### Create Career Plan - Without Authentication (Negative Test)
+# @name createPlanNoAuth
+POST {{baseUrl}}/careerplans
+Content-Type: {{contentType}}
+
+{
+  "title": "Unauthorized Plan",
+  "targetRole": "Developer",
+  "currentLevel": "Junior",
+  "targetLevel": "Senior",
+  "estimatedDuration": 12
+}
+
+###############################################################################
+# 2. ????? ??? ????? ?????? AI (Generate Career Plan with AI)
+###############################################################################
+
+### Generate Career Plan with AI - Software Development
+# @name generateWithAI
+POST {{baseUrl}}/careerplans/generate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Full-Stack Developer",
+  "currentSkills": [
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "Basic React"
+  ],
+  "experienceLevel": "Junior",
+  "timeframe": 12,
+  "preferences": "Focus on modern web technologies and cloud platforms"
+}
+
+### Generate Career Plan with AI - Data Science
+# @name generateWithAI2
+POST {{baseUrl}}/careerplans/generate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Data Scientist",
+  "currentSkills": [
+    "Python",
+    "Statistics",
+    "SQL"
+  ],
+  "experienceLevel": "Entry",
+  "timeframe": 24,
+  "preferences": "Machine learning and deep learning focus"
+}
+
+### Generate Career Plan with AI - Cloud Architecture
+# @name generateWithAI3
+POST {{baseUrl}}/careerplans/generate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Cloud Solutions Architect",
+  "currentSkills": [
+    "Azure Basics",
+    "Networking",
+    "Linux Administration"
+  ],
+  "experienceLevel": "Mid",
+  "timeframe": 18,
+  "preferences": "Azure certification path"
+}
+
+### Generate with AI - Invalid Timeframe (Negative Test)
+# @name generateWithAIInvalid
+POST {{baseUrl}}/careerplans/generate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Developer",
+  "currentSkills": ["HTML"],
+  "experienceLevel": "Junior",
+  "timeframe": 0
+}
+
+###############################################################################
+# 3. ?????? ??? ???? ??? ??????? (Get All Career Plans)
+###############################################################################
+
+### Get All Career Plans for Current User
+# @name getAllPlans
+GET {{baseUrl}}/careerplans
+Authorization: Bearer {{accessToken}}
+
+### Get All Plans - With Pagination
+# @name getAllPlansPaginated
+GET {{baseUrl}}/careerplans?pageNumber=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+
+### Get All Plans - Filter by Status
+# @name getPlansByStatus
+GET {{baseUrl}}/careerplans?status=InProgress
+Authorization: Bearer {{accessToken}}
+
+### Get All Plans - Without Authentication (Negative Test)
+# @name getAllPlansNoAuth
+GET {{baseUrl}}/careerplans
+
+###############################################################################
+# 4. ?????? ??? ??? ????? ????? (Get Career Plan by ID)
+###############################################################################
+
+### Get Career Plan by ID
+# @name getPlanById
+GET {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Get AI Generated Plan by ID
+# @name getAIPlanById
+GET {{baseUrl}}/careerplans/{{aiGeneratedPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Get Plan by ID - Invalid ID (Negative Test)
+# @name getPlanByIdInvalid
+GET {{baseUrl}}/careerplans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Get Plan by ID - Non-existent ID (Negative Test)
+# @name getPlanByIdNotFound
+GET {{baseUrl}}/careerplans/99999999-9999-9999-9999-999999999999
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 5. ????? ??? ??????? (Update Career Plan)
+###############################################################################
+
+### Update Career Plan - Full Update
+# @name updatePlan
+PUT {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Software Engineering Path",
+  "targetRole": "Lead Full-Stack Developer",
+  "targetCompany": "Microsoft",
+  "currentLevel": "Mid",
+  "targetLevel": "Lead",
+  "estimatedDuration": 18,
+  "description": "Updated description with new goals and objectives",
+  "status": "InProgress"
+}
+
+### Update Career Plan - Partial Update (Title Only)
+# @name updatePlanPartial
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "My Advanced Career Path"
+}
+
+### Update Plan - Invalid Data (Negative Test)
+# @name updatePlanInvalid
+PUT {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "estimatedDuration": -5
+}
+
+###############################################################################
+# 6. ????? ???? ????? (Update Career Plan Status)
+###############################################################################
+
+### Update Status - Mark as In Progress
+# @name updateStatusInProgress
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "InProgress"
+}
+
+### Update Status - Mark as Completed
+# @name updateStatusCompleted
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "Completed"
+}
+
+### Update Status - Mark as On Hold
+# @name updateStatusOnHold
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "OnHold"
+}
+
+### Update Status - Invalid Status (Negative Test)
+# @name updateStatusInvalid
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "InvalidStatus"
+}
+
+###############################################################################
+# 7. ??? ??? ??????? (Delete Career Plan)
+###############################################################################
+
+### Delete Career Plan - Soft Delete
+# @name deletePlan
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Verify Plan is Deleted (Should return 404)
+# @name verifyDeleted
+GET {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Delete Plan - Already Deleted (Negative Test)
+# @name deletePlanAgain
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}
+Authorization: Bearer {{accessToken}}
+
+### Delete Plan - Non-existent ID (Negative Test)
+# @name deletePlanNotFound
+DELETE {{baseUrl}}/careerplans/99999999-9999-9999-9999-999999999999
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 8. ???????? ??? ??????? (Career Plans Statistics)
+###############################################################################
+
+### Get Career Plans Statistics
+# @name getStatistics
+GET {{baseUrl}}/careerplans/statistics
+Authorization: Bearer {{accessToken}}
+
+### Get Plans Summary
+# @name getSummary
+GET {{baseUrl}}/careerplans/summary
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 9. ????? ??? ????? (Duplicate Career Plan)
+###############################################################################
+
+### Duplicate Career Plan
+# @name duplicatePlan
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/duplicate
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "newTitle": "Duplicated Career Plan"
+}
+
+###############################################################################
+# 10. ?????? ??? ??????? (Share Career Plan)
+###############################################################################
+
+### Share Career Plan - Generate Share Link
+# @name sharePlan
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/share
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "allowEdit": false,
+  "expiresInDays": 30
+}
+
+### Get Shared Plan - Public Access
+# @name getSharedPlan
+GET {{baseUrl}}/careerplans/shared/{{sharePlan.response.body.$.shareToken}}
+
+###############################################################################
+# Testing Scenarios:
+# -----------------------------------------------------------------------------
+# ? Scenario 1: Complete Manual Plan Creation Flow
+#    1. Login ? Create Plan ? Get Plan ? Update Plan ? Delete Plan
+#
+# ? Scenario 2: AI-Powered Plan Generation Flow
+#    1. Login ? Generate with AI ? Get Generated Plan ? Review Steps
+#
+# ? Scenario 3: Multiple Plans Management
+#    1. Login ? Create 3 Plans ? Get All Plans ? Filter by Status
+#
+# ? Scenario 4: Plan Lifecycle Management
+#    1. Create Plan ? Start (InProgress) ? Complete ? Archive
+#
+# ? Scenario 5: Collaboration Flow
+#    1. Create Plan ? Share ? Access Shared Link ? View
+#
+# Expected Results:
+# - POST /careerplans: 201 Created with plan details
+# - POST /careerplans/generate: 201 Created with AI-generated plan
+# - GET /careerplans: 200 OK with list of plans
+# - GET /careerplans/{id}: 200 OK with plan details
+# - PUT /careerplans/{id}: 200 OK with updated plan
+# - DELETE /careerplans/{id}: 204 No Content
+# - All Negative Tests: 400/401/404 with appropriate error messages
+###############################################################################
