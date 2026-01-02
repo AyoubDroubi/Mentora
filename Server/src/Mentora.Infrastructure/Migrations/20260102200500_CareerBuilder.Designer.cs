@@ -4,6 +4,7 @@ using Mentora.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mentora.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260102200500_CareerBuilder")]
+    partial class CareerBuilder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Achievements", (string)null);
+                    b.ToTable("Achievements");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.AiRequestLog", b =>
@@ -96,7 +99,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AiRequestLogs", (string)null);
+                    b.ToTable("AiRequestLogs");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.Auth.PasswordResetToken", b =>
@@ -132,7 +135,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PasswordResetTokens", (string)null);
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.Auth.User", b =>
@@ -256,7 +259,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("StudyPlanId");
 
-                    b.ToTable("AvailabilitySlots", (string)null);
+                    b.ToTable("AvailabilitySlots");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.CareerPlan", b =>
@@ -321,7 +324,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CareerPlans", (string)null);
+                    b.ToTable("CareerPlans");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.CareerPlanSkill", b =>
@@ -367,7 +370,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("CareerPlanSkills", (string)null);
+                    b.ToTable("CareerPlanSkills");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.CareerQuizAttempt", b =>
@@ -398,7 +401,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CareerQuizAttempts", (string)null);
+                    b.ToTable("CareerQuizAttempts");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.CareerStep", b =>
@@ -451,7 +454,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("CareerPlanId");
 
-                    b.ToTable("CareerSteps", (string)null);
+                    b.ToTable("CareerSteps");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.DailyReflection", b =>
@@ -487,7 +490,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DailyReflections", (string)null);
+                    b.ToTable("DailyReflections");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.LearningResource", b =>
@@ -530,7 +533,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("CareerStepId");
 
-                    b.ToTable("LearningResources", (string)null);
+                    b.ToTable("LearningResources");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.Notification", b =>
@@ -571,7 +574,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.RefreshToken", b =>
@@ -618,7 +621,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.Skill", b =>
@@ -649,7 +652,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Skills", (string)null);
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StepCheckpoint", b =>
@@ -687,7 +690,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("CareerStepId");
 
-                    b.ToTable("StepCheckpoints", (string)null);
+                    b.ToTable("StepCheckpoints");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyPlan", b =>
@@ -722,7 +725,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StudyPlans", (string)null);
+                    b.ToTable("StudyPlans");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyPlanner.PlannerEvent", b =>
@@ -760,7 +763,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PlannerEvents", (string)null);
+                    b.ToTable("PlannerEvents");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyPlanner.StudyQuizAttempt", b =>
@@ -796,7 +799,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StudyQuizAttempts", (string)null);
+                    b.ToTable("StudyQuizAttempts");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyPlanner.TodoItem", b =>
@@ -831,7 +834,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TodoItems", (string)null);
+                    b.ToTable("TodoItems");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyPlanner.UserNote", b =>
@@ -867,7 +870,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserNotes", (string)null);
+                    b.ToTable("UserNotes");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudySession", b =>
@@ -913,7 +916,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("StudyTaskId");
 
-                    b.ToTable("StudySessions", (string)null);
+                    b.ToTable("StudySessions");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.StudyTask", b =>
@@ -979,7 +982,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("StudyTasks", (string)null);
+                    b.ToTable("StudyTasks");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.TaskFeedbackLog", b =>
@@ -1020,7 +1023,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasIndex("StudyTaskId")
                         .IsUnique();
 
-                    b.ToTable("TaskFeedbackLogs", (string)null);
+                    b.ToTable("TaskFeedbackLogs");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.UserAchievement", b =>
@@ -1054,7 +1057,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("AchievementId");
 
-                    b.ToTable("UserAchievements", (string)null);
+                    b.ToTable("UserAchievements");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.UserDiagnosticResponse", b =>
@@ -1088,7 +1091,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserDiagnosticResponses", (string)null);
+                    b.ToTable("UserDiagnosticResponses");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.UserProfile", b =>
@@ -1165,7 +1168,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.UserSkill", b =>
@@ -1202,7 +1205,7 @@ namespace Mentora.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserSkills", (string)null);
+                    b.ToTable("UserSkills");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.UserStats", b =>
@@ -1243,7 +1246,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserStats", (string)null);
+                    b.ToTable("UserStats");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

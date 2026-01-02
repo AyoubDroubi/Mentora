@@ -25,10 +25,11 @@ namespace Mentora.Infrastructure.Persistence
         public DbSet<Skill> Skills { get; set; }
         public DbSet<UserDiagnosticResponse> UserDiagnosticResponses { get; set; }
 
-        // Career Builder Module
+        // Career Builder Module per SRS Feature 1-4
         public DbSet<CareerPlan> CareerPlans { get; set; }
         public DbSet<CareerStep> CareerSteps { get; set; }
         public DbSet<CareerPlanSkill> CareerPlanSkills { get; set; }
+        public DbSet<CareerQuizAttempt> CareerQuizAttempts { get; set; }
         public DbSet<StepCheckpoint> StepCheckpoints { get; set; }
         public DbSet<LearningResource> LearningResources { get; set; }
 
@@ -60,16 +61,22 @@ namespace Mentora.Infrastructure.Persistence
         {
             base.OnModelCreating(builder);
 
-            // Enums as strings for readability
+            // Enums as strings for readability per SRS 8.1
             builder.Entity<StudyTask>().Property(t => t.Status).HasConversion<string>();
             builder.Entity<StudyTask>().Property(t => t.Priority).HasConversion<string>();
             builder.Entity<CareerStep>().Property(s => s.Status).HasConversion<string>();
             builder.Entity<UserSkill>().Property(s => s.CurrentLevel).HasConversion<string>();
             builder.Entity<CareerPlanSkill>().Property(s => s.TargetLevel).HasConversion<string>();
+            
+            // Career Builder enums per SRS
+            builder.Entity<CareerPlan>().Property(p => p.Status).HasConversion<string>();
+            builder.Entity<CareerPlanSkill>().Property(s => s.Status).HasConversion<string>();
+            builder.Entity<Skill>().Property(s => s.Category).HasConversion<string>();
+            builder.Entity<CareerQuizAttempt>().Property(q => q.Status).HasConversion<string>();
 
             // User Relationships
             
-            // User -> CareerPlans (One-to-Many) per SRS
+            // User -> CareerPlans (One-to-Many) per SRS Feature 1
             builder.Entity<User>()
                 .HasMany(u => u.CareerPlans)
                 .WithOne(cp => cp.User)
@@ -96,6 +103,43 @@ namespace Mentora.Infrastructure.Persistence
                 .WithOne()
                 .HasForeignKey<UserStats>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Career Builder Relationships per SRS Feature 1-4
+            
+            // CareerPlan -> CareerQuizAttempt (Many-to-One) per SRS 6.4
+            builder.Entity<CareerPlan>()
+                .HasOne(p => p.CareerQuizAttempt)
+                .WithMany(q => q.GeneratedPlans)
+                .HasForeignKey(p => p.CareerQuizAttemptId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // CareerPlan -> CareerSteps (One-to-Many) per SRS 3.3
+            builder.Entity<CareerPlan>()
+                .HasMany(p => p.Steps)
+                .WithOne(s => s.CareerPlan)
+                .HasForeignKey(s => s.CareerPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // CareerPlan -> Skills (One-to-Many) per SRS 5.6
+            builder.Entity<CareerPlan>()
+                .HasMany(p => p.Skills)
+                .WithOne(s => s.CareerPlan)
+                .HasForeignKey(s => s.CareerPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            // CareerStep -> Skills (One-to-Many) per SRS 5.4
+            builder.Entity<CareerStep>()
+                .HasMany(s => s.Skills)
+                .WithOne(ps => ps.CareerStep)
+                .HasForeignKey(ps => ps.CareerStepId)
+                .OnDelete(DeleteBehavior.NoAction);
+                
+            // CareerPlanSkill -> Skill (Many-to-One) per SRS 5.5
+            builder.Entity<CareerPlanSkill>()
+                .HasOne(ps => ps.Skill)
+                .WithMany()
+                .HasForeignKey(ps => ps.SkillId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Study Planner Relationships
             builder.Entity<TodoItem>()
