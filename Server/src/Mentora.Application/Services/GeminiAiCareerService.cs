@@ -46,12 +46,12 @@ namespace Mentora.Application.Services
             {
                 _logger.LogInformation("?? Starting Google Gemini AI Career Plan Generation...");
 
-                // 1. Parse quiz answers
-                var answers = JsonSerializer.Deserialize<List<QuizAnswer>>(quizAnswersJson) 
+                // 1. Parse quiz answers - handle Dictionary<string, object> format
+                var answersDict = JsonSerializer.Deserialize<Dictionary<string, object>>(quizAnswersJson) 
                     ?? throw new InvalidOperationException("Failed to parse quiz answers");
 
-                // 2. Extract user data
-                var userData = ExtractUserData(answers);
+                // 2. Extract user data from dictionary
+                var userData = ExtractUserDataFromDictionary(answersDict);
                 _logger.LogInformation($"?? User Goal: {userData.CareerGoal}, Experience: {userData.Experience}");
 
                 // 3. Build intelligent prompt
@@ -85,22 +85,108 @@ namespace Mentora.Application.Services
             }
         }
 
-        private UserCareerData ExtractUserData(List<QuizAnswer> answers)
+        private UserCareerData ExtractUserDataFromDictionary(Dictionary<string, object> answers)
         {
+            string GetAnswer(string key)
+            {
+                if (answers.TryGetValue(key, out var value))
+                {
+                    if (value == null) return string.Empty;
+                    
+                    // Handle JsonElement type from deserialization
+                    if (value is JsonElement jsonElement)
+                    {
+                        return jsonElement.ValueKind switch
+                        {
+                            JsonValueKind.String => jsonElement.GetString() ?? string.Empty,
+                            JsonValueKind.Array => string.Join(", ", jsonElement.EnumerateArray()
+                                .Select(e => e.GetString() ?? string.Empty)),
+                            JsonValueKind.Object => jsonElement.ToString() ?? string.Empty,
+                            _ => value.ToString() ?? string.Empty
+                        };
+                    }
+                    
+                    return value.ToString() ?? string.Empty;
+                }
+                return string.Empty;
+            }
+
+            string GetNestedValue(string key, string nestedKey)
+            {
+                if (answers.TryGetValue(key, out var value) && value is JsonElement jsonElement)
+                {
+                    if (jsonElement.ValueKind == JsonValueKind.Object && 
+                        jsonElement.TryGetProperty(nestedKey, out var nestedElement))
+                    {
+                        return nestedElement.GetString() ?? string.Empty;
+                    }
+                }
+                return string.Empty;
+            }
+
+            // Extract career goal from q1 (career field interest)
+            var careerGoal = GetAnswer("q1");
+            if (string.IsNullOrWhiteSpace(careerGoal))
+                careerGoal = "Software Developer";
+
+            // Simplify career goal if it's too long (extract key role)
+            if (careerGoal.Length > 100)
+            {
+                // Try to extract the main role/field
+                if (careerGoal.Contains("software engineer", StringComparison.OrdinalIgnoreCase))
+                    careerGoal = "Software Engineer";
+                else if (careerGoal.Contains("artificial intelligence", StringComparison.OrdinalIgnoreCase) ||
+                         careerGoal.Contains("AI", StringComparison.OrdinalIgnoreCase))
+                    careerGoal = "AI/ML Engineer";
+                else if (careerGoal.Contains("software development", StringComparison.OrdinalIgnoreCase))
+                    careerGoal = "Software Developer";
+                else
+                    careerGoal = careerGoal.Substring(0, Math.Min(50, careerGoal.Length)) + "...";
+            }
+
+            // Extract experience level from q13
+            var experienceLevel = GetNestedValue("q13", "option");
+            var experience = experienceLevel switch
+            {
+                "Entry-level / Fresh graduate" => "0-2 years",
+                "Mid-level professional" => "3-5 years",
+                "Senior professional" => "5-10 years",
+                "Expert / Lead" => "10+ years",
+                _ => "3-5 years" // Default to mid-level if not specified
+            };
+
+            // Extract work style from q8 and q9
+            var teamPreference = GetAnswer("q8");
+            var workStructure = GetAnswer("q9");
+            var workStyle = $"{teamPreference}, {workStructure}";
+
+            // Extract skills to learn from q5 and q6
+            var currentSkills = GetAnswer("q5");
+            var areasToImprove = GetAnswer("q6");
+            var skillsToLearn = !string.IsNullOrWhiteSpace(areasToImprove) 
+                ? areasToImprove 
+                : "Technical and soft skills development";
+
+            // Extract obstacles from q12 and q14
+            var timeManagement = GetAnswer("q12");
+            var mainObstacle = GetNestedValue("q14", "option");
+            var obstacles = !string.IsNullOrWhiteSpace(mainObstacle) 
+                ? mainObstacle 
+                : timeManagement;
+
+            // Extract time available from q14
+            var timeAvailable = GetNestedValue("q14", "time");
+            if (string.IsNullOrWhiteSpace(timeAvailable))
+                timeAvailable = "5-10 hours";
+
             return new UserCareerData
             {
-                CareerGoal = answers.FirstOrDefault(a => a.QuestionId == "q1")?.Answer 
-                    ?? "Software Developer",
-                Experience = answers.FirstOrDefault(a => a.QuestionId == "q2")?.Answer 
-                    ?? "0-2 years",
-                WorkStyle = answers.FirstOrDefault(a => a.QuestionId == "q3")?.Answer 
-                    ?? "Not specified",
-                SkillsToLearn = answers.FirstOrDefault(a => a.QuestionId == "q4")?.Answer 
-                    ?? "Not specified",
-                Obstacles = answers.FirstOrDefault(a => a.QuestionId == "q5")?.Answer 
-                    ?? "Not specified",
-                TimeAvailable = answers.FirstOrDefault(a => a.QuestionId == "q6")?.Answer 
-                    ?? "5-10 hours"
+                CareerGoal = careerGoal,
+                Experience = experience,
+                WorkStyle = workStyle,
+                SkillsToLearn = skillsToLearn,
+                Obstacles = obstacles,
+                TimeAvailable = timeAvailable
             };
         }
 
@@ -342,9 +428,20 @@ Generate the plan now:";
         {
             _logger.LogWarning("??  Using intelligent mock fallback...");
 
-            // Parse answers for personalization even in fallback
-            var answers = JsonSerializer.Deserialize<List<QuizAnswer>>(quizAnswersJson) ?? new List<QuizAnswer>();
-            var userData = ExtractUserData(answers);
+            UserCareerData userData;
+            try
+            {
+                // Try to parse answers for personalization even in fallback
+                var answersDict = JsonSerializer.Deserialize<Dictionary<string, object>>(quizAnswersJson);
+                userData = answersDict != null 
+                    ? ExtractUserDataFromDictionary(answersDict) 
+                    : new UserCareerData { CareerGoal = "Software Developer", Experience = "0-2 years" };
+            }
+            catch
+            {
+                // If parsing fails, use defaults
+                userData = new UserCareerData { CareerGoal = "Software Developer", Experience = "0-2 years" };
+            }
 
             await Task.Delay(500); // Simulate processing
 
@@ -437,7 +534,7 @@ Generate the plan now:";
         }
 
         // Helper classes
-        private class QuizAnswer
+        public class QuizAnswer
         {
             public string QuestionId { get; set; } = string.Empty;
             public string Answer { get; set; } = string.Empty;
