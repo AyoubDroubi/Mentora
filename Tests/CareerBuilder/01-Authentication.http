@@ -1,0 +1,231 @@
+###############################################################################
+# Career Builder Module - Authentication Tests
+# Description: ????? ???????? ????????
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables - ???? ??????? ???????? ??? ?? ???
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@refreshToken = {{login.response.body.$.refreshToken}}
+@userId = {{login.response.body.$.userId}}
+
+###############################################################################
+# 1. ????? ?????? ???? (Register New User)
+###############################################################################
+
+### Register - Test User 1
+# @name register1
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest1@mentora.com",
+  "password": "CareerTest@123",
+  "firstName": "Career",
+  "lastName": "Tester1",
+  "institution": "Mentora University",
+  "fieldOfStudy": "Software Engineering"
+}
+
+### Register - Test User 2
+# @name register2
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest2@mentora.com",
+  "password": "CareerTest@123",
+  "firstName": "Career",
+  "lastName": "Tester2",
+  "institution": "Mentora University",
+  "fieldOfStudy": "Data Science"
+}
+
+### Register - Test User 3 (????? ???????)
+# @name register3
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest3@mentora.com",
+  "password": "CareerTest@123",
+  "firstName": "Career",
+  "lastName": "Tester3",
+  "institution": "Mentora University",
+  "fieldOfStudy": "Artificial Intelligence"
+}
+
+###############################################################################
+# 2. ????? ?????? (Login)
+###############################################################################
+
+### Login - Test User 1
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest1@mentora.com",
+  "password": "CareerTest@123"
+}
+
+### Login - Test User 2
+# @name login2
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest2@mentora.com",
+  "password": "CareerTest@123"
+}
+
+### Login - Test User 3
+# @name login3
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest3@mentora.com",
+  "password": "CareerTest@123"
+}
+
+### Login - Invalid Credentials (Negative Test)
+# @name loginInvalid
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid@mentora.com",
+  "password": "WrongPassword@123"
+}
+
+###############################################################################
+# 3. ????? Token (Refresh Token)
+###############################################################################
+
+### Refresh Token
+# @name refresh
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Refresh Token - Invalid Token (Negative Test)
+# @name refreshInvalid
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "invalid-refresh-token-here"
+}
+
+###############################################################################
+# 4. ?????? ??? ??????? ???????? (Get Current User)
+###############################################################################
+
+### Get Current User
+# @name currentUser
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### Get Current User - No Token (Negative Test)
+# @name currentUserNoToken
+GET {{baseUrl}}/auth/me
+
+### Get Current User - Invalid Token (Negative Test)
+# @name currentUserInvalidToken
+GET {{baseUrl}}/auth/me
+Authorization: Bearer invalid-token-here
+
+###############################################################################
+# 5. ????? ?????? (Logout)
+###############################################################################
+
+### Logout
+# @name logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Logout - Already Logged Out (Negative Test)
+# @name logoutAgain
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###############################################################################
+# 6. ???? ???? ?????? (Forgot Password)
+###############################################################################
+
+### Forgot Password
+# @name forgotPassword
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "careertest1@mentora.com"
+}
+
+### Forgot Password - Invalid Email (Negative Test)
+# @name forgotPasswordInvalid
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "nonexistent@mentora.com"
+}
+
+###############################################################################
+# 7. ????? ????? ?????? (Update Profile)
+###############################################################################
+
+### Update Profile
+# @name updateProfile
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Career Updated",
+  "lastName": "Tester Updated",
+  "institution": "Mentora Advanced University",
+  "fieldOfStudy": "Advanced Software Engineering"
+}
+
+### Get Updated Profile
+# @name getProfile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# Testing Notes:
+# -----------------------------------------------------------------------------
+# 1. ?? ?????? Register ????? ?????? ??????????
+# 2. ?? Login ?????? ??? Access Token
+# 3. Token ???? ???? ???????? ?? ??????? @accessToken
+# 4. ?????? Token ?? ???? ??????? ???????
+# 5. Negative Tests ????? ??????? ???????
+#
+# Expected Results:
+# - Register: 200 OK ?? userId ? tokens
+# - Login: 200 OK ?? accessToken ? refreshToken
+# - Get Current User: 200 OK ?? ??????? ????????
+# - Refresh Token: 200 OK ?? tokens ?????
+# - Logout: 200 OK
+# - Negative Tests: 400/401 ?? ????? ??? ??????
+###############################################################################

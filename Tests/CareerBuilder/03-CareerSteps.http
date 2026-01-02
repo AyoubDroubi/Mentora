@@ -1,0 +1,560 @@
+###############################################################################
+# Career Builder Module - Career Steps Tests
+# Description: ????? ????? ??????? (CRUD + Progress Tracking)
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables - ??? ????? Authentication ? Career Plans ?????
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@careerPlanId = {{createPlan.response.body.$.id}}
+@stepId = {{createStep.response.body.$.id}}
+@step2Id = {{createStep2.response.body.$.id}}
+@step3Id = {{createStep3.response.body.$.id}}
+
+###############################################################################
+# 1. ????? ????? ???? ??????? (Add Steps to Career Plan)
+###############################################################################
+
+### Create Step 1 - Learn React Fundamentals
+# @name createStep
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Master React Fundamentals",
+  "description": "Learn React basics including components, hooks, and state management",
+  "order": 1,
+  "estimatedDuration": 4,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "React Official Documentation",
+      "url": "https://react.dev",
+      "type": "Documentation"
+    },
+    {
+      "title": "React Tutorial for Beginners",
+      "url": "https://youtube.com/react-tutorial",
+      "type": "Video"
+    }
+  ],
+  "milestones": [
+    "Understand JSX syntax",
+    "Create functional components",
+    "Master useState and useEffect",
+    "Build a simple todo app"
+  ]
+}
+
+### Create Step 2 - Learn State Management
+# @name createStep2
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Master State Management",
+  "description": "Learn Redux and Context API for complex state management",
+  "order": 2,
+  "estimatedDuration": 3,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "Redux Toolkit Documentation",
+      "url": "https://redux-toolkit.js.org",
+      "type": "Documentation"
+    },
+    {
+      "title": "State Management Course",
+      "url": "https://udemy.com/redux-course",
+      "type": "Course"
+    }
+  ],
+  "milestones": [
+    "Understand Redux concepts",
+    "Implement Redux Toolkit",
+    "Use Context API",
+    "Build a shopping cart"
+  ]
+}
+
+### Create Step 3 - Backend Integration
+# @name createStep3
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Backend Integration with APIs",
+  "description": "Learn to integrate frontend with RESTful APIs and handle async operations",
+  "order": 3,
+  "estimatedDuration": 3,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "Axios Documentation",
+      "url": "https://axios-http.com",
+      "type": "Documentation"
+    },
+    {
+      "title": "REST API Integration Tutorial",
+      "url": "https://youtube.com/api-tutorial",
+      "type": "Video"
+    }
+  ],
+  "milestones": [
+    "Setup API client",
+    "Handle authentication",
+    "Implement CRUD operations",
+    "Error handling and loading states"
+  ]
+}
+
+### Create Step 4 - Testing and Deployment
+# @name createStep4
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Testing and Deployment",
+  "description": "Learn testing strategies and deployment processes",
+  "order": 4,
+  "estimatedDuration": 2,
+  "status": "NotStarted",
+  "resources": [
+    {
+      "title": "Jest Testing Framework",
+      "url": "https://jestjs.io",
+      "type": "Documentation"
+    },
+    {
+      "title": "Vercel Deployment Guide",
+      "url": "https://vercel.com/docs",
+      "type": "Documentation"
+    }
+  ],
+  "milestones": [
+    "Write unit tests",
+    "Write integration tests",
+    "Setup CI/CD pipeline",
+    "Deploy to production"
+  ]
+}
+
+### Create Step - Missing Required Fields (Negative Test)
+# @name createStepInvalid
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Incomplete Step"
+}
+
+### Create Step - Invalid Plan ID (Negative Test)
+# @name createStepInvalidPlan
+POST {{baseUrl}}/careerplans/00000000-0000-0000-0000-000000000000/steps
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Step for Invalid Plan",
+  "description": "This should fail",
+  "order": 1,
+  "estimatedDuration": 1
+}
+
+###############################################################################
+# 2. ?????? ??? ???? ????? ????? (Get All Steps for a Plan)
+###############################################################################
+
+### Get All Steps for Career Plan
+# @name getAllSteps
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps
+Authorization: Bearer {{accessToken}}
+
+### Get Steps - Sorted by Order
+# @name getStepsSorted
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps?sortBy=order
+Authorization: Bearer {{accessToken}}
+
+### Get Steps - Filter by Status (NotStarted)
+# @name getStepsNotStarted
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps?status=NotStarted
+Authorization: Bearer {{accessToken}}
+
+### Get Steps - Filter by Status (InProgress)
+# @name getStepsInProgress
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps?status=InProgress
+Authorization: Bearer {{accessToken}}
+
+### Get Steps - Filter by Status (Completed)
+# @name getStepsCompleted
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps?status=Completed
+Authorization: Bearer {{accessToken}}
+
+### Get Steps - Invalid Plan ID (Negative Test)
+# @name getStepsInvalidPlan
+GET {{baseUrl}}/careerplans/99999999-9999-9999-9999-999999999999/steps
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 3. ?????? ??? ???? ????? (Get Step by ID)
+###############################################################################
+
+### Get Step by ID
+# @name getStepById
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}
+Authorization: Bearer {{accessToken}}
+
+### Get Step - With Resources and Milestones
+# @name getStepWithDetails
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}?includeResources=true&includeMilestones=true
+Authorization: Bearer {{accessToken}}
+
+### Get Step - Invalid ID (Negative Test)
+# @name getStepInvalidId
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 4. ????? ???? (Update Step)
+###############################################################################
+
+### Update Step - Full Update
+# @name updateStep
+PUT {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Master React Fundamentals - Updated",
+  "description": "Updated description with more details about React fundamentals",
+  "order": 1,
+  "estimatedDuration": 5,
+  "status": "InProgress",
+  "resources": [
+    {
+      "title": "React Official Documentation",
+      "url": "https://react.dev",
+      "type": "Documentation"
+    },
+    {
+      "title": "React Tutorial for Beginners",
+      "url": "https://youtube.com/react-tutorial",
+      "type": "Video"
+    },
+    {
+      "title": "React Hooks Deep Dive",
+      "url": "https://youtube.com/hooks-deep-dive",
+      "type": "Video"
+    }
+  ],
+  "milestones": [
+    "Understand JSX syntax",
+    "Create functional components",
+    "Master useState and useEffect",
+    "Master useContext and useReducer",
+    "Build a todo app with local storage"
+  ]
+}
+
+### Update Step - Partial Update (Title and Status)
+# @name updateStepPartial
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "React Fundamentals - In Progress",
+  "status": "InProgress"
+}
+
+### Update Step - Invalid Data (Negative Test)
+# @name updateStepInvalid
+PUT {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "estimatedDuration": -3
+}
+
+###############################################################################
+# 5. ????? ???? ?????? (Update Step Status)
+###############################################################################
+
+### Update Step Status - Mark as In Progress
+# @name updateStepStatusInProgress
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "InProgress",
+  "startDate": "2025-01-15T10:00:00Z"
+}
+
+### Update Step Status - Mark as Completed
+# @name updateStepStatusCompleted
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "Completed",
+  "completionDate": "2025-02-15T18:00:00Z",
+  "notes": "Successfully completed all milestones and built the todo app"
+}
+
+### Update Step Status - Mark as Blocked
+# @name updateStepStatusBlocked
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step2Id}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "Blocked",
+  "notes": "Waiting for Step 1 completion"
+}
+
+### Update Status - Invalid Status (Negative Test)
+# @name updateStepStatusInvalid
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "status": "InvalidStatus"
+}
+
+###############################################################################
+# 6. ????? ???? ?????? (Update Step Progress)
+###############################################################################
+
+### Update Progress - 25%
+# @name updateProgress25
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 25,
+  "notes": "Completed JSX and component basics"
+}
+
+### Update Progress - 50%
+# @name updateProgress50
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 50,
+  "notes": "Mastered useState and useEffect hooks"
+}
+
+### Update Progress - 75%
+# @name updateProgress75
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 75,
+  "notes": "Built basic todo app, working on advanced features"
+}
+
+### Update Progress - 100%
+# @name updateProgress100
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 100,
+  "notes": "Completed all milestones successfully!"
+}
+
+### Update Progress - Invalid Percentage (Negative Test)
+# @name updateProgressInvalid
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/progress
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "progressPercentage": 150
+}
+
+###############################################################################
+# 7. ????? ????? ??????? (Reorder Steps)
+###############################################################################
+
+### Reorder Steps - Move Step to Different Position
+# @name reorderSteps
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "stepOrders": [
+    {
+      "stepId": "{{stepId}}",
+      "newOrder": 2
+    },
+    {
+      "stepId": "{{step2Id}}",
+      "newOrder": 1
+    },
+    {
+      "stepId": "{{step3Id}}",
+      "newOrder": 3
+    }
+  ]
+}
+
+### Verify New Order
+# @name verifyReorder
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps?sortBy=order
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 8. ????? ????? ?????? (Add Resources to Step)
+###############################################################################
+
+### Add Resources to Step
+# @name addResources
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/resources
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "resources": [
+    {
+      "title": "React Design Patterns",
+      "url": "https://patterns.dev/posts/react-patterns",
+      "type": "Article"
+    },
+    {
+      "title": "Advanced React Course",
+      "url": "https://frontendmasters.com/react-advanced",
+      "type": "Course"
+    }
+  ]
+}
+
+### Get Step with Updated Resources
+# @name getStepWithResources
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 9. ????? ????? ?????? (Update Step Milestones)
+###############################################################################
+
+### Mark Milestone as Completed
+# @name completeMilestone
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/milestones
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "milestoneIndex": 0,
+  "isCompleted": true,
+  "completionDate": "2025-01-20T14:00:00Z"
+}
+
+### Mark Multiple Milestones as Completed
+# @name completeMultipleMilestones
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/milestones/bulk
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "completedMilestones": [0, 1, 2]
+}
+
+###############################################################################
+# 10. ??? ???? (Delete Step)
+###############################################################################
+
+### Delete Step - Soft Delete
+# @name deleteStep
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step3Id}}
+Authorization: Bearer {{accessToken}}
+
+### Verify Step is Deleted
+# @name verifyStepDeleted
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step3Id}}
+Authorization: Bearer {{accessToken}}
+
+### Delete Step - Already Deleted (Negative Test)
+# @name deleteStepAgain
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{step3Id}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 11. ???????? ??????? (Steps Statistics)
+###############################################################################
+
+### Get Steps Statistics for Plan
+# @name getStepsStatistics
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/statistics
+Authorization: Bearer {{accessToken}}
+
+### Get Overall Progress
+# @name getOverallProgress
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/progress
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 12. ??? ???? ??? ??? ???? (Copy Step to Another Plan)
+###############################################################################
+
+### Copy Step to Another Plan
+# @name copyStep
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/copy
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetPlanId": "{{otherPlanId}}",
+  "includeResources": true,
+  "includeMilestones": true
+}
+
+###############################################################################
+# Testing Scenarios:
+# -----------------------------------------------------------------------------
+# ? Scenario 1: Complete Step Creation Flow
+#    1. Create Plan ? Add 4 Steps ? Get All Steps ? Verify Order
+#
+# ? Scenario 2: Step Progress Tracking
+#    1. Create Step ? Start (InProgress) ? Update Progress 25% ? 50% ? 75% ? Complete
+#
+# ? Scenario 3: Step Management
+#    1. Create Steps ? Reorder ? Update ? Delete ? Verify
+#
+# ? Scenario 4: Resources and Milestones
+#    1. Create Step ? Add Resources ? Complete Milestones ? Track Progress
+#
+# ? Scenario 5: Multi-Step Workflow
+#    1. Create 4 Steps ? Complete Step 1 ? Start Step 2 ? Block Step 3 ? Track Overall Progress
+#
+# Expected Results:
+# - POST /steps: 201 Created with step details
+# - GET /steps: 200 OK with list of steps
+# - GET /steps/{id}: 200 OK with step details
+# - PUT /steps/{id}: 200 OK with updated step
+# - PATCH /steps/{id}/status: 200 OK
+# - PATCH /steps/{id}/progress: 200 OK
+# - DELETE /steps/{id}: 204 No Content
+# - All Negative Tests: 400/404 with appropriate error messages
+###############################################################################

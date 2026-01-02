@@ -1,0 +1,600 @@
+###############################################################################
+# Career Builder Module - Career Quiz Tests
+# Description: ????? ?????? (CRUD + Attempts + Scoring)
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@careerPlanId = {{createPlan.response.body.$.id}}
+@stepId = {{createStep.response.body.$.id}}
+@quizId = {{createQuiz.response.body.$.id}}
+@attemptId = {{startAttempt.response.body.$.id}}
+
+###############################################################################
+# 1. ????? ???? ?????? (Create Quiz for Step)
+###############################################################################
+
+### Create Quiz - React Fundamentals Assessment
+# @name createQuiz
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "React Fundamentals Assessment",
+  "description": "Test your knowledge of React basics, hooks, and components",
+  "passingScore": 70,
+  "timeLimit": 30,
+  "questions": [
+    {
+      "questionText": "What is JSX?",
+      "questionType": "MultipleChoice",
+      "order": 1,
+      "points": 10,
+      "options": [
+        {
+          "optionText": "JavaScript XML - A syntax extension for JavaScript",
+          "isCorrect": true,
+          "explanation": "JSX allows you to write HTML-like code in JavaScript"
+        },
+        {
+          "optionText": "A JavaScript library",
+          "isCorrect": false,
+          "explanation": "JSX is not a library, it's a syntax extension"
+        },
+        {
+          "optionText": "A database query language",
+          "isCorrect": false,
+          "explanation": "JSX has nothing to do with databases"
+        },
+        {
+          "optionText": "A CSS framework",
+          "isCorrect": false,
+          "explanation": "JSX is not related to CSS"
+        }
+      ]
+    },
+    {
+      "questionText": "Which hook is used for managing state in functional components?",
+      "questionType": "MultipleChoice",
+      "order": 2,
+      "points": 10,
+      "options": [
+        {
+          "optionText": "useState",
+          "isCorrect": true,
+          "explanation": "useState is the primary hook for managing component state"
+        },
+        {
+          "optionText": "useEffect",
+          "isCorrect": false,
+          "explanation": "useEffect is for side effects, not state management"
+        },
+        {
+          "optionText": "useContext",
+          "isCorrect": false,
+          "explanation": "useContext is for consuming context, not managing state"
+        },
+        {
+          "optionText": "useReducer",
+          "isCorrect": false,
+          "explanation": "While useReducer can manage state, useState is the basic hook"
+        }
+      ]
+    },
+    {
+      "questionText": "What does useEffect hook do?",
+      "questionType": "MultipleChoice",
+      "order": 3,
+      "points": 10,
+      "options": [
+        {
+          "optionText": "Performs side effects in functional components",
+          "isCorrect": true,
+          "explanation": "useEffect is used for side effects like data fetching and subscriptions"
+        },
+        {
+          "optionText": "Creates state variables",
+          "isCorrect": false,
+          "explanation": "That's what useState does"
+        },
+        {
+          "optionText": "Renders components",
+          "isCorrect": false,
+          "explanation": "React automatically renders components"
+        },
+        {
+          "optionText": "Handles events",
+          "isCorrect": false,
+          "explanation": "Events are handled with event handlers"
+        }
+      ]
+    },
+    {
+      "questionText": "Select all valid React hooks:",
+      "questionType": "MultipleSelect",
+      "order": 4,
+      "points": 15,
+      "options": [
+        {
+          "optionText": "useState",
+          "isCorrect": true
+        },
+        {
+          "optionText": "useEffect",
+          "isCorrect": true
+        },
+        {
+          "optionText": "useProps",
+          "isCorrect": false
+        },
+        {
+          "optionText": "useContext",
+          "isCorrect": true
+        },
+        {
+          "optionText": "useComponent",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionText": "Explain the difference between props and state in React.",
+      "questionType": "Essay",
+      "order": 5,
+      "points": 20,
+      "referenceAnswer": "Props are read-only data passed from parent to child components, while state is mutable data managed within a component. Props are used for component communication, state is for internal component data."
+    },
+    {
+      "questionText": "Props are immutable in React.",
+      "questionType": "TrueFalse",
+      "order": 6,
+      "points": 10,
+      "options": [
+        {
+          "optionText": "True",
+          "isCorrect": true,
+          "explanation": "Props cannot be modified by the child component"
+        },
+        {
+          "optionText": "False",
+          "isCorrect": false,
+          "explanation": "Props are indeed immutable"
+        }
+      ]
+    },
+    {
+      "questionText": "Write a simple useState example to manage a counter.",
+      "questionType": "Code",
+      "order": 7,
+      "points": 25,
+      "codeLanguage": "javascript",
+      "referenceAnswer": "const [count, setCount] = useState(0);\nconst increment = () => setCount(count + 1);"
+    }
+  ]
+}
+
+### Create Quiz - State Management Quiz
+# @name createQuiz2
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "State Management Quiz",
+  "description": "Test your Redux and Context API knowledge",
+  "passingScore": 75,
+  "timeLimit": 45,
+  "questions": [
+    {
+      "questionText": "What is Redux?",
+      "questionType": "MultipleChoice",
+      "order": 1,
+      "points": 20,
+      "options": [
+        {
+          "optionText": "A predictable state container for JavaScript apps",
+          "isCorrect": true
+        },
+        {
+          "optionText": "A React component library",
+          "isCorrect": false
+        },
+        {
+          "optionText": "A routing library",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionText": "Explain the Redux data flow.",
+      "questionType": "Essay",
+      "order": 2,
+      "points": 30,
+      "referenceAnswer": "Action ? Reducer ? Store ? View. Components dispatch actions, reducers handle actions and update state, store holds the state, and views subscribe to state changes."
+    }
+  ]
+}
+
+### Create Quiz - Missing Required Fields (Negative Test)
+# @name createQuizInvalid
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/quizzes
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Incomplete Quiz"
+}
+
+###############################################################################
+# 2. ?????? ??? ???? ???????? (Get All Quizzes)
+###############################################################################
+
+### Get All Quizzes for Step
+# @name getAllQuizzes
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/quizzes
+Authorization: Bearer {{accessToken}}
+
+### Get All Quizzes for Career Plan
+# @name getAllQuizzesForPlan
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/quizzes
+Authorization: Bearer {{accessToken}}
+
+### Get Quizzes - With Pagination
+# @name getQuizzesPaginated
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/quizzes?pageNumber=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 3. ?????? ??? ???? ???? (Get Quiz by ID)
+###############################################################################
+
+### Get Quiz by ID - With Questions
+# @name getQuizById
+GET {{baseUrl}}/careerquizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+### Get Quiz by ID - Without Answers (For Taking Quiz)
+# @name getQuizForTaking
+GET {{baseUrl}}/careerquizzes/{{quizId}}/take
+Authorization: Bearer {{accessToken}}
+
+### Get Quiz - Invalid ID (Negative Test)
+# @name getQuizInvalidId
+GET {{baseUrl}}/careerquizzes/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 4. ????? ?????? (Update Quiz)
+###############################################################################
+
+### Update Quiz - Full Update
+# @name updateQuiz
+PUT {{baseUrl}}/careerquizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "React Fundamentals Assessment - Updated",
+  "description": "Updated comprehensive test of React basics",
+  "passingScore": 75,
+  "timeLimit": 40,
+  "questions": [
+    {
+      "questionText": "What is JSX in React?",
+      "questionType": "MultipleChoice",
+      "order": 1,
+      "points": 10,
+      "options": [
+        {
+          "optionText": "JavaScript XML",
+          "isCorrect": true
+        },
+        {
+          "optionText": "Java Syntax Extension",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}
+
+### Update Quiz - Partial Update
+# @name updateQuizPartial
+PATCH {{baseUrl}}/careerquizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeLimit": 35,
+  "passingScore": 80
+}
+
+###############################################################################
+# 5. ??? ?????? ???? (Start Quiz Attempt)
+###############################################################################
+
+### Start Quiz Attempt
+# @name startAttempt
+POST {{baseUrl}}/careerquizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "startTime": "2025-01-15T10:00:00Z"
+}
+
+### Get Active Attempt
+# @name getActiveAttempt
+GET {{baseUrl}}/careerquizzes/{{quizId}}/attempts/active
+Authorization: Bearer {{accessToken}}
+
+### Start Attempt - Already Active (Negative Test)
+# @name startAttemptDuplicate
+POST {{baseUrl}}/careerquizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "startTime": "2025-01-15T10:05:00Z"
+}
+
+###############################################################################
+# 6. ??????? ??? ??????? (Answer Questions)
+###############################################################################
+
+### Submit Answer - Question 1 (Multiple Choice)
+# @name submitAnswer1
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionId": "question-1-id",
+  "selectedOptionIds": ["option-1-id"],
+  "answerText": null
+}
+
+### Submit Answer - Question 4 (Multiple Select)
+# @name submitAnswer4
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionId": "question-4-id",
+  "selectedOptionIds": ["option-4-1-id", "option-4-2-id", "option-4-4-id"],
+  "answerText": null
+}
+
+### Submit Answer - Question 5 (Essay)
+# @name submitAnswer5
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionId": "question-5-id",
+  "selectedOptionIds": null,
+  "answerText": "Props are read-only data passed from parent components, while state is mutable data managed within the component itself. Props enable component communication, and state manages internal component data that can change over time."
+}
+
+### Submit Answer - Question 7 (Code)
+# @name submitAnswer7
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionId": "question-7-id",
+  "selectedOptionIds": null,
+  "answerText": "const [count, setCount] = useState(0);\nconst increment = () => setCount(prevCount => prevCount + 1);\nconst decrement = () => setCount(prevCount => prevCount - 1);"
+}
+
+### Update Answer (Change Answer Before Submission)
+# @name updateAnswer
+PUT {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers/{{answerId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "selectedOptionIds": ["option-1-corrected-id"],
+  "answerText": null
+}
+
+###############################################################################
+# 7. ????? ???????? (Submit Quiz Attempt)
+###############################################################################
+
+### Submit Quiz Attempt
+# @name submitAttempt
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "endTime": "2025-01-15T10:28:00Z"
+}
+
+### Get Attempt Results
+# @name getAttemptResults
+GET {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/results
+Authorization: Bearer {{accessToken}}
+
+### Submit Attempt - Already Submitted (Negative Test)
+# @name submitAttemptAgain
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "endTime": "2025-01-15T10:30:00Z"
+}
+
+###############################################################################
+# 8. ?????? ??? ???? ????????? (Get All Attempts)
+###############################################################################
+
+### Get All Attempts for Quiz
+# @name getAllAttempts
+GET {{baseUrl}}/careerquizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+
+### Get User's Attempts for Quiz
+# @name getUserAttempts
+GET {{baseUrl}}/careerquizzes/{{quizId}}/attempts/my
+Authorization: Bearer {{accessToken}}
+
+### Get Best Attempt
+# @name getBestAttempt
+GET {{baseUrl}}/careerquizzes/{{quizId}}/attempts/best
+Authorization: Bearer {{accessToken}}
+
+### Get Latest Attempt
+# @name getLatestAttempt
+GET {{baseUrl}}/careerquizzes/{{quizId}}/attempts/latest
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 9. ?????? ???????? (Review Answers)
+###############################################################################
+
+### Get Detailed Review with Correct Answers
+# @name getDetailedReview
+GET {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/review
+Authorization: Bearer {{accessToken}}
+
+### Get Question-by-Question Review
+# @name getQuestionReview
+GET {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/review/questions
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 10. ???????? ?????? (Quiz Statistics)
+###############################################################################
+
+### Get Quiz Statistics
+# @name getQuizStatistics
+GET {{baseUrl}}/careerquizzes/{{quizId}}/statistics
+Authorization: Bearer {{accessToken}}
+
+### Get User Quiz Performance
+# @name getUserQuizPerformance
+GET {{baseUrl}}/careerquizzes/performance
+Authorization: Bearer {{accessToken}}
+
+### Get Step Quiz Summary
+# @name getStepQuizSummary
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/steps/{{stepId}}/quizzes/summary
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 11. ????? ???????? (Retry Quiz)
+###############################################################################
+
+### Start New Attempt (Retry)
+# @name retryQuiz
+POST {{baseUrl}}/careerquizzes/{{quizId}}/attempts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "startTime": "2025-01-16T10:00:00Z"
+}
+
+###############################################################################
+# 12. ??? ?????? (Delete Quiz)
+###############################################################################
+
+### Delete Quiz
+# @name deleteQuiz
+DELETE {{baseUrl}}/careerquizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+### Verify Quiz is Deleted
+# @name verifyQuizDeleted
+GET {{baseUrl}}/careerquizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 13. ????? ???????? ?????? (Grade Essay/Code Answers)
+###############################################################################
+
+### Grade Essay Answer - Manual Grading
+# @name gradeEssayAnswer
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers/{{essayAnswerId}}/grade
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "score": 18,
+  "maxScore": 20,
+  "feedback": "Good explanation of props vs state. Could add more details about immutability."
+}
+
+### Grade Code Answer - Manual Grading
+# @name gradeCodeAnswer
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers/{{codeAnswerId}}/grade
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "score": 23,
+  "maxScore": 25,
+  "feedback": "Excellent useState implementation. Consider adding error handling."
+}
+
+### Bulk Grade Answers
+# @name bulkGradeAnswers
+POST {{baseUrl}}/careerquizzes/attempts/{{attemptId}}/answers/grade-bulk
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "grades": [
+    {
+      "answerId": "{{essayAnswerId}}",
+      "score": 18,
+      "feedback": "Good answer"
+    },
+    {
+      "answerId": "{{codeAnswerId}}",
+      "score": 23,
+      "feedback": "Excellent code"
+    }
+  ]
+}
+
+###############################################################################
+# Testing Scenarios:
+# -----------------------------------------------------------------------------
+# ? Scenario 1: Complete Quiz Flow
+#    1. Create Quiz ? Start Attempt ? Answer All Questions ? Submit ? View Results
+#
+# ? Scenario 2: Multiple Attempts
+#    1. Take Quiz (Fail) ? Review Answers ? Retry ? Pass
+#
+# ? Scenario 3: Different Question Types
+#    1. Answer Multiple Choice ? Multiple Select ? Essay ? Code ? True/False
+#
+# ? Scenario 4: Time Management
+#    1. Start Quiz ? Check Time Remaining ? Submit Before Time Expires
+#
+# ? Scenario 5: Manual Grading
+#    1. Submit Quiz ? Auto-grade MC/MS/TF ? Manual Grade Essay/Code ? Final Score
+#
+# Expected Results:
+# - POST /quizzes: 201 Created with quiz and questions
+# - POST /attempts: 201 Created with attempt details
+# - POST /answers: 201 Created for each answer
+# - POST /submit: 200 OK with automatic grading for objective questions
+# - GET /results: 200 OK with score, passing status, and detailed feedback
+# - POST /grade: 200 OK with manual scores for essay/code questions
+# - All Negative Tests: 400/404/409 with appropriate error messages
+###############################################################################

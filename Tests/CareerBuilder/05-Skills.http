@@ -1,0 +1,563 @@
+###############################################################################
+# Career Builder Module - Skills Tests
+# Description: ????? ???????? (CRUD + Linking to Plans)
+# Base URL: https://localhost:7134/api
+###############################################################################
+
+@baseUrl = https://localhost:7134/api
+@contentType = application/json
+
+###############################################################################
+# Variables
+###############################################################################
+@accessToken = {{login.response.body.$.accessToken}}
+@careerPlanId = {{createPlan.response.body.$.id}}
+@skillId = {{createSkill.response.body.$.id}}
+@skill2Id = {{createSkill2.response.body.$.id}}
+@skill3Id = {{createSkill3.response.body.$.id}}
+
+###############################################################################
+# 1. ????? ?????? (Create Skills)
+###############################################################################
+
+### Create Skill - React
+# @name createSkill
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "React",
+  "category": "Frontend Framework",
+  "description": "A JavaScript library for building user interfaces",
+  "proficiencyLevel": "Intermediate",
+  "tags": ["JavaScript", "Frontend", "Web Development", "UI"]
+}
+
+### Create Skill - TypeScript
+# @name createSkill2
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "TypeScript",
+  "category": "Programming Language",
+  "description": "Typed superset of JavaScript that compiles to plain JavaScript",
+  "proficiencyLevel": "Beginner",
+  "tags": ["JavaScript", "Type Safety", "Programming"]
+}
+
+### Create Skill - Node.js
+# @name createSkill3
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Node.js",
+  "category": "Backend Framework",
+  "description": "JavaScript runtime built on Chrome's V8 engine",
+  "proficiencyLevel": "Intermediate",
+  "tags": ["JavaScript", "Backend", "Server-Side"]
+}
+
+### Create Skill - Docker
+# @name createSkill4
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Docker",
+  "category": "DevOps Tool",
+  "description": "Platform for developing, shipping, and running applications in containers",
+  "proficiencyLevel": "Beginner",
+  "tags": ["DevOps", "Containerization", "Infrastructure"]
+}
+
+### Create Skill - PostgreSQL
+# @name createSkill5
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "PostgreSQL",
+  "category": "Database",
+  "description": "Open-source relational database management system",
+  "proficiencyLevel": "Intermediate",
+  "tags": ["Database", "SQL", "Backend"]
+}
+
+### Create Skill - Redux
+# @name createSkill6
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Redux",
+  "category": "State Management",
+  "description": "Predictable state container for JavaScript apps",
+  "proficiencyLevel": "Advanced",
+  "tags": ["JavaScript", "State Management", "React"]
+}
+
+### Create Skill - Missing Name (Negative Test)
+# @name createSkillInvalid
+POST {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "category": "Programming",
+  "description": "Missing name field"
+}
+
+### Create Skill - Without Authentication (Negative Test)
+# @name createSkillNoAuth
+POST {{baseUrl}}/skills
+Content-Type: {{contentType}}
+
+{
+  "name": "Unauthorized Skill",
+  "category": "Test"
+}
+
+###############################################################################
+# 2. ?????? ??? ???? ???????? (Get All Skills)
+###############################################################################
+
+### Get All Skills
+# @name getAllSkills
+GET {{baseUrl}}/skills
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - With Pagination
+# @name getSkillsPaginated
+GET {{baseUrl}}/skills?pageNumber=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Filter by Category
+# @name getSkillsByCategory
+GET {{baseUrl}}/skills?category=Frontend Framework
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Filter by Proficiency Level
+# @name getSkillsByProficiency
+GET {{baseUrl}}/skills?proficiencyLevel=Intermediate
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Search by Name
+# @name searchSkills
+GET {{baseUrl}}/skills?search=React
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Search by Tag
+# @name getSkillsByTag
+GET {{baseUrl}}/skills?tag=JavaScript
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Multiple Filters
+# @name getSkillsFiltered
+GET {{baseUrl}}/skills?category=Frontend Framework&proficiencyLevel=Intermediate&tag=JavaScript
+Authorization: Bearer {{accessToken}}
+
+### Get Skills - Without Authentication (Negative Test)
+# @name getAllSkillsNoAuth
+GET {{baseUrl}}/skills
+
+###############################################################################
+# 3. ?????? ??? ????? ????? (Get Skill by ID)
+###############################################################################
+
+### Get Skill by ID
+# @name getSkillById
+GET {{baseUrl}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+
+### Get Skill - With Related Career Plans
+# @name getSkillWithPlans
+GET {{baseUrl}}/skills/{{skillId}}?includePlans=true
+Authorization: Bearer {{accessToken}}
+
+### Get Skill - Invalid ID (Negative Test)
+# @name getSkillInvalidId
+GET {{baseUrl}}/skills/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Get Skill - Non-existent ID (Negative Test)
+# @name getSkillNotFound
+GET {{baseUrl}}/skills/99999999-9999-9999-9999-999999999999
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 4. ????? ??????? (Update Skill)
+###############################################################################
+
+### Update Skill - Full Update
+# @name updateSkill
+PUT {{baseUrl}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "React (Advanced)",
+  "category": "Frontend Framework",
+  "description": "Advanced React including hooks, context, and performance optimization",
+  "proficiencyLevel": "Advanced",
+  "tags": ["JavaScript", "Frontend", "Web Development", "UI", "Advanced"]
+}
+
+### Update Skill - Partial Update (Proficiency Only)
+# @name updateSkillPartial
+PATCH {{baseUrl}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "proficiencyLevel": "Expert"
+}
+
+### Update Skill - Add Tags
+# @name addTags
+PATCH {{baseUrl}}/skills/{{skillId}}/tags
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "tags": ["Hooks", "Context API", "Performance"]
+}
+
+### Update Skill - Invalid Proficiency (Negative Test)
+# @name updateSkillInvalid
+PUT {{baseUrl}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "proficiencyLevel": "InvalidLevel"
+}
+
+###############################################################################
+# 5. ??? ???????? ???? ??????? (Link Skills to Career Plan)
+###############################################################################
+
+### Link Skill to Career Plan
+# @name linkSkillToPlan
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "skillId": "{{skillId}}",
+  "targetProficiencyLevel": "Expert",
+  "priority": "High",
+  "notes": "Essential for full-stack development"
+}
+
+### Link Multiple Skills to Plan
+# @name linkMultipleSkills
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/skills/bulk
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "skills": [
+    {
+      "skillId": "{{skill2Id}}",
+      "targetProficiencyLevel": "Advanced",
+      "priority": "High"
+    },
+    {
+      "skillId": "{{skill3Id}}",
+      "targetProficiencyLevel": "Advanced",
+      "priority": "Medium"
+    },
+    {
+      "skillId": "{{skill4Id}}",
+      "targetProficiencyLevel": "Intermediate",
+      "priority": "Low"
+    }
+  ]
+}
+
+### Link Skill - Already Linked (Negative Test)
+# @name linkSkillDuplicate
+POST {{baseUrl}}/careerplans/{{careerPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "skillId": "{{skillId}}",
+  "targetProficiencyLevel": "Expert",
+  "priority": "High"
+}
+
+###############################################################################
+# 6. ?????? ??? ?????? ??? ??????? (Get Skills for Career Plan)
+###############################################################################
+
+### Get All Skills for Career Plan
+# @name getPlanSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+
+### Get Plan Skills - Filter by Priority
+# @name getPlanSkillsByPriority
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills?priority=High
+Authorization: Bearer {{accessToken}}
+
+### Get Plan Skills - Filter by Proficiency Gap
+# @name getPlanSkillsByGap
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills?showGap=true
+Authorization: Bearer {{accessToken}}
+
+### Get Required Skills (Not Yet Acquired)
+# @name getRequiredSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/required
+Authorization: Bearer {{accessToken}}
+
+### Get Acquired Skills
+# @name getAcquiredSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/acquired
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 7. ????? ??? ??????? (Update Skill Link)
+###############################################################################
+
+### Update Skill Link - Change Target Proficiency
+# @name updateSkillLink
+PUT {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetProficiencyLevel": "Expert",
+  "priority": "Critical",
+  "notes": "Updated priority based on job requirements"
+}
+
+### Update Current Proficiency
+# @name updateCurrentProficiency
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skillId}}/proficiency
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentProficiencyLevel": "Advanced",
+  "lastAssessmentDate": "2025-01-15T10:00:00Z",
+  "notes": "Completed advanced React course"
+}
+
+### Mark Skill as Acquired
+# @name markSkillAcquired
+PATCH {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skillId}}/acquire
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "acquiredDate": "2025-01-20T15:00:00Z",
+  "certificationUrl": "https://certificates.com/react-expert-123",
+  "notes": "Passed certification exam with 95%"
+}
+
+###############################################################################
+# 8. ????? ????? ?? ????? (Remove Skill from Plan)
+###############################################################################
+
+### Unlink Skill from Career Plan
+# @name unlinkSkill
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skill4Id}}
+Authorization: Bearer {{accessToken}}
+
+### Verify Skill Unlinked
+# @name verifySkillUnlinked
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills
+Authorization: Bearer {{accessToken}}
+
+### Unlink Skill - Already Removed (Negative Test)
+# @name unlinkSkillAgain
+DELETE {{baseUrl}}/careerplans/{{careerPlanId}}/skills/{{skill4Id}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 9. ??? ??????? (Delete Skill)
+###############################################################################
+
+### Delete Skill - Soft Delete
+# @name deleteSkill
+DELETE {{baseUrl}}/skills/{{skill6Id}}
+Authorization: Bearer {{accessToken}}
+
+### Verify Skill is Deleted
+# @name verifySkillDeleted
+GET {{baseUrl}}/skills/{{skill6Id}}
+Authorization: Bearer {{accessToken}}
+
+### Delete Skill - In Use (Should Fail if linked to plans)
+# @name deleteSkillInUse
+DELETE {{baseUrl}}/skills/{{skillId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 10. ???????? ???????? (Skills Statistics)
+###############################################################################
+
+### Get User's Skills Statistics
+# @name getSkillsStatistics
+GET {{baseUrl}}/skills/statistics
+Authorization: Bearer {{accessToken}}
+
+### Get Skills Distribution by Category
+# @name getSkillsByDistribution
+GET {{baseUrl}}/skills/distribution
+Authorization: Bearer {{accessToken}}
+
+### Get Proficiency Levels Summary
+# @name getProficiencySummary
+GET {{baseUrl}}/skills/proficiency-summary
+Authorization: Bearer {{accessToken}}
+
+### Get Career Plan Skills Progress
+# @name getPlanSkillsProgress
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/progress
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 11. ???????? ?????? ??? (Recommended Skills)
+###############################################################################
+
+### Get Recommended Skills for Career Plan
+# @name getRecommendedSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/recommendations
+Authorization: Bearer {{accessToken}}
+
+### Get Skills Gap Analysis
+# @name getSkillsGapAnalysis
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/gap-analysis
+Authorization: Bearer {{accessToken}}
+
+### Get Skills Roadmap
+# @name getSkillsRoadmap
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/roadmap
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 12. ???????/????? ???????? (Import/Export Skills)
+###############################################################################
+
+### Export Skills to JSON
+# @name exportSkills
+GET {{baseUrl}}/skills/export
+Authorization: Bearer {{accessToken}}
+
+### Export Career Plan Skills
+# @name exportPlanSkills
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/export
+Authorization: Bearer {{accessToken}}
+
+### Import Skills from JSON
+# @name importSkills
+POST {{baseUrl}}/skills/import
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "skills": [
+    {
+      "name": "Kubernetes",
+      "category": "DevOps Tool",
+      "description": "Container orchestration platform",
+      "proficiencyLevel": "Beginner",
+      "tags": ["DevOps", "Containers", "Orchestration"]
+    },
+    {
+      "name": "AWS",
+      "category": "Cloud Platform",
+      "description": "Amazon Web Services cloud platform",
+      "proficiencyLevel": "Intermediate",
+      "tags": ["Cloud", "Infrastructure", "AWS"]
+    }
+  ]
+}
+
+###############################################################################
+# 13. ????? ???????? (Skills Assessment)
+###############################################################################
+
+### Create Skills Assessment
+# @name createAssessment
+POST {{baseUrl}}/skills/{{skillId}}/assessments
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "assessmentType": "SelfAssessment",
+  "score": 85,
+  "proficiencyLevel": "Advanced",
+  "assessmentDate": "2025-01-15T10:00:00Z",
+  "notes": "Completed advanced React patterns course",
+  "certificationUrl": "https://certificates.com/react-123"
+}
+
+### Get Assessment History
+# @name getAssessmentHistory
+GET {{baseUrl}}/skills/{{skillId}}/assessments
+Authorization: Bearer {{accessToken}}
+
+### Get Latest Assessment
+# @name getLatestAssessment
+GET {{baseUrl}}/skills/{{skillId}}/assessments/latest
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# 14. ?????? ???????? (Skills Comparison)
+###############################################################################
+
+### Compare Skills with Target Role
+# @name compareSkills
+POST {{baseUrl}}/skills/compare
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "targetRole": "Senior Full-Stack Developer",
+  "currentSkills": ["React", "Node.js", "PostgreSQL"]
+}
+
+### Get Skills Match Percentage
+# @name getSkillsMatch
+GET {{baseUrl}}/careerplans/{{careerPlanId}}/skills/match-percentage
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# Testing Scenarios:
+# -----------------------------------------------------------------------------
+# ? Scenario 1: Complete Skills Management Flow
+#    1. Create Skills ? Get All ? Update ? Delete
+#
+# ? Scenario 2: Skills and Career Plan Integration
+#    1. Create Plan ? Link Skills ? Track Progress ? Mark as Acquired
+#
+# ? Scenario 3: Skills Gap Analysis
+#    1. Define Target Skills ? Assess Current Skills ? Get Gap Analysis ? Create Action Plan
+#
+# ? Scenario 4: Skills Progress Tracking
+#    1. Link Skill ? Set Target ? Update Proficiency ? Complete Assessments ? Mark Acquired
+#
+# ? Scenario 5: Skills Recommendations
+#    1. Create Career Plan ? Get Recommended Skills ? Add to Plan ? Track Progress
+#
+# Expected Results:
+# - POST /skills: 201 Created with skill details
+# - GET /skills: 200 OK with list of skills
+# - GET /skills/{id}: 200 OK with skill details
+# - PUT /skills/{id}: 200 OK with updated skill
+# - POST /careerplans/{id}/skills: 201 Created with skill link
+# - GET /careerplans/{id}/skills: 200 OK with linked skills
+# - DELETE /skills/{id}: 204 No Content
+# - All Negative Tests: 400/404/409 with appropriate error messages
+###############################################################################
