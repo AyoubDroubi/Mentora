@@ -59,25 +59,42 @@ export default function CareerPlan() {
   };
 
   useEffect(() => {
+    const fetchCareerPlan = async () => {
+      // If no ID, show error
+      if (!id) {
+        setError('No career plan ID provided');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('accessToken');
+        
+        if (!token) {
+          setError('Please log in to view career plans');
+          setLoading(false);
+          return;
+        }
+
+        console.log('Fetching career plan:', id);
+        const response = await axios.get(`${API_URL}/career-plans/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log('Career plan loaded:', response.data);
+        setCareerPlan(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching career plan:', err);
+        setError(err.response?.data?.message || 'Failed to load career plan');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCareerPlan();
   }, [id]);
-
-  const fetchCareerPlan = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(`${API_URL}/career-plans/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCareerPlan(response.data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching career plan:', err);
-      setError(err.response?.data?.message || 'Failed to load career plan');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const Header = () => (
     <header
@@ -92,12 +109,14 @@ export default function CareerPlan() {
       </div>
 
       <div className="flex items-center gap-4">
-        <img
-          onClick={() => navigate('/profile')}
-          src={user?.avatar || '/default-avatar.png'}
-          alt="Profile"
-          className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-        />
+        {user?.avatar && (
+          <img
+            onClick={() => navigate('/profile')}
+            src={user.avatar}
+            alt="Profile"
+            className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
+          />
+        )}
       </div>
     </header>
   );
@@ -228,51 +247,55 @@ export default function CareerPlan() {
         <div className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: M.text }}>Career Roadmap</h2>
           <div className="space-y-6">
-            {careerPlan.steps.map((step, index) => {
-              const IconComponent = getStepIcon(index);
-              const isCompleted = step.progressPercentage === 100;
-              const isInProgress = step.progressPercentage > 0 && step.progressPercentage < 100;
-              
-              return (
-                <div key={step.id} className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
-                    isCompleted ? 'bg-green-100' : isInProgress ? 'bg-blue-100' : 'bg-gray-100'
-                  }`}>
-                    <IconComponent className={`w-6 h-6 ${
-                      isCompleted ? 'text-green-600' : isInProgress ? 'text-blue-600' : 'text-gray-400'
-                    }`} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold" style={{ color: M.text }}>
-                        Step {index + 1}: {step.name}
-                      </h3>
-                      {isCompleted && <CheckCircle className="w-5 h-5 text-green-600" />}
+            {careerPlan.steps && careerPlan.steps.length > 0 ? (
+              careerPlan.steps.map((step, index) => {
+                const IconComponent = getStepIcon(index);
+                const isCompleted = step.progressPercentage === 100;
+                const isInProgress = step.progressPercentage > 0 && step.progressPercentage < 100;
+                
+                return (
+                  <div key={step.id} className="flex items-start gap-4">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                      isCompleted ? 'bg-green-100' : isInProgress ? 'bg-blue-100' : 'bg-gray-100'
+                    }`}>
+                      <IconComponent className={`w-6 h-6 ${
+                        isCompleted ? 'text-green-600' : isInProgress ? 'text-blue-600' : 'text-gray-400'
+                      }`} />
                     </div>
-                    <p className="text-sm mb-3" style={{ color: M.muted }}>{step.description}</p>
-                    
-                    {/* Step Progress */}
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium" style={{ color: M.muted }}>Progress</span>
-                        <span className="text-xs font-bold" style={{ color: M.primary }}>
-                          {step.progressPercentage}%
-                        </span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold" style={{ color: M.text }}>
+                          Step {index + 1}: {step.name}
+                        </h3>
+                        {isCompleted && <CheckCircle className="w-5 h-5 text-green-600" />}
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="h-2 rounded-full transition-all"
-                          style={{
-                            width: `${step.progressPercentage}%`,
-                            backgroundColor: M.primary
-                          }}
-                        />
+                      <p className="text-sm mb-3" style={{ color: M.muted }}>{step.description}</p>
+                      
+                      {/* Step Progress */}
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium" style={{ color: M.muted }}>Progress</span>
+                          <span className="text-xs font-bold" style={{ color: M.primary }}>
+                            {step.progressPercentage}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full transition-all"
+                            style={{
+                              width: `${step.progressPercentage}%`,
+                              backgroundColor: M.primary
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <p style={{ color: M.muted }}>No steps found for this career plan.</p>
+            )}
           </div>
         </div>
 
