@@ -1,0 +1,438 @@
+### ========================================
+### PLANNER & ATTENDANCE - COMPLETE TESTS
+### ========================================
+
+@baseUrl = https://localhost:7000/api
+@accessToken = 
+
+### 1. Login First
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "saad@mentora.com",
+  "password": "Saad@123",
+  "deviceInfo": "Test"
+}
+
+###
+@accessToken = {{login.response.body.accessToken}}
+
+### ========================================
+### PLANNER (EVENTS) TESTS
+### ========================================
+
+### 2. Create Event (Upcoming - Tomorrow)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Software Engineering Midterm Exam",
+  "eventDateTime": "2026-01-15T10:00:00Z"
+}
+
+### 3. Create Event (Past - Yesterday)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Database Lab Session",
+  "eventDateTime": "2026-01-08T14:00:00Z"
+}
+
+### 4. Create Event (Today)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Team Meeting",
+  "eventDateTime": "2026-01-10T15:00:00Z"
+}
+
+### 5. Get All Events
+GET {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+
+### 6. Get Events by Date (2026-01-15)
+GET {{baseUrl}}/planner/events?date=2026-01-15
+Authorization: Bearer {{accessToken}}
+
+### 7. Get Upcoming Events
+GET {{baseUrl}}/planner/events/upcoming
+Authorization: Bearer {{accessToken}}
+
+### 8. Mark Event as Attended (Get event ID from previous responses)
+# Replace {eventId} with actual ID
+PATCH {{baseUrl}}/planner/events/{eventId}/attend
+Authorization: Bearer {{accessToken}}
+
+### 9. Create Event with Arabic Title
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "?????? ????? ????? - ????? ????????",
+  "eventDateTime": "2026-01-20T10:00:00Z"
+}
+
+### 10. Delete Event
+# Replace {eventId} with actual ID
+DELETE {{baseUrl}}/planner/events/{eventId}
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### TODO TESTS (For Progress Calculation)
+### ========================================
+
+### 11. Create Multiple Todos
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Complete Software Assignment"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Read Chapter 5"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Prepare for Exam"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Submit Lab Report"
+}
+
+### 12. Get All Todos
+GET {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+
+### 13. Toggle Todo (Complete)
+# Replace {todoId} with actual ID
+PATCH {{baseUrl}}/todo/{todoId}
+Authorization: Bearer {{accessToken}}
+
+### 14. Get Todo Summary
+GET {{baseUrl}}/todo/summary
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### ATTENDANCE & PROGRESS TESTS
+### ========================================
+
+### 15. Get Attendance Summary (Overall Progress)
+# This should calculate:
+# Progress = (completedTasks / totalTasks) * 50% + (attendedEvents / totalPastEvents) * 50%
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+### Expected Response:
+# {
+#   "totalTasks": 4,
+#   "completedTasks": 2,
+#   "pendingTasks": 2,
+#   "taskCompletionRate": 50,
+#   "totalPastEvents": 2,
+#   "attendedEvents": 1,
+#   "upcomingEvents": 3,
+#   "attendanceRate": 50,
+#   "progressPercentage": 50,
+#   "breakdown": {
+#     "tasksContribution": 25,
+#     "eventsContribution": 25
+#   }
+# }
+
+### 16. Get Attendance History (Last 7 Days)
+GET {{baseUrl}}/study-planner/attendance/history?days=7
+Authorization: Bearer {{accessToken}}
+
+### 17. Get Attendance History (Last 30 Days)
+GET {{baseUrl}}/study-planner/attendance/history?days=30
+Authorization: Bearer {{accessToken}}
+
+### 18. Get Weekly Progress
+GET {{baseUrl}}/study-planner/attendance/weekly
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### PROGRESS CALCULATION TEST SCENARIOS
+### ========================================
+
+### Scenario 1: 0% Progress (No completed tasks, no attended events)
+# 1. Delete all todos
+# 2. Delete all events
+# 3. Check progress -> Should be 0%
+
+### Scenario 2: 50% Progress (Tasks only)
+# 1. Create 4 tasks
+# 2. Complete 2 tasks (50%)
+# 3. No events
+# 4. Progress = (2/4) * 50% + 0% = 25%
+
+### Scenario 3: 50% Progress (Events only)
+# 1. No tasks
+# 2. Create 4 past events
+# 3. Mark 2 as attended (50%)
+# 4. Progress = 0% + (2/4) * 50% = 25%
+
+### Scenario 4: 100% Progress
+# 1. Create 4 tasks, complete all 4 (100%)
+# 2. Create 4 past events, mark all 4 as attended (100%)
+# 3. Progress = (4/4) * 50% + (4/4) * 50% = 100%
+
+### Scenario 5: 75% Progress
+# 1. Create 4 tasks, complete 3 (75%)
+# 2. Create 4 past events, mark 3 as attended (75%)
+# 3. Progress = (3/4) * 50% + (3/4) * 50% = 75%
+
+### ========================================
+### TEST: CREATE COMPLETE SCENARIO
+### ========================================
+
+### 19. Complete Test Scenario
+# Step 1: Create 10 tasks
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 1"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 2"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 3"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 4"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 5"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 6"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 7"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 8"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 9"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 10"
+}
+
+### Step 2: Create 6 past events
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 1 (Past)",
+  "eventDateTime": "2026-01-05T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 2 (Past)",
+  "eventDateTime": "2026-01-06T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 3 (Past)",
+  "eventDateTime": "2026-01-07T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 4 (Past)",
+  "eventDateTime": "2026-01-08T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 5 (Past)",
+  "eventDateTime": "2026-01-09T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 6 (Past)",
+  "eventDateTime": "2026-01-09T14:00:00Z"
+}
+
+### Step 3: Complete 6 out of 10 tasks (60%)
+# Use PATCH /api/todo/{id} for 6 different task IDs
+
+### Step 4: Mark 3 out of 6 events as attended (50%)
+# Use PATCH /api/planner/events/{id}/attend for 3 different event IDs
+
+### Step 5: Check Final Progress
+# Expected: (6/10) * 50% + (3/6) * 50% = 30% + 25% = 55%
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### VALIDATION TESTS
+### ========================================
+
+### 20. Invalid Event (Missing Title)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "eventDateTime": "2026-01-15T10:00:00Z"
+}
+
+### 21. Invalid Event (Missing DateTime)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Test Event"
+}
+
+### 22. Invalid Event (Past DateTime Format)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Test Event",
+  "eventDateTime": "invalid-date"
+}
+
+### ========================================
+### CLEANUP (Optional)
+### ========================================
+
+### 23. Delete All Test Todos
+# Use DELETE /api/todo/{id} for each todo
+
+### 24. Delete All Test Events
+# Use DELETE /api/planner/events/{id} for each event
+
+### ========================================
+### END OF TESTS
+### ========================================

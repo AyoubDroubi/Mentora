@@ -1,5 +1,7 @@
 using Mentora.Api.Configuration;
 using Mentora.Application.Interfaces;
+using Mentora.Application.Interfaces.Repositories;
+using Mentora.Application.Interfaces.Services;
 using Mentora.Domain.Entities.Auth;
 using Mentora.Infrastructure.BackgroundServices;
 using Mentora.Infrastructure.Data;
@@ -78,14 +80,30 @@ builder.Services.AddAuthorization();
 // 5. Background Services
 builder.Services.AddHostedService<TokenCleanupService>();
 
-// 6. Dependency Injection - Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
+// 6. Dependency Injection - Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>(); // Module 2: User Profile
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+builder.Services.AddScoped<IPlannerRepository, PlannerRepository>();
+builder.Services.AddScoped<INotesRepository, NotesRepository>();
+builder.Services.AddScoped<IStudyQuizRepository, StudyQuizRepository>();
+builder.Services.AddScoped<IStudySessionsRepository, StudySessionsRepository>();
 
-// 7. Controllers and API
+// 7. Dependency Injection - Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ITodoService, TodoService>();
+builder.Services.AddScoped<IPlannerService, PlannerService>();
+builder.Services.AddScoped<INotesService, NotesService>();
+builder.Services.AddScoped<IStudyQuizService, StudyQuizService>();
+builder.Services.AddScoped<IStudySessionsService, StudySessionsService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+
+// 8. Controllers and API
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -93,10 +111,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
     });
 
-// 8. Swagger Documentation (Always enabled)
+// 9. Swagger Documentation (Always enabled)
 builder.Services.AddSwaggerDocumentation();
 
-// 9. CORS - Updated for port 8000
+// 10. CORS - Updated for port 8000
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

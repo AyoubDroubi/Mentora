@@ -1,0 +1,699 @@
+### ========================================
+### MENTORA API - COMPREHENSIVE TEST SUITE
+### DDD Architecture Verification
+### ========================================
+
+### Environment Variables
+@baseUrl = https://localhost:7000/api
+@accessToken = 
+@refreshToken = 
+@userId = 
+
+### ========================================
+### 1. AUTHENTICATION TESTS
+### ========================================
+
+### 1.1 Register New User
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Hassan",
+  "email": "ahmed.test@mentora.com",
+  "password": "Test@123456"
+}
+
+### 1.2 Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "saad@mentora.com",
+  "password": "Saad@123",
+  "deviceInfo": "Chrome/Windows 11"
+}
+
+###
+@accessToken = {{login.response.body.accessToken}}
+@refreshToken = {{login.response.body.refreshToken}}
+
+### 1.3 Get Current User (Verify Token)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 1.4 Refresh Token
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 1.5 Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 1.6 Logout All Devices
+POST {{baseUrl}}/auth/logout-all
+Authorization: Bearer {{accessToken}}
+
+### 1.7 Forgot Password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "saad@mentora.com"
+}
+
+### ========================================
+### 2. USER PROFILE TESTS
+### ========================================
+
+### 2.1 Get Profile
+GET {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+
+### 2.2 Check Profile Exists
+GET {{baseUrl}}/userprofile/exists
+Authorization: Bearer {{accessToken}}
+
+### 2.3 Get Profile Completion
+GET {{baseUrl}}/userprofile/completion
+Authorization: Bearer {{accessToken}}
+
+### 2.4 Create/Update Profile (English)
+PUT {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "bio": "Passionate Computer Science student focused on AI and Software Engineering",
+  "location": "Amman, Jordan",
+  "phoneNumber": "+962791234567",
+  "dateOfBirth": "2000-01-15",
+  "university": "University of Jordan",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman",
+  "linkedInUrl": "https://linkedin.com/in/test",
+  "gitHubUrl": "https://github.com/test",
+  "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=test"
+}
+
+### 2.5 Update Profile (Arabic)
+PUT {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "bio": "???? ???? ????? ???? ??????? ????????? ?????? ?????????",
+  "location": "????? ??????",
+  "phoneNumber": "+962791234567",
+  "university": "??????? ????????",
+  "major": "???? ???????",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 2.6 Update Profile (Mixed English/Arabic)
+PUT {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "bio": "CS Student | ???? ???? ?????",
+  "location": "Amman - ????",
+  "phoneNumber": "+962791234567",
+  "university": "University of Jordan - ??????? ????????",
+  "major": "Computer Science - ???? ???????",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 2.7 Get Suggested Timezones
+GET {{baseUrl}}/userprofile/timezones?location=Jordan
+Authorization: Bearer {{accessToken}}
+
+### 2.8 Validate Timezone
+GET {{baseUrl}}/userprofile/validate-timezone?timezone=Asia/Amman
+Authorization: Bearer {{accessToken}}
+
+### 2.9 Invalid Profile Update (Missing Required Field)
+PUT {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "bio": "Test",
+  "major": "Computer Science",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Asia/Amman"
+}
+
+### 2.10 Invalid Timezone
+PUT {{baseUrl}}/userprofile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "university": "Test University",
+  "major": "Test Major",
+  "expectedGraduationYear": 2026,
+  "currentLevel": "Junior",
+  "timezone": "Invalid/Timezone"
+}
+
+### ========================================
+### 3. TODO LIST TESTS
+### ========================================
+
+### 3.1 Get All Todos
+GET {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+
+### 3.2 Get Active Todos
+GET {{baseUrl}}/todo?filter=active
+Authorization: Bearer {{accessToken}}
+
+### 3.3 Get Completed Todos
+GET {{baseUrl}}/todo?filter=completed
+Authorization: Bearer {{accessToken}}
+
+### 3.4 Create Todo
+# @name createTodo
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Complete Software Engineering Assignment"
+}
+
+###
+@todoId = {{createTodo.response.body.data.id}}
+
+### 3.5 Create Todo (Arabic)
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "????? ????? ????? ?????????"
+}
+
+### 3.6 Toggle Todo Completion
+PATCH {{baseUrl}}/todo/{{todoId}}
+Authorization: Bearer {{accessToken}}
+
+### 3.7 Get Todo Summary
+GET {{baseUrl}}/todo/summary
+Authorization: Bearer {{accessToken}}
+
+### 3.8 Delete Todo
+DELETE {{baseUrl}}/todo/{{todoId}}
+Authorization: Bearer {{accessToken}}
+
+### 3.9 Create Todo (Empty Title - Should Fail)
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+### ========================================
+### 4. PLANNER (EVENTS) TESTS
+### ========================================
+
+### 4.1 Get All Events
+GET {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+
+### 4.2 Get Events by Date
+GET {{baseUrl}}/planner/events?date=2026-01-15
+Authorization: Bearer {{accessToken}}
+
+### 4.3 Get Upcoming Events
+GET {{baseUrl}}/planner/events/upcoming
+Authorization: Bearer {{accessToken}}
+
+### 4.4 Create Event
+# @name createEvent
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Software Engineering Midterm Exam",
+  "eventDateTime": "2026-01-20T10:00:00Z"
+}
+
+###
+@eventId = {{createEvent.response.body.data.id}}
+
+### 4.5 Create Event (Arabic)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "?????? ????? ????? - ????? ????????",
+  "eventDateTime": "2026-01-25T14:00:00Z"
+}
+
+### 4.6 Mark Event as Attended
+PATCH {{baseUrl}}/planner/events/{{eventId}}/attend
+Authorization: Bearer {{accessToken}}
+
+### 4.7 Delete Event
+DELETE {{baseUrl}}/planner/events/{{eventId}}
+Authorization: Bearer {{accessToken}}
+
+### 4.8 Create Event (Invalid Date - Should Fail)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Test Event",
+  "eventDateTime": "invalid-date"
+}
+
+### ========================================
+### 5. NOTES TESTS
+### ========================================
+
+### 5.1 Get All Notes
+GET {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+
+### 5.2 Create Note
+# @name createNote
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Software Design Patterns",
+  "content": "Key patterns: Singleton, Factory, Observer, Strategy. Used for solving common design problems."
+}
+
+###
+@noteId = {{createNote.response.body.data.id}}
+
+### 5.3 Create Note (Arabic)
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "????? ??????? ????????",
+  "content": "??????? ????????: Singleton, Factory, Observer, Strategy. ?????? ??? ????? ??????? ???????."
+}
+
+### 5.4 Get Specific Note
+GET {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+
+### 5.5 Update Note
+PUT {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Software Design Patterns - Updated",
+  "content": "Key patterns: Singleton, Factory, Observer, Strategy, Decorator, Adapter. Used for solving common design problems and improving code maintainability."
+}
+
+### 5.6 Update Note (Partial - Only Content)
+PUT {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Updated content only - title remains the same"
+}
+
+### 5.7 Delete Note
+DELETE {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+
+### 5.8 Create Note (Empty Title - Should Fail)
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "",
+  "content": "Some content"
+}
+
+### ========================================
+### 6. STUDY QUIZ TESTS
+### ========================================
+
+### 6.1 Get Quiz Questions
+GET {{baseUrl}}/study-quiz/questions
+Authorization: Bearer {{accessToken}}
+
+### 6.2 Submit Quiz Answers
+# @name submitQuiz
+POST {{baseUrl}}/study-quiz/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "1": "Improve my GPA and develop practical skills",
+  "2": "Software Development and Data Structures",
+  "3": "2-3 hours",
+  "4": ["Early morning (5-9 AM)", "Evening (5-9 PM)"],
+  "5": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+  "6": "Calendar or time-blocking",
+  "7": "Start immediately",
+  "8": "45-60 minutes",
+  "9": ["Phone / social media", "Noise or environment"],
+  "10": "Advanced mathematics and algorithm optimization",
+  "11": "Understanding concepts",
+  "12": "Procrastination",
+  "13": "Software Engineering project due in 2 weeks, Database exam next month",
+  "14": "Semi-organized"
+}
+
+### 6.3 Get Latest Quiz Attempt
+GET {{baseUrl}}/study-quiz/latest
+Authorization: Bearer {{accessToken}}
+
+### 6.4 Submit Quiz (Empty Answers - Should Fail)
+POST {{baseUrl}}/study-quiz/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+### ========================================
+### 7. STUDY SESSIONS TESTS
+### ========================================
+
+### 7.1 Get All Study Sessions
+GET {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+
+### 7.2 Get Study Sessions (Limited)
+GET {{baseUrl}}/study-sessions?limit=10
+Authorization: Bearer {{accessToken}}
+
+### 7.3 Get Study Summary
+GET {{baseUrl}}/study-sessions/summary
+Authorization: Bearer {{accessToken}}
+
+### 7.4 Save Study Session
+# @name saveSession
+POST {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 45,
+  "startTime": "2026-01-10T14:00:00Z",
+  "pauseCount": 2,
+  "focusScore": 85
+}
+
+###
+@sessionId = {{saveSession.response.body.data.id}}
+
+### 7.5 Save Another Session
+POST {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 30,
+  "pauseCount": 1,
+  "focusScore": 90
+}
+
+### 7.6 Get Sessions by Date Range
+GET {{baseUrl}}/study-sessions/range?from=2026-01-01&to=2026-01-31
+Authorization: Bearer {{accessToken}}
+
+### 7.7 Delete Study Session
+DELETE {{baseUrl}}/study-sessions/{{sessionId}}
+Authorization: Bearer {{accessToken}}
+
+### 7.8 Save Session (Invalid Duration - Should Fail)
+POST {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 0,
+  "pauseCount": 0,
+  "focusScore": 100
+}
+
+### 7.9 Save Session (Negative Duration - Should Fail)
+POST {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "durationMinutes": -10,
+  "pauseCount": 0,
+  "focusScore": 100
+}
+
+### ========================================
+### 8. ATTENDANCE & PROGRESS TESTS
+### ========================================
+
+### 8.1 Get Attendance Summary
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+### 8.2 Get Attendance History (Last 30 Days)
+GET {{baseUrl}}/study-planner/attendance/history?days=30
+Authorization: Bearer {{accessToken}}
+
+### 8.3 Get Attendance History (Last 7 Days)
+GET {{baseUrl}}/study-planner/attendance/history?days=7
+Authorization: Bearer {{accessToken}}
+
+### 8.4 Get Weekly Progress
+GET {{baseUrl}}/study-planner/attendance/weekly
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### 9. INTEGRATION TESTS
+### ========================================
+
+### 9.1 Create Complete Study Plan
+# Create Todo
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Complete Chapter 5 - Data Structures"
+}
+
+###
+
+# Create Related Event
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Data Structures Quiz",
+  "eventDateTime": "2026-01-18T10:00:00Z"
+}
+
+###
+
+# Create Study Notes
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Data Structures - Chapter 5",
+  "content": "Trees: Binary Tree, BST, AVL, Red-Black. Key operations: Insert, Delete, Search. Time complexities: O(log n) for balanced trees."
+}
+
+###
+
+# Start Study Session
+POST {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 60,
+  "pauseCount": 1,
+  "focusScore": 88
+}
+
+### 9.2 Check Overall Progress
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### 10. ERROR HANDLING TESTS
+### ========================================
+
+### 10.1 Unauthorized Access (No Token)
+GET {{baseUrl}}/todo
+
+### 10.2 Invalid Token
+GET {{baseUrl}}/todo
+Authorization: Bearer invalid_token_here
+
+### 10.3 Access Non-existent Resource
+GET {{baseUrl}}/todo/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### 10.4 Delete Non-existent Resource
+DELETE {{baseUrl}}/notes/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### 10.5 Update Non-existent Resource
+PUT {{baseUrl}}/notes/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "content": "Test"
+}
+
+### ========================================
+### 11. PERFORMANCE & STRESS TESTS
+### ========================================
+
+### 11.1 Create Multiple Todos (Batch Test)
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 1"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 2"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 3"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 4"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 5"
+}
+
+### 11.2 Get All Data (Load Test)
+GET {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{baseUrl}}/study-sessions
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### 12. UNICODE & SPECIAL CHARACTERS TESTS
+### ========================================
+
+### 12.1 Arabic Text
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "?????? ????? ?????? ?? ???? ????? ????????"
+}
+
+### 12.2 Emojis
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "?? Study for exam ?? Practice problems ??"
+}
+
+### 12.3 Mixed Languages
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json; charset=utf-8
+
+{
+  "title": "Algorithm Analysis - ????? ???????????",
+  "content": "Big O Notation: O(1), O(log n), O(n), O(n log n), O(n²). ??????? ?????? ?????? ????? ???????????."
+}
+
+### 12.4 Special Characters
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Math Symbols & Formulas",
+  "content": "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"
+}
+
+### ========================================
+### END OF TESTS
+### ========================================

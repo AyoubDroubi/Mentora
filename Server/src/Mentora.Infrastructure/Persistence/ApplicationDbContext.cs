@@ -1,6 +1,7 @@
 ﻿using Mentora.Domain.Common;
 using Mentora.Domain.Entities;
 using Mentora.Domain.Entities.Auth;
+using Mentora.Domain.Entities.StudyPlanner;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,12 @@ namespace Mentora.Infrastructure.Persistence
         public DbSet<StudyTask> StudyTasks { get; set; }
         public DbSet<StudySession> StudySessions { get; set; }
         public DbSet<TaskFeedbackLog> TaskFeedbackLogs { get; set; }
+
+        // Study Planner Module
+        public DbSet<TodoItem> TodoItems { get; set; }
+        public DbSet<PlannerEvent> PlannerEvents { get; set; }
+        public DbSet<UserNote> UserNotes { get; set; }
+        public DbSet<StudyQuizAttempt> StudyQuizAttempts { get; set; }
 
         // Engagement & AI Logging
         public DbSet<Achievement> Achievements { get; set; }
@@ -88,6 +95,31 @@ namespace Mentora.Infrastructure.Persistence
                 .HasOne(s => s.User)
                 .WithOne()
                 .HasForeignKey<UserStats>(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Study Planner Relationships
+            builder.Entity<TodoItem>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PlannerEvent>()
+                .HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<UserNote>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<StudyQuizAttempt>()
+                .HasOne(q => q.User)
+                .WithMany()
+                .HasForeignKey(q => q.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // StudyTask -> FeedbackLog (One-to-One)

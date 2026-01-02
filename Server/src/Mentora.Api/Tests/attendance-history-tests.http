@@ -1,0 +1,402 @@
+### ========================================
+### ATTENDANCE HISTORY - COMPLETE TESTS
+### ========================================
+
+@baseUrl = https://localhost:7000/api
+@accessToken = 
+
+### 1. Login First
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "saad@mentora.com",
+  "password": "Saad@123",
+  "deviceInfo": "Test"
+}
+
+###
+@accessToken = {{login.response.body.accessToken}}
+
+### ========================================
+### TEST DATA SETUP
+### ========================================
+
+### 2. Create Multiple Tasks (for history)
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 1 - Last Week"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 2 - This Week"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 3 - Yesterday"
+}
+
+###
+
+POST {{baseUrl}}/todo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Task 4 - Today"
+}
+
+### 3. Complete Some Tasks
+# Get todo IDs from previous responses and toggle them
+PATCH {{baseUrl}}/todo/{todoId1}
+Authorization: Bearer {{accessToken}}
+
+###
+
+PATCH {{baseUrl}}/todo/{todoId2}
+Authorization: Bearer {{accessToken}}
+
+### 4. Create Past Events (for history)
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 1 - Last Week",
+  "eventDateTime": "2026-01-03T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 2 - 3 Days Ago",
+  "eventDateTime": "2026-01-07T14:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 3 - Yesterday",
+  "eventDateTime": "2026-01-09T10:00:00Z"
+}
+
+###
+
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Event 4 - Today",
+  "eventDateTime": "2026-01-10T15:00:00Z"
+}
+
+### 5. Mark Some Events as Attended
+# Get event IDs from previous responses
+PATCH {{baseUrl}}/planner/events/{eventId1}/attend
+Authorization: Bearer {{accessToken}}
+
+###
+
+PATCH {{baseUrl}}/planner/events/{eventId2}/attend
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### ATTENDANCE HISTORY TESTS
+### ========================================
+
+### 6. Get Attendance Summary
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "totalTasks": 4,
+#     "completedTasks": 2,
+#     "pendingTasks": 2,
+#     "taskCompletionRate": 50,
+#     "totalPastEvents": 4,
+#     "attendedEvents": 2,
+#     "upcomingEvents": 0,
+#     "attendanceRate": 50,
+#     "progressPercentage": 50,
+#     "breakdown": {
+#       "tasksContribution": 25,
+#       "eventsContribution": 25
+#     }
+#   }
+# }
+
+### 7. Get Attendance History - Last 7 Days
+GET {{baseUrl}}/study-planner/attendance/history?days=7
+Authorization: Bearer {{accessToken}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "period": {
+#       "from": "2026-01-03",
+#       "to": "2026-01-10",
+#       "days": 7
+#     },
+#     "events": [
+#       {
+#         "id": "guid",
+#         "title": "Event 3 - Yesterday",
+#         "eventDateTime": "2026-01-09T10:00:00Z",
+#         "isAttended": false
+#       },
+#       {
+#         "id": "guid",
+#         "title": "Event 2 - 3 Days Ago",
+#         "eventDateTime": "2026-01-07T14:00:00Z",
+#         "isAttended": true
+#       }
+#     ],
+#     "tasks": [
+#       {
+#         "id": "guid",
+#         "title": "Task 4 - Today",
+#         "completedAt": "2026-01-10T...",
+#         "isCompleted": true
+#       }
+#     ],
+#     "summary": {
+#       "tasksTotal": 4,
+#       "tasksCompleted": 2,
+#       "tasksPending": 2,
+#       "eventsTotal": 2,
+#       "eventsAttended": 1,
+#       "eventsMissed": 1
+#     }
+#   }
+# }
+
+### 8. Get Attendance History - Last 30 Days
+GET {{baseUrl}}/study-planner/attendance/history?days=30
+Authorization: Bearer {{accessToken}}
+
+### 9. Get Attendance History - Last 90 Days
+GET {{baseUrl}}/study-planner/attendance/history?days=90
+Authorization: Bearer {{accessToken}}
+
+### 10. Get Weekly Progress
+GET {{baseUrl}}/study-planner/attendance/weekly
+Authorization: Bearer {{accessToken}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "weekStart": "2026-01-05",
+#     "weekEnd": "2026-01-12",
+#     "days": [
+#       {
+#         "date": "2026-01-05",
+#         "dayOfWeek": "Sunday",
+#         "tasks": 0,
+#         "completedTasks": 0,
+#         "events": 0,
+#         "attendedEvents": 0
+#       },
+#       {
+#         "date": "2026-01-06",
+#         "dayOfWeek": "Monday",
+#         "tasks": 1,
+#         "completedTasks": 0,
+#         "events": 0,
+#         "attendedEvents": 0
+#       },
+#       {
+#         "date": "2026-01-07",
+#         "dayOfWeek": "Tuesday",
+#         "tasks": 1,
+#         "completedTasks": 1,
+#         "events": 1,
+#         "attendedEvents": 1
+#       },
+#       {
+#         "date": "2026-01-08",
+#         "dayOfWeek": "Wednesday",
+#         "tasks": 0,
+#         "completedTasks": 0,
+#         "events": 0,
+#         "attendedEvents": 0
+#       },
+#       {
+#         "date": "2026-01-09",
+#         "dayOfWeek": "Thursday",
+#         "tasks": 1,
+#         "completedTasks": 0,
+#         "events": 1,
+#         "attendedEvents": 0
+#       },
+#       {
+#         "date": "2026-01-10",
+#         "dayOfWeek": "Friday",
+#         "tasks": 1,
+#         "completedTasks": 1,
+#         "events": 1,
+#         "attendedEvents": 0
+#       },
+#       {
+#         "date": "2026-01-11",
+#         "dayOfWeek": "Saturday",
+#         "tasks": 0,
+#         "completedTasks": 0,
+#         "events": 0,
+#         "attendedEvents": 0
+#       }
+#     ]
+#   }
+# }
+
+### ========================================
+### VERIFICATION TESTS
+### ========================================
+
+### 11. Verify History Shows Correct Date Range
+# Test: History for 7 days should only show last 7 days
+# Expected: Events/Tasks from 2026-01-03 to 2026-01-10
+
+### 12. Verify Summary Calculations
+# Test: Summary numbers match individual items
+# Expected: 
+#   - tasksTotal = count of all user tasks
+#   - tasksCompleted = count of tasks in date range
+#   - eventsTotal = count of events in date range
+#   - eventsAttended = count of attended events in range
+
+### 13. Verify Weekly Progress Days
+# Test: Weekly progress shows 7 days
+# Expected: Array with exactly 7 days, Sunday to Saturday
+
+### 14. Verify Date Filtering
+# Create event outside date range
+POST {{baseUrl}}/planner/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Old Event - 60 Days Ago",
+  "eventDateTime": "2025-11-11T10:00:00Z"
+}
+
+###
+
+# Get history for 30 days
+GET {{baseUrl}}/study-planner/attendance/history?days=30
+Authorization: Bearer {{accessToken}}
+
+# Expected: Old event should NOT appear in response
+
+### 15. Verify Progress Calculation
+# Scenario:
+#   - 4 tasks total, 2 completed (50%)
+#   - 4 past events, 2 attended (50%)
+#   - Progress = (2/4)*50% + (2/4)*50% = 25% + 25% = 50%
+
+GET {{baseUrl}}/study-planner/attendance/summary
+Authorization: Bearer {{accessToken}}
+
+# Expected:
+# {
+#   "progressPercentage": 50,
+#   "breakdown": {
+#     "tasksContribution": 25,
+#     "eventsContribution": 25
+#   }
+# }
+
+### ========================================
+### EDGE CASES
+### ========================================
+
+### 16. Test Empty History
+# Delete all tasks and events, then check history
+GET {{baseUrl}}/study-planner/attendance/history?days=7
+Authorization: Bearer {{accessToken}}
+
+# Expected:
+# {
+#   "events": [],
+#   "tasks": [],
+#   "summary": {
+#     "tasksTotal": 0,
+#     "tasksCompleted": 0,
+#     "tasksPending": 0,
+#     "eventsTotal": 0,
+#     "eventsAttended": 0,
+#     "eventsMissed": 0
+#   }
+# }
+
+### 17. Test Invalid Days Parameter
+GET {{baseUrl}}/study-planner/attendance/history?days=0
+Authorization: Bearer {{accessToken}}
+
+### 18. Test Large Days Parameter
+GET {{baseUrl}}/study-planner/attendance/history?days=365
+Authorization: Bearer {{accessToken}}
+
+### 19. Test Negative Days Parameter
+GET {{baseUrl}}/study-planner/attendance/history?days=-7
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### PERFORMANCE TESTS
+### ========================================
+
+### 20. Test with Many Items
+# Create 50 tasks and 50 events
+# Then get history
+
+### 21. Test History Response Time
+# GET /history?days=90
+# Expected: Response time < 1 second
+
+### ========================================
+### CLEANUP (Optional)
+### ========================================
+
+### 22. Delete Test Data
+# Delete all test todos
+DELETE {{baseUrl}}/todo/{todoId}
+Authorization: Bearer {{accessToken}}
+
+###
+
+# Delete all test events
+DELETE {{baseUrl}}/planner/events/{eventId}
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### END OF TESTS
+### ========================================

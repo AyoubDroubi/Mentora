@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProfileProvider } from "./contexts/ProfileContext";
+import { UserProvider } from "./contexts/UserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Public pages
@@ -32,140 +33,142 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ProfileProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/about-us" element={<AboutUs />} />
+        <UserProvider>
+          <ProfileProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/about-us" element={<AboutUs />} />
 
-            {/* Test Auth Page - Protected */}
-            <Route
-              path="/test-auth"
-              element={
-                <ProtectedRoute>
-                  <TestAuth />
-                </ProtectedRoute>
-              }
-            />
+              {/* Test Auth Page - Protected */}
+              <Route
+                path="/test-auth"
+                element={
+                  <ProtectedRoute>
+                    <TestAuth />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/study-planner"
-              element={
-                <ProtectedRoute>
-                  <StudyPlanner />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/todo"
-              element={
-                <ProtectedRoute>
-                  <Todo />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/timer"
-              element={
-                <ProtectedRoute>
-                  <Timer />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/notes"
-              element={
-                <ProtectedRoute>
-                  <Notes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/planner"
-              element={
-                <ProtectedRoute>
-                  <Planner />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/attendance"
-              element={
-                <ProtectedRoute>
-                  <Attendance />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/career-builder"
-              element={
-                <ProtectedRoute>
-                  <CareerBuilder />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create-career-builder"
-              element={
-                <ProtectedRoute>
-                  <CreateCareerBuilder />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/career-plan"
-              element={
-                <ProtectedRoute>
-                  <CareerPlan />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/career-progress"
-              element={
-                <ProtectedRoute>
-                  <CareerProgress />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/career-skills"
-              element={
-                <ProtectedRoute>
-                  <CareerSkills />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/quiz"
-              element={
-                <ProtectedRoute>
-                  <Quiz />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </ProfileProvider>
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study-planner"
+                element={
+                  <ProtectedRoute>
+                    <StudyPlanner />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/todo"
+                element={
+                  <ProtectedRoute>
+                    <Todo />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timer"
+                element={
+                  <ProtectedRoute>
+                    <Timer />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notes"
+                element={
+                  <ProtectedRoute>
+                    <Notes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/planner"
+                element={
+                  <ProtectedRoute>
+                    <Planner />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/attendance"
+                element={
+                  <ProtectedRoute>
+                    <Attendance />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career-builder"
+                element={
+                  <ProtectedRoute>
+                    <CareerBuilder />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create-career-builder"
+                element={
+                  <ProtectedRoute>
+                    <CreateCareerBuilder />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career-plan"
+                element={
+                  <ProtectedRoute>
+                    <CareerPlan />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career-progress"
+                element={
+                  <ProtectedRoute>
+                    <CareerProgress />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/career-skills"
+                element={
+                  <ProtectedRoute>
+                    <CareerSkills />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  <ProtectedRoute>
+                    <Quiz />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </ProfileProvider>
+        </UserProvider>
       </AuthProvider>
     </BrowserRouter>
   );
