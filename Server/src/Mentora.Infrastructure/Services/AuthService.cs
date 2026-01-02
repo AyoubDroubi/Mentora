@@ -1,11 +1,10 @@
 ﻿using Mentora.Application.DTOs;
 using Mentora.Application.Interfaces;
+using Mentora.Application.Interfaces.Repositories;
 using Mentora.Application.Validators;
 using Mentora.Domain.Entities;
 using Mentora.Domain.Entities.Auth;
-using Mentora.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 
@@ -20,20 +19,23 @@ namespace Mentora.Infrastructure.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
-        private readonly ApplicationDbContext _context;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
         private readonly IConfiguration _config;
 
         public AuthService(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ITokenService tokenService,
-            ApplicationDbContext context,
+            IRefreshTokenRepository refreshTokenRepository,
+            IPasswordResetTokenRepository passwordResetTokenRepository,
             IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
-            _context = context;
+            _refreshTokenRepository = refreshTokenRepository;
+            _passwordResetTokenRepository = passwordResetTokenRepository;
             _config = config;
         }
 
@@ -135,8 +137,7 @@ namespace Mentora.Infrastructure.Services
 
             // 1.2.2: Generate and store Refresh Token
             var refreshToken = _tokenService.GenerateRefreshToken(user.Id, dto.DeviceInfo, ipAddress);
-            await _context.RefreshTokens.AddAsync(refreshToken);
-            await _context.SaveChangesAsync();
+            await _refreshTokenRepository.CreateAsync(refreshToken);
 
             return new AuthResponseDto
             {
@@ -177,13 +178,13 @@ namespace Mentora.Infrastructure.Services
             // Generate new access token
             var newAccessToken = _tokenService.GenerateAccessToken(user);
 
-            // Optionally rotate refresh token (recommended security practice)
+            // Rotate refresh token
             var newRefreshToken = _tokenService.GenerateRefreshToken(user.Id, token.DeviceInfo, ipAddress);
-            await _context.RefreshTokens.AddAsync(newRefreshToken);
+            await _refreshTokenRepository.CreateAsync(newRefreshToken);
 
             // Revoke old refresh token
             token.RevokedOn = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _refreshTokenRepository.UpdateAsync(token);
 
             return new AuthResponseDto
             {
@@ -224,8 +225,7 @@ namespace Mentora.Infrastructure.Services
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
-                // Return true for security (don't reveal user existence)
-                return true;
+                return true; // Don't reveal user existence
             }
 
             // Generate secure token
@@ -236,16 +236,13 @@ namespace Mentora.Infrastructure.Services
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
                 Token = resetToken,
-                ExpiresAt = DateTime.UtcNow.AddHours(1), // 1 hour validity
+                ExpiresAt = DateTime.UtcNow.AddHours(1),
                 Used = false
             };
 
-            await _context.Set<PasswordResetToken>().AddAsync(passwordResetToken);
-            await _context.SaveChangesAsync();
+            await _passwordResetTokenRepository.CreateAsync(passwordResetToken);
 
-            // TODO: Send email with reset token (implement email service)
-            // await _emailService.SendPasswordResetEmail(user.Email, resetToken);
-
+            // TODO: Send email with reset token
             return true;
         }
 
@@ -255,7 +252,6 @@ namespace Mentora.Infrastructure.Services
         /// </summary>
         public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
         {
-            // Validate password complexity
             if (!PasswordValidator.IsValid(dto.NewPassword))
             {
                 return new AuthResponseDto
@@ -277,10 +273,9 @@ namespace Mentora.Infrastructure.Services
             }
 
             // Validate token
-            var resetToken = await _context.Set<PasswordResetToken>()
-                .FirstOrDefaultAsync(t => t.Token == dto.Token && t.UserId == user.Id);
+            var resetToken = await _passwordResetTokenRepository.GetByTokenAsync(dto.Token);
 
-            if (resetToken == null || resetToken.Used || resetToken.ExpiresAt < DateTime.UtcNow)
+            if (resetToken == null || resetToken.UserId != user.Id || resetToken.Used || resetToken.ExpiresAt < DateTime.UtcNow)
             {
                 return new AuthResponseDto
                 {
@@ -305,9 +300,9 @@ namespace Mentora.Infrastructure.Services
 
             // Mark token as used
             resetToken.Used = true;
-            await _context.SaveChangesAsync();
+            await _passwordResetTokenRepository.UpdateAsync(resetToken);
 
-            // Revoke all refresh tokens for security
+            // Revoke all refresh tokens
             await _tokenService.RevokeAllUserTokensAsync(user.Id);
 
             return new AuthResponseDto

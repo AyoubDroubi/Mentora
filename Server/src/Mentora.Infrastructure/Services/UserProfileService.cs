@@ -1,8 +1,7 @@
 using Mentora.Application.DTOs.UserProfile;
 using Mentora.Application.Interfaces;
+using Mentora.Application.Interfaces.Repositories;
 using Mentora.Domain.Entities;
-using Mentora.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Mentora.Infrastructure.Services
@@ -13,7 +12,7 @@ namespace Mentora.Infrastructure.Services
     /// </summary>
     public class UserProfileService : IUserProfileService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserProfileRepository _profileRepository;
         private readonly ILogger<UserProfileService> _logger;
 
         // IANA timezones organized by region
@@ -35,9 +34,9 @@ namespace Mentora.Infrastructure.Services
             "Australia/Sydney", "Pacific/Auckland"
         };
 
-        public UserProfileService(ApplicationDbContext context, ILogger<UserProfileService> logger)
+        public UserProfileService(IUserProfileRepository profileRepository, ILogger<UserProfileService> logger)
         {
-            _context = context;
+            _profileRepository = profileRepository;
             _logger = logger;
         }
 
@@ -45,10 +44,7 @@ namespace Mentora.Infrastructure.Services
         {
             try
             {
-                var profile = await _context.UserProfiles
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.UserId == userId);
-
+                var profile = await _profileRepository.GetByUserIdAsync(userId);
                 return profile == null ? null : MapToDto(profile);
             }
             catch (Exception ex)
@@ -68,27 +64,26 @@ namespace Mentora.Infrastructure.Services
                     throw new ArgumentException($"Invalid timezone '{dto.Timezone}'. Use IANA format (e.g., Asia/Amman) or UTC.");
                 }
 
-                var profile = await _context.UserProfiles
-                    .FirstOrDefaultAsync(p => p.UserId == userId);
-
+                var profile = await _profileRepository.GetByUserIdAsync(userId);
                 var isNew = profile == null;
 
                 if (isNew)
                 {
-                    profile = new Domain.Entities.UserProfile
+                    profile = new UserProfile
                     {
                         Id = Guid.NewGuid(),
                         UserId = userId,
                         CreatedAt = DateTime.UtcNow
                     };
-                    _context.UserProfiles.Add(profile);
                 }
 
                 // Update profile fields
                 UpdateProfileFields(profile, dto);
                 profile.UpdatedAt = DateTime.UtcNow;
 
-                await _context.SaveChangesAsync();
+                var savedProfile = isNew 
+                    ? await _profileRepository.CreateAsync(profile)
+                    : await _profileRepository.UpdateAsync(profile);
 
                 _logger.LogInformation(
                     "{Action} profile for user {UserId}",
@@ -96,11 +91,11 @@ namespace Mentora.Infrastructure.Services
                     userId
                 );
 
-                return MapToDto(profile);
+                return MapToDto(savedProfile);
             }
             catch (ArgumentException)
             {
-                throw; // Re-throw validation errors
+                throw;
             }
             catch (Exception ex)
             {
@@ -111,14 +106,12 @@ namespace Mentora.Infrastructure.Services
 
         public async Task<bool> HasProfileAsync(Guid userId)
         {
-            return await _context.UserProfiles.AnyAsync(p => p.UserId == userId);
+            return await _profileRepository.ExistsAsync(userId);
         }
 
         public async Task<int> GetProfileCompletionAsync(Guid userId)
         {
-            var profile = await _context.UserProfiles
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.UserId == userId);
+            var profile = await _profileRepository.GetByUserIdAsync(userId);
 
             if (profile == null) return 0;
 
@@ -183,30 +176,23 @@ namespace Mentora.Infrastructure.Services
             return Task.FromResult(suggestions);
         }
 
-        private void UpdateProfileFields(Domain.Entities.UserProfile profile, UpdateUserProfileDto dto)
+        private void UpdateProfileFields(UserProfile profile, UpdateUserProfileDto dto)
         {
-            // Personal information
             profile.Bio = dto.Bio ?? string.Empty;
             profile.Location = dto.Location ?? string.Empty;
             profile.PhoneNumber = dto.PhoneNumber ?? string.Empty;
             profile.DateOfBirth = dto.DateOfBirth;
-
-            // Academic attributes (required)
             profile.University = dto.University.Trim();
             profile.Major = dto.Major.Trim();
             profile.ExpectedGraduationYear = dto.ExpectedGraduationYear;
             profile.CurrentLevel = dto.GetStudyLevel();
-
-            // System configuration
             profile.Timezone = dto.Timezone.Trim();
-
-            // Social links
             profile.LinkedInUrl = dto.LinkedInUrl ?? string.Empty;
             profile.GitHubUrl = dto.GitHubUrl ?? string.Empty;
             profile.AvatarUrl = dto.AvatarUrl ?? string.Empty;
         }
 
-        private UserProfileResponseDto MapToDto(Domain.Entities.UserProfile profile)
+        private UserProfileResponseDto MapToDto(UserProfile profile)
         {
             var currentYear = DateTime.UtcNow.Year;
             var yearsUntilGraduation = Math.Max(0, profile.ExpectedGraduationYear - currentYear);
