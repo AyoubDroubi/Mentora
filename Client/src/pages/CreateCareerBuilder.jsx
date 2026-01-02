@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import api from '../services/api';
 import {
   BookOpen,
   GraduationCap,
@@ -227,7 +228,7 @@ export default function CreateCareerBuilder() {
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
-        ...prev[questionId],
+        ...(prev[questionId] || {}),
         [field]: value
       }
     }));
@@ -281,33 +282,24 @@ export default function CreateCareerBuilder() {
     if (!hasCompletedAssessment) return;
 
     try {
-      // Submit answers to backend
-      const response = await fetch('/api/career-quiz/submit', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Add auth token
-        },
-        body: JSON.stringify({ answers }),
-      });
+      // Submit answers to backend using the configured API client
+      const response = await api.post('/career-quiz/submit', { answers });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        console.log('✅ Career plan generated:', data);
+      if (response.data.success) {
+        console.log('✅ Career plan generated:', response.data);
         // Navigate to the generated plan
-        if (data.planId) {
-          navigate(`/career-plan/${data.planId}`);
+        if (response.data.planId) {
+          navigate(`/career-plan/${response.data.planId}`);
         } else {
           navigate('/career-builder');
         }
       } else {
-        console.error('❌ Failed to submit assessment:', data.message);
-        alert(data.message || 'Failed to generate career plan');
+        console.error('❌ Failed to submit assessment:', response.data.message);
+        alert(response.data.message || 'Failed to generate career plan');
       }
     } catch (error) {
       console.error('❌ Error submitting assessment:', error);
-      alert('Error connecting to server. Please try again.');
+      alert(error.response?.data?.message || 'Error connecting to server. Please try again.');
     }
   };
 
