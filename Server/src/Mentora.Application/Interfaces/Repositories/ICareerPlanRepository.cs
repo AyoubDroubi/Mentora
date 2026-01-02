@@ -1,6 +1,6 @@
-﻿using Mentora.Domain.Entities;
+using Mentora.Domain.Entities;
 
-namespace Mentora.Application.Interfaces
+namespace Mentora.Application.Interfaces.Repositories
 {
     public interface ICareerPlanRepository
     {
@@ -9,6 +9,8 @@ namespace Mentora.Application.Interfaces
         Task<List<CareerPlan>> GetAllByUserIdAsync(Guid userId);
 
         Task<CareerPlan?> GetByIdAndUserIdAsync(Guid id, Guid userId);
+
+        Task<CareerPlan?> GetByIdWithStepsAsync(Guid id);
 
         Task UpdateAsync(CareerPlan careerPlan);
 

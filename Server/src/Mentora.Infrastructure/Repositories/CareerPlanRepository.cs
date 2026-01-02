@@ -1,6 +1,5 @@
-﻿using Mentora.Domain.Entities.Auth;
-using Mentora.Application.Interfaces;
-using Mentora.Domain.Entities;
+﻿using Mentora.Domain.Entities;
+using Mentora.Application.Interfaces.Repositories;
 using Mentora.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,23 +21,17 @@ namespace Mentora.Infrastructure.Repositories
             return careerPlan;
         }
 
-        public async Task<bool> DeleteAsync(CareerPlan careerPlan)
+        public async Task DeleteAsync(CareerPlan careerPlan)
         {
             _context.CareerPlans.Remove(careerPlan);
             await SaveChangesAsync();
-            return true;
-        }
-
-        Task ICareerPlanRepository.DeleteAsync(CareerPlan careerPlan)
-        {
-            _context.CareerPlans.Remove(careerPlan);
-            return SaveChangesAsync(); // نرجع Task
         }
 
         public async Task<List<CareerPlan>> GetAllByUserIdAsync(Guid userId)
         {
             return await _context.CareerPlans
                 .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.CreatedAt)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -49,12 +42,14 @@ namespace Mentora.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
         }
 
-        public async Task<bool> SaveChangesAsync()
+        public async Task<CareerPlan?> GetByIdWithStepsAsync(Guid id)
         {
-            return await _context.SaveChangesAsync() > 0;
+            return await _context.CareerPlans
+                .Include(p => p.Steps.OrderBy(s => s.OrderIndex))
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        async Task<bool> ICareerPlanRepository.SaveChangesAsync()
+        public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

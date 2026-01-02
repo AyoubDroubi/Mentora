@@ -135,7 +135,7 @@ export default function App() {
                 }
               />
               <Route
-                path="/career-plan"
+                path="/career-plan/:id"
                 element={
                   <ProtectedRoute>
                     <CareerPlan />

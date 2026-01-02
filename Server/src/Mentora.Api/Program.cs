@@ -83,6 +83,10 @@ builder.Services.AddHostedService<TokenCleanupService>();
 // 6. Dependency Injection - Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICareerPlanRepository, CareerPlanRepository>();
+builder.Services.AddScoped<ICareerStepRepository, CareerStepRepository>();
+builder.Services.AddScoped<ICareerPlanSkillRepository, CareerPlanSkillRepository>();
+builder.Services.AddScoped<ICareerQuizRepository, CareerQuizRepository>();
+builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
@@ -102,6 +106,17 @@ builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddScoped<IStudyQuizService, StudyQuizService>();
 builder.Services.AddScoped<IStudySessionsService, StudySessionsService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+
+// Career Builder Services per SRS
+builder.Services.AddScoped<ICareerPlanService, Mentora.Application.Services.CareerPlanService>();
+
+// AI Services - Choose one (Google Gemini recommended)
+builder.Services.AddHttpClient(); // Required for AI services
+builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.GeminiAiCareerService>(); // Google Gemini (FREE)
+// builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.OpenAiCareerService>(); // OpenAI (Paid)
+// builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.MockAiCareerService>(); // Mock (Development)
+
+Console.WriteLine("?? AI Service: Google Gemini 2.0 Flash");
 
 // 8. Controllers and API
 builder.Services.AddControllers()

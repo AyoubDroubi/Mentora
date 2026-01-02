@@ -23,4 +23,17 @@
 
     public enum SkillLevel
     { Beginner, Intermediate, Advanced }
+
+    // Career Builder Enums per SRS
+    public enum CareerPlanStatus
+    { Generated, InProgress, Completed, Outdated }
+
+    public enum CareerQuizStatus
+    { Draft, Completed, Outdated }
+
+    public enum SkillStatus
+    { Missing, InProgress, Achieved }
+
+    public enum SkillCategory
+    { Technical, Soft }
 }

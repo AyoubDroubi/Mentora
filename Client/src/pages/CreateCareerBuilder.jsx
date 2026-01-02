@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import api from '../services/api';
 import {
   BookOpen,
   GraduationCap,
@@ -227,7 +228,7 @@ export default function CreateCareerBuilder() {
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
-        ...prev[questionId],
+        ...(prev[questionId] || {}),
         [field]: value
       }
     }));
@@ -281,20 +282,24 @@ export default function CreateCareerBuilder() {
     if (!hasCompletedAssessment) return;
 
     try {
-      // Submit answers to backend
-      const response = await fetch('/api/submit-assessment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
-      });
+      // Submit answers to backend using the configured API client
+      const response = await api.post('/career-quiz/submit', { answers });
 
-      if (response.ok) {
-        navigate('/career-plan');
+      if (response.data.success) {
+        console.log('✅ Career plan generated:', response.data);
+        // Navigate to the generated plan
+        if (response.data.planId) {
+          navigate(`/career-plan/${response.data.planId}`);
+        } else {
+          navigate('/career-builder');
+        }
       } else {
-        console.error('Failed to submit assessment');
+        console.error('❌ Failed to submit assessment:', response.data.message);
+        alert(response.data.message || 'Failed to generate career plan');
       }
     } catch (error) {
-      console.error('Error submitting assessment:', error);
+      console.error('❌ Error submitting assessment:', error);
+      alert(error.response?.data?.message || 'Error connecting to server. Please try again.');
     }
   };
 
@@ -347,12 +352,12 @@ export default function CreateCareerBuilder() {
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Industries:</h3>
-                <p>{answers.q3 || 'Not specified'}</p>
+                <p>{Array.isArray(answers.q3) ? answers.q3.join(', ') : answers.q3 || 'Not specified'}</p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Strengths:</h3>
-                <p>{answers.q4 || 'Not specified'}</p>
+                <p>{Array.isArray(answers.q4) ? answers.q4.join(', ') : answers.q4 || 'Not specified'}</p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -362,12 +367,12 @@ export default function CreateCareerBuilder() {
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Skills to Learn:</h3>
-                <p>{answers.q6 || 'Not specified'}</p>
+                <p>{Array.isArray(answers.q6) ? answers.q6.join(', ') : answers.q6 || 'Not specified'}</p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Experience:</h3>
-                <p>{answers.q7 || 'Not specified'}</p>
+                <p>{Array.isArray(answers.q7) ? answers.q7.join(', ') : answers.q7 || 'Not specified'}</p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -382,7 +387,7 @@ export default function CreateCareerBuilder() {
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Activities:</h3>
-                <p>{answers.q10 || 'Not specified'}</p>
+                <p>{Array.isArray(answers.q10) ? answers.q10.join(', ') : answers.q10 || 'Not specified'}</p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -397,12 +402,14 @@ export default function CreateCareerBuilder() {
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Goals:</h3>
-                <p>{answers.q13 || 'Not specified'}</p>
+                <p>{answers.q13?.option || 'Not specified'}</p>
+                {answers.q13?.salary && <p className="text-sm text-gray-600 mt-1">Salary: {answers.q13.salary}</p>}
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2" style={{ color: M.text }}>Challenges:</h3>
-                <p>{answers.q14 || 'Not specified'}</p>
+                <p>{answers.q14?.option || 'Not specified'}</p>
+                {answers.q14?.time && <p className="text-sm text-gray-600 mt-1">Time: {answers.q14.time}</p>}
               </div>
             </div>
 
