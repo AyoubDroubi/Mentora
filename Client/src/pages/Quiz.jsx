@@ -18,8 +18,6 @@ export default function StudyPlannerAssessment() {
     muted: '#5A7A6B',
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-
   // Quiz state 
   const [quizzes, setQuizzes] = useState([
     {
@@ -177,35 +175,6 @@ export default function StudyPlannerAssessment() {
   ];
 
  
-
-  // Header 
-  const Header = () => (
-    <header className="px-6 py-4 flex items-center justify-between shadow-lg"
-      style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}>
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-          <HelpCircle className="w-6 h-6" style={{ color: M.primary }} />
-        </div>
-        <span className="text-white text-xl font-bold">Mentora - Study Planner</span>
-      </div>
-
-      <nav className="flex items-center gap-4">
-        
-
-        {isLoggedIn ? (
-          <button
-            onClick={() => navigate('/profile')}
-            className="ml-4 w-10 h-10 rounded-full border-2 border-white overflow-hidden hover:scale-110 transition-transform"
-            title="Open profile"
-          >
-            <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
-          </button>
-        ) : (
-          <button onClick={() => navigate('/login')} className="ml-4 bg-white text-[#6B9080] px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-shadow">Login</button>
-        )}
-      </nav>
-    </header>
-  );
 
   const startQuiz = (id) => {
     setCurrentQuizId(id);
@@ -447,8 +416,6 @@ export default function StudyPlannerAssessment() {
             </div>
           )}
 
-          
-
           <div className="flex gap-4">
             <button
               onClick={resetQuiz}
@@ -615,4 +582,4 @@ export default function StudyPlannerAssessment() {
       </main>
     </div>
   );
-}}
+}

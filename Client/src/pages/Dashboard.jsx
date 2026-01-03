@@ -11,7 +11,8 @@ import {
   Flame,
   Target,
   BookOpenCheck,
-  CalendarIcon
+  CalendarIcon,
+  User
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -186,7 +187,7 @@ export default function Dashboard() {
             className="bg-white rounded-2xl p-6 shadow-lg border hover:scale-105 transition-transform text-center"
             style={{ borderColor: M.bg3 }}
           >
-            <UserIcon className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
+            <User className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
             <h3 className="font-bold text-[#2C3E3F] text-sm">Profile</h3>
             <p className="text-xs text-[#5A7A6B] mt-1">View & edit profile</p>
           </button>
