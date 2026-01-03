@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import SharedHeader from '../components/SharedHeader';
 import {
-  BookOpen,
   Lightbulb,
   ListChecks,
   FileText as FileTextIcon,
@@ -29,57 +29,11 @@ export default function CareerBuilder() {
 
   /* ================= COMPONENTS ================= */
 
-  const Header = () => (
-      <header
-        className="px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-            <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-          </div>
-          <span className="text-white text-xl font-bold">Mentora</span>
-        </div>
-  
-        <div className="flex items-center gap-4">
-          <nav className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/study-planner')}
-              className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-            >
-              Study Planner
-            </button>
-            <button
-              onClick={() => navigate('/career-builder')}
-              className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-            >
-              Career Builder
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-            >
-              Dashboard
-            </button>
-          </nav>
-          <img
-          onClick={() => navigate('/profile')}
-            src={user.avatar}
-            alt="Profile"
-            className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-          />
-        </div>
-      </header>
-    );
-  
-
-
-
   /* ================= MAIN VIEW ================= */
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Career Builder" />
       <main className="container mx-auto px-4 mt-6">
         {/* Hero Section */}
         <div className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>

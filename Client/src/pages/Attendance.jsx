@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import SharedHeader from '../components/SharedHeader';
 import { ClipboardCheck, TrendingUp, Calendar, CheckSquare, Target } from 'lucide-react';
 import { attendanceService } from '../services';
 
@@ -51,44 +52,10 @@ export default function Attendance() {
     }
   };
 
-  const Header = () => (
-    <header
-      className="px-6 py-4 flex items-center justify-between shadow-lg"
-      style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-          <ClipboardCheck className="w-6 h-6" style={{ color: M.primary }} />
-        </div>
-        <span className="text-white text-xl font-bold">Mentora - Attendance & Progress</span>
-      </div>
-
-      <nav className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/study-planner')}
-          className="text-white hover:bg-white/20 px-3 py-2 rounded-lg transition-colors"
-        >
-          Dashboard
-        </button>
-        <button
-          onClick={() => navigate('/profile')}
-          className="w-10 h-10 rounded-full border-2 border-white overflow-hidden hover:scale-110 transition-transform"
-          title="Open profile"
-        >
-          <img
-            src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
-        </button>
-      </nav>
-    </header>
-  );
-
   if (loading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
-        <Header />
+        <SharedHeader title="Mentora - Attendance" />
         <div className="flex items-center justify-center h-screen">
           <p style={{ color: M.muted }}>Loading attendance data...</p>
         </div>
@@ -98,7 +65,7 @@ export default function Attendance() {
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Attendance" />
 
       <main className="container mx-auto px-4 mt-6">
         {/* Error Message */}

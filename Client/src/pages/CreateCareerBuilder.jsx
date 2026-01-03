@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import api from '../services/api';
+import SharedHeader from '../components/SharedHeader';
 import {
-  BookOpen,
   GraduationCap,
   Briefcase,
   TrendingUp as TrendingUpIcon,
@@ -303,37 +303,10 @@ export default function CreateCareerBuilder() {
     }
   };
 
-  
-    const Header = () => (
-         <header
-           className="px-6 py-4 flex items-center justify-between shadow-lg"
-           style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-         >
-           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-               <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-             </div>
-             <span className="text-white text-xl font-bold">Mentora - career builder</span>
-           </div>
-     
-           <div className="flex items-center gap-4">
-             <img
-             onClick={() => navigate('/profile')}
-               src={user.avatar}
-               alt="Profile"
-               className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-             />
-           </div>
-         </header>
-       );
-     
-
-
-
   if (showResult) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Career Assessment" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>
             <h2 className="text-2xl font-bold mb-4" style={{ color: M.text }}>Career Assessment Result</h2>
@@ -441,7 +414,7 @@ export default function CreateCareerBuilder() {
   if (!showQuiz) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Career Assessment" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-3xl p-8 shadow-lg border text-center" style={{ borderColor: M.bg3 }}>
             <h1 className="text-3xl font-bold mb-4" style={{ color: M.text }}>Career Assessment</h1>
@@ -474,7 +447,7 @@ export default function CreateCareerBuilder() {
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Career Assessment" />
       <main className="container mx-auto px-4 mt-6">
         <div className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>
           <div className="mb-6">

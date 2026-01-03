@@ -2,40 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import axios from 'axios';
+import SharedHeader from '../components/SharedHeader';
 import {
   Target,
   ChevronRight,
   Award,
   CheckSquare,
-  BookOpen,
   TrendingUp,
-  Clock,
-  BookMarked,
-  RotateCcw,
-  ArrowLeft,
-  ArrowRight,
-  Brain,
-  Home as HomeIcon,
-  User as UserIcon,
-  LayoutDashboard,
-  FileText,
-  Download,
-  Lightbulb,
-  ListChecks,
-  Zap,
-  FileText as FileTextIcon,
-  ExternalLink,
-  BarChart3,
-  CheckCircle,
-  AlertCircle,
   Clock as ClockIcon,
-  Star,
+  ArrowLeft,
   Code,
-  Users,
-  Briefcase,
-  GraduationCap,
-  TrendingUp as TrendingUpIcon,
+  Lightbulb,
   Loader2,
+  AlertCircle,
+  TrendingUp as TrendingUpIcon,
+  CheckCircle,
+  BarChart3
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7000/api';
@@ -96,31 +78,6 @@ export default function CareerPlan() {
     fetchCareerPlan();
   }, [id]);
 
-  const Header = () => (
-    <header
-      className="px-6 py-4 flex items-center justify-between shadow-lg"
-      style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-          <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-        </div>
-        <span className="text-white text-xl font-bold">Mentora - Career Plan</span>
-      </div>
-
-      <div className="flex items-center gap-4">
-        {user?.avatar && (
-          <img
-            onClick={() => navigate('/profile')}
-            src={user.avatar}
-            alt="Profile"
-            className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-          />
-        )}
-      </div>
-    </header>
-  );
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       Generated: {
@@ -168,7 +125,7 @@ export default function CareerPlan() {
   if (loading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Career Plan" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-3xl p-8 shadow-lg border text-center" style={{ borderColor: M.bg3 }}>
             <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: M.primary }} />
@@ -182,7 +139,7 @@ export default function CareerPlan() {
   if (error || !careerPlan) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Career Plan" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-3xl p-8 shadow-lg border text-center" style={{ borderColor: M.bg3 }}>
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
@@ -205,7 +162,7 @@ export default function CareerPlan() {
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Career Plan" />
       <main className="container mx-auto px-4 mt-6">
         {/* Header Section */}
         <div className="bg-white rounded-3xl p-8 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>

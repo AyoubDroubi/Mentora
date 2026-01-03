@@ -90,6 +90,7 @@ builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IUserProfileSkillRepository, UserProfileSkillRepository>(); // NEW: Skills Repository
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<IPlannerRepository, PlannerRepository>();
 builder.Services.AddScoped<INotesRepository, NotesRepository>();
@@ -100,6 +101,7 @@ builder.Services.AddScoped<IStudySessionsRepository, StudySessionsRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserProfileSkillService, UserProfileSkillService>(); // NEW: Skills Service
 builder.Services.AddScoped<ITodoService, TodoService>();
 builder.Services.AddScoped<IPlannerService, PlannerService>();
 builder.Services.AddScoped<INotesService, NotesService>();

@@ -2,17 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import SharedHeader from '../components/SharedHeader';
 import {
-  BookOpen,
   CheckSquare,
   BookMarked,
   Clock,
   Calendar as CalendarIcon,
   HelpCircle,
   ClipboardCheck,
-  Flame,
-  TrendingUp,
-  Target
+  Target,
+  TrendingUp
 } from 'lucide-react';
 import {
   todoService,
@@ -113,47 +112,10 @@ export default function StudyPlanner() {
     // You can add modal or navigate to specific page
   };
 
-  const Header = () => (
-    <header
-      className="px-6 py-4 flex items-center justify-between shadow-lg"
-      style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-          <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-        </div>
-        <span className="text-white text-xl font-bold">Mentora - Study Planner</span>
-      </div>
-
-      <div className="flex items-center gap-4">
-        <nav className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/study-planner')}
-            className="text-white font-medium bg-white/20 px-3 py-2 rounded-lg"
-          >
-            Study Planner
-          </button>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-white font-medium hover:bg-white/20 transition-all px-3 py-2 rounded-lg hidden md:block"
-          >
-            Dashboard
-          </button>
-        </nav>
-        <img
-          onClick={() => navigate('/profile')}
-          src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
-          alt="Profile"
-          className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-        />
-      </div>
-    </header>
-  );
-
   if (loading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
-        <Header />
+        <SharedHeader title="Mentora - Study Planner" />
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <Clock className="w-12 h-12 mx-auto mb-4 animate-spin" style={{ color: M.primary }} />
@@ -169,7 +131,7 @@ export default function StudyPlanner() {
       style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }}
       className="min-h-screen pb-24 text-[#2C3E3F]"
     >
-      <Header />
+      <SharedHeader title="Mentora - Study Planner" />
       <main className="container mx-auto px-4 mt-6">
         {/* Error Message */}
         {error && (

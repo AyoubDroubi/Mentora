@@ -6,6 +6,12 @@ namespace Mentora.Domain.Entities
     {
         public string Name { get; set; } = string.Empty;
         public SkillCategory Category { get; set; } = SkillCategory.Technical;
+        
+        // Navigation Properties
+        /// <summary>
+        /// User Profile Skills - Many-to-Many relationship
+        /// </summary>
+        public ICollection<UserProfileSkill> UserProfileSkills { get; set; } = new List<UserProfileSkill>();
     }
 
     public class CareerPlanSkill : BaseEntity
