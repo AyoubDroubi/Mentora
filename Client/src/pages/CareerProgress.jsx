@@ -1,48 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import SharedHeader from '../components/SharedHeader';
 import {
   Target,
-  ChevronRight,
   Award,
   CheckSquare,
-  BookOpen,
   TrendingUp,
   Clock,
-  BookMarked,
-  RotateCcw,
-  ArrowLeft,
-  ArrowRight,
-  Brain,
-  Home as HomeIcon,
-  User as UserIcon,
-  LayoutDashboard,
-  FileText,
-  Download,
-  Lightbulb,
-  ListChecks,
-  Zap,
-  FileText as FileTextIcon,
-  ExternalLink,
-  BarChart3,
+  Calendar,
+  Trophy,
   CheckCircle,
   AlertCircle,
   Clock as ClockIcon,
   Star,
-  Code,
-  Users,
-  Briefcase,
-  GraduationCap,
-  TrendingUp as TrendingUpIcon,
-  Activity,
-  PieChart,
-  Calendar,
-  Trophy,
-  X,
-  Eye,
-  Percent,
-  Goal,
-  MapPin,
 } from 'lucide-react';
 
 export default function CareerProgress() {
@@ -202,60 +173,10 @@ export default function CareerProgress() {
     return 'pending';
   };
 
-  const Header = () => (
-       <header
-         className="px-6 py-4 flex items-center justify-between shadow-lg"
-         style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-       >
-         <div className="flex items-center gap-3">
-           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-             <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-           </div>
-           <span className="text-white text-xl font-bold">Mentora - progress</span>
-         </div>
-   
-         <div className="flex items-center gap-4">
-           <img
-           onClick={() => navigate('/profile')}
-             src={user.avatar}
-             alt="Profile"
-             className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-           />
-         </div>
-       </header>
-     );
-   
-  
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-700';
-      case 'in_progress':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'pending':
-        return 'bg-gray-100 text-gray-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'in_progress':
-        return <Clock className="w-4 h-4" />;
-      case 'pending':
-        return <AlertCircle className="w-4 h-4" />;
-      default:
-        return <AlertCircle className="w-4 h-4" />;
-    }
-  };
-
   if (progressData === null) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24 flex items-center justify-center">
+        <SharedHeader title="Mentora - Career Progress" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p style={{ color: M.text }}>Loading career progress...</p>
@@ -266,7 +187,7 @@ export default function CareerProgress() {
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Career Progress" />
       <main className="container mx-auto px-4 mt-6">
         {/* Progress Overview */}
         <div className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>

@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
-import {BookOpen,CheckSquare, Clock, ChevronRight, Award, TrendingUp, BookOpenCheck, Flame, User as UserIcon,} from 'lucide-react';
+import SharedHeader from '../components/SharedHeader';
+import {
+  CheckSquare,
+  Clock,
+  ChevronRight,
+  Award,
+  TrendingUp,
+  Flame,
+  Target,
+  BookOpenCheck,
+  CalendarIcon
+} from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -94,52 +105,9 @@ export default function Dashboard() {
     percentage: Math.round((attendanceRecords.filter(r => r.status === 'present').length / attendanceRecords.length) * 100) || 0,
     };
 
-    const Header = () => (
-      <header
-           className="px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: `linear-gradient(90deg, ${M.primary}, ${M.secondary})` }}
-       >
-         <div className="flex items-center gap-3">
-           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md border-2 border-gray-300">
-             <BookOpen className="w-6 h-6" style={{ color: M.primary }} />
-          </div>
-            <span className="text-white text-xl font-bold">Mentora</span>
-         </div>
-  
-         <div className="flex items-center gap-4">
-             <nav className="flex items-center gap-4">
-              <button
-              onClick={() => navigate('/study-planner')}
-              className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-            >
-                 Study Planner
-            </button>
-              <button
-                onClick={() => navigate('/career-builder')}
-                className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-              >
-              Career Builder
-             </button>
-            <button
-                onClick={() => navigate('/dashboard')}
-              className="text-white font-medium hover:bg-white/20 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hidden md:block"
-              >
-                       Dashboard
-                     </button>
-              </nav>
-                  <img
-               onClick={() => navigate('/profile')}
-                 src={user.avatar}
-               alt="Profile"
-                className="w-10 h-10 rounded-full border-2 border-white hover:scale-110 hover:opacity-90 transition-all cursor-pointer"
-          />
-        </div>
-      </header>
-    );
-  
-  return (
+    return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen text-[#2C3E3F]">
-         <Header />
+      <SharedHeader title="Mentora - Dashboard" />
       <main className="container mx-auto px-4 mt-6">
            {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -181,6 +149,48 @@ export default function Dashboard() {
             </div>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <button
+            onClick={() => navigate('/study-planner')}
+            className="bg-white rounded-2xl p-6 shadow-lg border hover:scale-105 transition-transform text-center"
+            style={{ borderColor: M.bg3 }}
+          >
+            <Clock className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
+            <h3 className="font-bold text-[#2C3E3F] text-sm">Study Planner</h3>
+            <p className="text-xs text-[#5A7A6B] mt-1">Manage your schedule</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/career-builder')}
+            className="bg-white rounded-2xl p-6 shadow-lg border hover:scale-105 transition-transform text-center"
+            style={{ borderColor: M.bg3 }}
+          >
+            <TrendingUp className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
+            <h3 className="font-bold text-[#2C3E3F] text-sm">Career Builder</h3>
+            <p className="text-xs text-[#5A7A6B] mt-1">Plan your future</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/skills')}
+            className="bg-white rounded-2xl p-6 shadow-lg border hover:scale-105 transition-transform text-center"
+            style={{ borderColor: M.bg3 }}
+          >
+            <Award className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
+            <h3 className="font-bold text-[#2C3E3F] text-sm">My Skills</h3>
+            <p className="text-xs text-[#5A7A6B] mt-1">Track your progress</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/profile')}
+            className="bg-white rounded-2xl p-6 shadow-lg border hover:scale-105 transition-transform text-center"
+            style={{ borderColor: M.bg3 }}
+          >
+            <UserIcon className="w-12 h-12 mx-auto mb-3" style={{ color: M.primary }} />
+            <h3 className="font-bold text-[#2C3E3F] text-sm">Profile</h3>
+            <p className="text-xs text-[#5A7A6B] mt-1">View & edit profile</p>
+          </button>
+        </div>
 
 
           {/* Upcoming Events & Tasks */}

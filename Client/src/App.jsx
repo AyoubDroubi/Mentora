@@ -26,6 +26,7 @@ import CreateCareerBuilder from "./pages/CreateCareerBuilder";
 import CareerPlan from "./pages/CareerPlan";
 import CareerProgress from "./pages/CareerProgress";
 import CareerSkills from "./pages/CareerSkills";
+import SkillsManagement from "./pages/SkillsManagement";
 import Quiz from "./pages/Quiz";
 import TestAuth from "./pages/TestAuth";
 
@@ -155,6 +156,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <CareerSkills />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/skills"
+                element={
+                  <ProtectedRoute>
+                    <SkillsManagement />
                   </ProtectedRoute>
                 }
               />

@@ -43,5 +43,12 @@ namespace Mentora.Domain.Entities
         public string LinkedInUrl { get; set; } = string.Empty;
         public string GitHubUrl { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
+        
+        // Navigation Properties
+        /// <summary>
+        /// User Profile Skills - Many-to-Many relationship with Skill entity
+        /// Per SRS 2.3.1: Skills Portfolio Management
+        /// </summary>
+        public ICollection<UserProfileSkill> Skills { get; set; } = new List<UserProfileSkill>();
     }
 }

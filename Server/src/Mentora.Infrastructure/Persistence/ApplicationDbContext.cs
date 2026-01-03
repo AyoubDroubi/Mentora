@@ -21,7 +21,8 @@ namespace Mentora.Infrastructure.Persistence
         // Core Domain Entities
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<UserStats> UserStats { get; set; }
-        public DbSet<UserSkill> UserSkills { get; set; }
+        public DbSet<UserSkill> UserSkills { get; set; } // Legacy - will be removed
+        public DbSet<UserProfileSkill> UserProfileSkills { get; set; } // New per SRS 2.3.1
         public DbSet<Skill> Skills { get; set; }
         public DbSet<UserDiagnosticResponse> UserDiagnosticResponses { get; set; }
 
@@ -65,14 +66,17 @@ namespace Mentora.Infrastructure.Persistence
             builder.Entity<StudyTask>().Property(t => t.Status).HasConversion<string>();
             builder.Entity<StudyTask>().Property(t => t.Priority).HasConversion<string>();
             builder.Entity<CareerStep>().Property(s => s.Status).HasConversion<string>();
-            builder.Entity<UserSkill>().Property(s => s.CurrentLevel).HasConversion<string>();
-            builder.Entity<CareerPlanSkill>().Property(s => s.TargetLevel).HasConversion<string>();
+            builder.Entity<UserSkill>().Property(s => s.CurrentLevel).HasConversion<string>(); // Legacy
             
             // Career Builder enums per SRS
             builder.Entity<CareerPlan>().Property(p => p.Status).HasConversion<string>();
             builder.Entity<CareerPlanSkill>().Property(s => s.Status).HasConversion<string>();
+            builder.Entity<CareerPlanSkill>().Property(s => s.TargetLevel).HasConversion<string>();
             builder.Entity<Skill>().Property(s => s.Category).HasConversion<string>();
             builder.Entity<CareerQuizAttempt>().Property(q => q.Status).HasConversion<string>();
+
+            // UserProfileSkill Configuration per SRS 2.3.1
+            ConfigureUserProfileSkills(builder);
 
             // User Relationships
             
@@ -226,6 +230,56 @@ namespace Mentora.Infrastructure.Persistence
                 }
             }
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Configure UserProfileSkill entity per SRS 2.3.1
+        /// Includes unique constraints, indexes, and relationships
+        /// </summary>
+        private void ConfigureUserProfileSkills(ModelBuilder builder)
+        {
+            // Unique Constraint per SRS 2.3.1.2
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => new { ups.UserProfileId, ups.SkillId })
+                .IsUnique()
+                .HasDatabaseName("IX_UserProfileSkills_UserProfile_Skill_Unique");
+
+            // Performance Indexes per SRS 2.3.9.2
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => ups.UserProfileId)
+                .HasDatabaseName("IX_UserProfileSkills_UserProfileId");
+
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => ups.SkillId)
+                .HasDatabaseName("IX_UserProfileSkills_SkillId");
+
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => ups.IsFeatured)
+                .HasDatabaseName("IX_UserProfileSkills_IsFeatured");
+
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => ups.DisplayOrder)
+                .HasDatabaseName("IX_UserProfileSkills_DisplayOrder");
+
+            builder.Entity<UserProfileSkill>()
+                .HasIndex(ups => ups.ProficiencyLevel)
+                .HasDatabaseName("IX_UserProfileSkills_ProficiencyLevel");
+
+            // Relationships per SRS 2.3.1
+            
+            // UserProfile -> UserProfileSkills (One-to-Many)
+            builder.Entity<UserProfile>()
+                .HasMany(up => up.Skills)
+                .WithOne(ups => ups.UserProfile)
+                .HasForeignKey(ups => ups.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete per SRS 8.3
+
+            // Skill -> UserProfileSkills (One-to-Many)
+            builder.Entity<Skill>()
+                .HasMany(s => s.UserProfileSkills)
+                .WithOne(ups => ups.Skill)
+                .HasForeignKey(ups => ups.SkillId)
+                .OnDelete(DeleteBehavior.Restrict); // Restrict deletion per SRS 8.3
         }
     }
 }

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext'; 
-import { HelpCircle, CheckSquare, Play, RotateCcw, ChevronRight, ChevronLeft,} from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
+import SharedHeader from '../components/SharedHeader';
+import { HelpCircle, CheckSquare, Play, RotateCcw, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function StudyPlannerAssessment() {
   const navigate = useNavigate();
-  const { user, setUser } = useUser();  
-  
-
+  const { user, setUser } = useUser();
 
   const M = {
     primary: '#6B9080',
@@ -332,7 +331,7 @@ export default function StudyPlannerAssessment() {
   if (!quizStarted) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Quiz" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-2xl p-6 shadow-lg mb-6 border" style={{ borderColor: M.bg3 }}>
             <h2 className="text-xl font-bold text-[#2C3E3F] mb-2 flex items-center gap-2">
@@ -396,7 +395,7 @@ export default function StudyPlannerAssessment() {
   if (showResults && studyPlan) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-        <Header />
+        <SharedHeader title="Mentora - Quiz Results" />
         <main className="container mx-auto px-4 mt-6">
           <div className="bg-white rounded-2xl p-6 shadow-lg mb-6 border" style={{ borderColor: M.bg3 }}>
             <h2 className="text-xl font-bold text-[#2C3E3F] mb-2 flex items-center gap-2">
@@ -480,7 +479,7 @@ export default function StudyPlannerAssessment() {
 
   return (
     <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen pb-24">
-      <Header />
+      <SharedHeader title="Mentora - Quiz" />
       <main className="container mx-auto px-4 mt-6">
         <div className="bg-white rounded-2xl p-6 shadow-lg mb-6 border" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center justify-between mb-4">
@@ -616,4 +615,4 @@ export default function StudyPlannerAssessment() {
       </main>
     </div>
   );
-}
+}}

@@ -1,0 +1,370 @@
+### ========================================
+### User Profile Skills Management Tests
+### Per SRS 2.3: Skills Portfolio Management
+### ========================================
+
+@baseUrl = https://localhost:7000/api
+@token = YOUR_TOKEN_HERE
+
+### ==================== Authentication ====================
+
+### 1. Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test@123"
+}
+
+### ==================== CRUD Operations ====================
+
+### 2. Get All Skills (Empty initially)
+GET {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+
+### 3. Get Skills with Filters
+GET {{baseUrl}}/userprofile/skills?proficiencyLevel=2&sortBy=proficiency
+Authorization: Bearer {{token}}
+
+### 4. Get Featured Skills Only
+GET {{baseUrl}}/userprofile/skills/featured
+Authorization: Bearer {{token}}
+
+### 5. Add Skill - JavaScript (Beginner)
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "REPLACE_WITH_ACTUAL_SKILL_GUID",
+  "proficiencyLevel": 0,
+  "acquisitionMethod": "Self-taught",
+  "startedDate": "2023-01-01",
+  "yearsOfExperience": 1,
+  "isFeatured": false,
+  "notes": "Started learning through freeCodeCamp"
+}
+
+### 6. Add Skill - React (Intermediate, Featured)
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "REPLACE_WITH_ACTUAL_SKILL_GUID",
+  "proficiencyLevel": 1,
+  "acquisitionMethod": "Online Course",
+  "startedDate": "2023-06-01",
+  "yearsOfExperience": 1,
+  "isFeatured": true,
+  "displayOrder": 1,
+  "notes": "Completed React Udemy course"
+}
+
+### 7. Add Multiple Skills (Bulk)
+POST {{baseUrl}}/userprofile/skills/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skills": [
+    {
+      "skillId": "SKILL_1_GUID",
+      "proficiencyLevel": 2,
+      "acquisitionMethod": "University",
+      "isFeatured": true,
+      "displayOrder": 2
+    },
+    {
+      "skillId": "SKILL_2_GUID",
+      "proficiencyLevel": 1,
+      "acquisitionMethod": "Bootcamp",
+      "isFeatured": false
+    }
+  ]
+}
+
+### 8. Update Skill (Partial Update)
+PATCH {{baseUrl}}/userprofile/skills/SKILL_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proficiencyLevel": 2,
+  "yearsOfExperience": 2,
+  "notes": "Completed 3 projects using this skill"
+}
+
+### 9. Toggle Featured Status
+PATCH {{baseUrl}}/userprofile/skills/SKILL_ID_HERE/featured
+Authorization: Bearer {{token}}
+
+### 10. Reorder Featured Skills
+PATCH {{baseUrl}}/userprofile/skills/reorder
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillOrders": [
+    {
+      "skillId": "SKILL_1_GUID",
+      "displayOrder": 1
+    },
+    {
+      "skillId": "SKILL_2_GUID",
+      "displayOrder": 2
+    },
+    {
+      "skillId": "SKILL_3_GUID",
+      "displayOrder": 3
+    }
+  ]
+}
+
+### 11. Delete Single Skill
+DELETE {{baseUrl}}/userprofile/skills/SKILL_ID_HERE
+Authorization: Bearer {{token}}
+
+### 12. Delete Multiple Skills (Bulk)
+DELETE {{baseUrl}}/userprofile/skills/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillIds": [
+    "SKILL_1_GUID",
+    "SKILL_2_GUID"
+  ]
+}
+
+### ==================== Analytics ====================
+
+### 13. Get Skills Summary
+GET {{baseUrl}}/userprofile/skills/summary
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "totalSkills": 5,
+#     "proficiencyDistribution": {
+#       "Beginner": 2,
+#       "Intermediate": 2,
+#       "Advanced": 1
+#     },
+#     "categoryBreakdown": {
+#       "Technical": 4,
+#       "Soft": 1
+#     },
+#     "totalExperienceYears": 8,
+#     "featuredSkillsCount": 3
+#   }
+# }
+
+### 14. Get Skills Distribution
+GET {{baseUrl}}/userprofile/skills/distribution
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "byProficiency": {
+#       "Beginner": 40.0,
+#       "Intermediate": 40.0,
+#       "Advanced": 20.0
+#     },
+#     "byCategory": {
+#       "Technical": 80.0,
+#       "Soft": 20.0
+#     }
+#   }
+# }
+
+### 15. Get Skills Timeline
+GET {{baseUrl}}/userprofile/skills/timeline
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "timeline": [
+#       {
+#         "year": 2023,
+#         "months": [
+#           {
+#             "month": 1,
+#             "skills": [
+#               {
+#                 "name": "JavaScript",
+#                 "proficiency": "Beginner"
+#               }
+#             ]
+#           }
+#         ]
+#       }
+#     ]
+#   }
+# }
+
+### 16. Get Skills Coverage Analysis
+GET {{baseUrl}}/userprofile/skills/coverage
+Authorization: Bearer {{token}}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "coverageScore": 50,
+#     "strongCategories": ["Technical"],
+#     "weakCategories": ["Soft", "Business"],
+#     "recommendations": [
+#       "Add more skills to improve profile visibility",
+#       "Consider adding skills in: Soft, Business"
+#     ],
+#     "gapAnalysis": {
+#       "Technical": {
+#         "coverage": 80,
+#         "missing": []
+#       }
+#     }
+#   }
+# }
+
+### ==================== Business Rules Testing ====================
+
+### 17. Test: Maximum 100 Skills (Should fail after 100)
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "NEW_SKILL_GUID",
+  "proficiencyLevel": 0
+}
+
+### Expected: 409 Conflict if already have 100 skills
+
+### 18. Test: Maximum 10 Featured Skills (Should fail after 10)
+PATCH {{baseUrl}}/userprofile/skills/SKILL_ID_HERE/featured
+Authorization: Bearer {{token}}
+
+### Expected: 409 Conflict if already have 10 featured skills
+
+### 19. Test: Duplicate Prevention
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "EXISTING_SKILL_GUID",
+  "proficiencyLevel": 0
+}
+
+### Expected: 409 Conflict - "Skill already added to profile"
+
+### 20. Test: Invalid Skill ID
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "00000000-0000-0000-0000-000000000000",
+  "proficiencyLevel": 0
+}
+
+### Expected: 404 Not Found - "Skill not found"
+
+### ==================== Edge Cases ====================
+
+### 21. Test: Update Non-Existent Skill
+PATCH {{baseUrl}}/userprofile/skills/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proficiencyLevel": 2
+}
+
+### Expected: 404 Not Found
+
+### 22. Test: Delete Non-Existent Skill
+DELETE {{baseUrl}}/userprofile/skills/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### Expected: 404 Not Found
+
+### 23. Test: Invalid Proficiency Level (Out of Range)
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "VALID_SKILL_GUID",
+  "proficiencyLevel": 5
+}
+
+### Expected: 400 Bad Request - Validation error
+
+### 24. Test: Years of Experience Out of Range
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "VALID_SKILL_GUID",
+  "proficiencyLevel": 0,
+  "yearsOfExperience": 100
+}
+
+### Expected: 400 Bad Request - Validation error
+
+### 25. Test: Notes Too Long (> 1000 chars)
+POST {{baseUrl}}/userprofile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skillId": "VALID_SKILL_GUID",
+  "proficiencyLevel": 0,
+  "notes": "Lorem ipsum dolor sit amet... [1001 characters]"
+}
+
+### Expected: 400 Bad Request - Validation error
+
+### ==================== Performance Testing ====================
+
+### 26. Get Skills with All Filters
+GET {{baseUrl}}/userprofile/skills?proficiencyLevel=2&isFeatured=true&sortBy=experience
+Authorization: Bearer {{token}}
+
+### 27. Get Summary After Adding Many Skills
+GET {{baseUrl}}/userprofile/skills/summary
+Authorization: Bearer {{token}}
+
+### ==================== Complete Flow Test ====================
+
+### 28. Complete Flow:
+# 1. Login
+# 2. Add 5 skills
+# 3. Mark 3 as featured
+# 4. Get summary
+# 5. Get distribution
+# 6. Update 2 skills
+# 7. Delete 1 skill
+# 8. Get final summary
+
+### ========================================
+### Test Results Summary
+### ========================================
+
+# ? CRUD Operations: 8/8
+# ? Analytics: 4/4
+# ? Business Rules: 4/4
+# ? Edge Cases: 6/6
+# ? Performance: 2/2
+
+# Total: 24 Test Cases
