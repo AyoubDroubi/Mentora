@@ -37,7 +37,97 @@ High - Level Requirement: The system shall maintain a detailed digital persona f
 
 2.2 System Configurations
 
-2.2.1 Timezone Synchronization: The system shall detect and store the user’s Timezone(IANA format) to ensure notifications and task schedules align with the user’s local time, not the server's UTC time.
+2.2.1 Timezone Synchronization: The system shall detect and store the user's Timezone(IANA format) to ensure notifications and task schedules align with the user's local time, not the server's UTC time.
+
+2.3 Skills Portfolio Management
+
+High - Level Requirement: The system shall enable students to build and showcase a comprehensive skills portfolio independent from career plans, supporting proficiency tracking, experience documentation, and public profile presentation.
+
+2.3.1 User Profile Skills Entity
+
+2.3.1.1 Data Structure: The system shall implement a UserProfileSkill entity with Many-to-Many relationship between UserProfile and Skill entities, containing:
+- ProficiencyLevel (enum 0-3: Beginner, Intermediate, Advanced, Expert)
+- AcquisitionMethod (string, max 200 chars): How skill was acquired
+- StartedDate (nullable DateTime): When learning began
+- YearsOfExperience (nullable int, 0-50 range)
+- IsFeatured (bool): Display on public profile
+- Notes (string, max 1000 chars)
+- DisplayOrder (int): Ordering for featured skills
+
+2.3.1.2 Constraints: The system shall enforce a unique constraint on (UserProfileId, SkillId) to prevent duplicate skills per profile.
+
+2.3.1.3 Limits: The system shall enforce business rules: maximum 100 skills per profile, maximum 10 featured skills.
+
+2.3.2 Skills CRUD Operations
+
+2.3.2.1 Add Skills: The system shall provide endpoints to add single skills (POST /api/userprofile/skills) or bulk skills (POST /api/userprofile/skills/bulk) to a user profile with validation.
+
+2.3.2.2 Retrieve Skills: The system shall provide filtered retrieval of skills by proficiency level, category, featured status, with sorting capabilities (GET /api/userprofile/skills with query parameters).
+
+2.3.2.3 Update Skills: The system shall support full updates (PUT), partial updates (PATCH) for proficiency, featured status, experience, and bulk reordering operations.
+
+2.3.2.4 Delete Skills: The system shall support single and bulk skill removal from profiles while maintaining referential integrity.
+
+2.3.3 Skills Analytics & Intelligence
+
+2.3.3.1 Skills Summary: The system shall calculate and return real-time statistics including total skills, proficiency distribution, category breakdown, and total experience years (GET /api/userprofile/skills/summary).
+
+2.3.3.2 Skills Distribution: The system shall provide percentage-based distribution analytics by proficiency level and category (GET /api/userprofile/skills/distribution).
+
+2.3.3.3 Skills Timeline: The system shall generate chronological skill acquisition timeline grouped by year and month (GET /api/userprofile/skills/timeline).
+
+2.3.3.4 Skills Coverage Analysis: The system shall analyze skill coverage across categories and provide recommendations for skill gaps (GET /api/userprofile/skills/coverage).
+
+2.3.4 Profile Completion Integration
+
+2.3.4.1 Skills Weight: The system shall allocate 40% weight to skills section in overall profile completion calculation, distributed as:
+- At least 3 skills: 20%
+- At least 1 featured skill: 10%
+- Skills with experience details: 10%
+
+2.3.4.2 Missing Fields Detection: The system shall identify missing profile components and generate actionable recommendations (GET /api/userprofile/completion/missing).
+
+2.3.4.3 Profile Strength Score: The system shall calculate a holistic profile strength score (0-100) considering completeness, skills diversity, experience depth, and featured skills quality (GET /api/userprofile/strength).
+
+2.3.5 Public Profile & Sharing
+
+2.3.5.1 Public Profile View: The system shall provide unauthenticated access to public profile views (GET /api/userprofile/public/{userId}) displaying only non-sensitive information and featured skills.
+
+2.3.5.2 Share Link Generation: The system shall generate time-limited shareable links with configurable expiration and privacy settings (POST /api/userprofile/share) including options to include/exclude contact information.
+
+2.3.5.3 Profile Export: The system shall support full profile export with skills in structured JSON format (GET /api/userprofile/export?includeSkills=true).
+
+2.3.6 Featured Skills Showcase
+
+2.3.6.1 Display Order Management: The system shall maintain displayOrder for featured skills allowing custom sorting (PATCH /api/userprofile/skills/reorder).
+
+2.3.6.2 Featured Toggle: The system shall provide atomic operations to toggle featured status (PATCH /api/userprofile/skills/{id}/featured).
+
+2.3.6.3 Featured Retrieval: The system shall provide dedicated endpoint to retrieve only featured skills sorted by displayOrder (GET /api/userprofile/skills/featured).
+
+2.3.7 Integration with Profile System
+
+2.3.7.1 Profile with Skills: The system shall support including skills in profile retrieval via query parameter (GET /api/userprofile?includeSkills=true&featuredOnly=false).
+
+2.3.7.2 Cascade Operations: The system shall cascade-delete user profile skills when profile is deleted, but restrict deletion when skill is referenced.
+
+2.3.8 Data Validation & Security
+
+2.3.8.1 Input Validation: The system shall validate all inputs server-side including proficiency levels (0-3), experience years (0-50), string lengths, and required fields.
+
+2.3.8.2 Authorization: The system shall enforce ownership validation ensuring users can only manage their own profile skills (403 Forbidden for unauthorized access).
+
+2.3.8.3 Skill Existence: The system shall validate that referenced skills exist in the Skills master table before creating associations (404 Not Found for invalid SkillId).
+
+2.3.8.4 Duplicate Prevention: The system shall prevent duplicate skill additions returning 409 Conflict error with descriptive message.
+
+2.3.9 Performance Requirements
+
+2.3.9.1 Response Times: The system shall respond to GET requests within 200ms, POST/PUT within 500ms, and bulk operations (up to 50 skills) within 1 second under normal load.
+
+2.3.9.2 Database Optimization: The system shall implement proper indexing on UserProfileId, SkillId, IsFeatured, and DisplayOrder columns.
+
+2.3.9.3 Caching Strategy: The system shall support caching frequently accessed profile skills lists with appropriate invalidation on updates.
 
 3. Module: AI Career Builder(The Strategist)
 
@@ -68,6 +158,8 @@ The Granular Actions: StepCheckpoints(Micro - steps like "Install VS Code").
 3.3.1 Many - to - Many Mapping: The system shall identify required skills(e.g., "Python") and map them to the CareerPlan via the CareerPlanSkill associative table, setting a TargetProficiency for each.
 
 3.3.2 Shared Skill Repository: The system shall query the Skill entity to check if a skill exists; if not, create it.This ensures analytics capability(e.g., "Top requested skills system-wide").
+
+3.3.3 Profile Skills Integration: The system shall cross-reference CareerPlan required skills with UserProfile skills to identify skill gaps and proficiency mismatches, providing actionable recommendations.
 
 4. Module: Intelligent Study Planner(The Executor)
 
@@ -119,6 +211,12 @@ IF a StudyTask is completed ->
 
 5.2.2 Impact Visualization: The system shall serve endpoints allowing the frontend to display metrics like "Studying for this exam contributes 2% to your Software Engineer Goal."
 
+5.3 Skills-Career Alignment
+
+5.3.1 Skill Progress Tracking: The system shall update UserProfileSkill proficiency levels based on completed career steps and study tasks related to that skill.
+
+5.3.2 Achievement Triggers: The system shall trigger skill-based achievements when users reach specific proficiency milestones or acquire multiple skills in a category.
+
 6. Module: Gamification & Engagement Strategy
 
 High - Level Requirement: The system shall utilize psychological triggers via data entities to increase user retention and session frequency.
@@ -129,9 +227,13 @@ High - Level Requirement: The system shall utilize psychological triggers via da
 
 6.1.2 Streak Maintenance: The system must calculate CurrentStreak by checking consecutive daily activity logs.A logic must exist to reset the streak if LastLogin > 24 hours + offset.
 
+6.1.3 Skills-Based XP: The system shall award XP for skill-related activities including adding skills (5 XP), updating proficiency (10 XP), and achieving featured skills (15 XP).
+
 6.2 Achievement System
 
 6.2.1 Trigger Conditions: The system shall define a flexible Achievement table with triggers(e.g., "7_day_streak").A background worker or in -request logic must evaluate these conditions to create UserAchievement records.
+
+6.2.2 Skills Achievements: The system shall define skill-specific achievements such as "Master 5 Skills", "Featured Showcase", "Full Stack Expert" (frontend + backend skills), "Skill Collector" (skills across 5 categories).
 
 6.3 Emotional Reflection
 
@@ -153,6 +255,12 @@ TokenUsage(Prompt + Completion).
 
 This data is non - functional for the user but critical for Business Logic(billing & optimization).
 
+7.2 Skills Analytics Dashboard
+
+7.2.1 System-Wide Analytics: The system shall provide admin dashboards showing trending skills, most acquired skills, average proficiency levels, and skills gap analysis across all users.
+
+7.2.2 Profile Completion Metrics: The system shall track and report profile completion rates, skills adoption rates, and feature usage statistics for business intelligence.
+
 8. Data Integrity & Naming Standards(Non - Functional)
 
 8.1 GUID Utilization: All primary keys for transactional entities(Users, Tasks, Plans) shall use GUID / UUID to ensure global uniqueness and prevent ID enumeration attacks.
@@ -161,8 +269,26 @@ This data is non - functional for the user but critical for Business Logic(billi
 
 8.3 Delete Cascades: The system shall configure specific Entity Framework deletion behaviors:
 
-Cascade: For parent - child strong ownership(Plan -> Steps).
+Cascade: For parent - child strong ownership(Plan -> Steps, UserProfile -> UserProfileSkills).
 
     SetNull: For history preservation(CareerStep Deleted -> Linked StudyTasks remain but disconnected).
+
+    Restrict: For shared resources(Skill entity cannot be deleted if referenced by UserProfileSkill or CareerPlanSkill).
+
+8.4 Unique Constraints: The system shall enforce database-level unique constraints on composite keys such as (UserProfileId, SkillId) in UserProfileSkills table to prevent data duplication.
+
+8.5 Index Strategy: The system shall implement database indexes on frequently queried columns including UserProfileId, SkillId, IsFeatured, DisplayOrder, ProficiencyLevel to ensure sub-200ms query performance.
+
+9. API Design Standards
+
+9.1 RESTful Conventions: All endpoints shall follow RESTful conventions with proper HTTP verbs (GET, POST, PUT, PATCH, DELETE) and status codes (200, 201, 400, 401, 403, 404, 409, 500).
+
+9.2 Query Parameters: The system shall support query parameters for filtering (proficiencyLevel, category, isFeatured) and configuration (includeSkills, featuredOnly).
+
+9.3 Bulk Operations: The system shall provide bulk endpoints (POST /bulk, DELETE /bulk) that accept arrays and return detailed results including success count and failed items with reasons.
+
+9.4 Pagination Support: The system shall implement pagination for endpoints returning large datasets with page, pageSize, totalCount, and totalPages metadata.
+
+9.5 Error Response Format: The system shall return consistent error response structure with message, errors dictionary, and optional timestamp.
 
 End of Specification.Prepared for the "Mentora" Development Team.
