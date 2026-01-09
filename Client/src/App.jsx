@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProfileProvider } from "./contexts/ProfileContext";
 import { UserProvider } from "./contexts/UserContext";
+import { AssessmentProvider } from "./contexts/AssessmentContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Public pages
@@ -30,152 +31,176 @@ import SkillsManagement from "./pages/SkillsManagement";
 import Quiz from "./pages/Quiz";
 import TestAuth from "./pages/TestAuth";
 
+// Assessment Module Pages
+import AssessmentQuiz from "./pages/AssessmentQuiz";
+import StudyPlanGenerated from "./pages/StudyPlanGenerated";
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <UserProvider>
           <ProfileProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/about-us" element={<AboutUs />} />
+            <AssessmentProvider>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/about-us" element={<AboutUs />} />
 
-              {/* Test Auth Page - Protected */}
-              <Route
-                path="/test-auth"
-                element={
-                  <ProtectedRoute>
-                    <TestAuth />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Test Auth Page - Protected */}
+                <Route
+                  path="/test-auth"
+                  element={
+                    <ProtectedRoute>
+                      <TestAuth />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Protected Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/study-planner"
-                element={
-                  <ProtectedRoute>
-                    <StudyPlanner />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/todo"
-                element={
-                  <ProtectedRoute>
-                    <Todo />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/timer"
-                element={
-                  <ProtectedRoute>
-                    <Timer />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/notes"
-                element={
-                  <ProtectedRoute>
-                    <Notes />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/planner"
-                element={
-                  <ProtectedRoute>
-                    <Planner />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/attendance"
-                element={
-                  <ProtectedRoute>
-                    <Attendance />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/career-builder"
-                element={
-                  <ProtectedRoute>
-                    <CareerBuilder />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/create-career-builder"
-                element={
-                  <ProtectedRoute>
-                    <CreateCareerBuilder />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/career-plan/:id"
-                element={
-                  <ProtectedRoute>
-                    <CareerPlan />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/career-progress"
-                element={
-                  <ProtectedRoute>
-                    <CareerProgress />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/career-skills"
-                element={
-                  <ProtectedRoute>
-                    <CareerSkills />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/skills"
-                element={
-                  <ProtectedRoute>
-                    <SkillsManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/quiz"
-                element={
-                  <ProtectedRoute>
-                    <Quiz />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
+                {/* Protected Routes */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/study-planner"
+                  element={
+                    <ProtectedRoute>
+                      <StudyPlanner />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/todo"
+                  element={
+                    <ProtectedRoute>
+                      <Todo />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/timer"
+                  element={
+                    <ProtectedRoute>
+                      <Timer />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/notes"
+                  element={
+                    <ProtectedRoute>
+                      <Notes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/planner"
+                  element={
+                    <ProtectedRoute>
+                      <Planner />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/attendance"
+                  element={
+                    <ProtectedRoute>
+                      <Attendance />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/career-builder"
+                  element={
+                    <ProtectedRoute>
+                      <CareerBuilder />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/create-career-builder"
+                  element={
+                    <ProtectedRoute>
+                      <CreateCareerBuilder />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/career-plan/:id"
+                  element={
+                    <ProtectedRoute>
+                      <CareerPlan />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/career-progress"
+                  element={
+                    <ProtectedRoute>
+                      <CareerProgress />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/career-skills"
+                  element={
+                    <ProtectedRoute>
+                      <CareerSkills />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/skills"
+                  element={
+                    <ProtectedRoute>
+                      <SkillsManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/quiz"
+                  element={
+                    <ProtectedRoute>
+                      <Quiz />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Assessment Module Routes */}
+                <Route
+                  path="/assessment"
+                  element={
+                    <ProtectedRoute>
+                      <AssessmentQuiz />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/study-plan-generated"
+                  element={
+                    <ProtectedRoute>
+                      <StudyPlanGenerated />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </AssessmentProvider>
           </ProfileProvider>
         </UserProvider>
       </AuthProvider>

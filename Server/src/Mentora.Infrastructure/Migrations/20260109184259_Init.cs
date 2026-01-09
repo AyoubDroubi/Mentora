@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Mentora.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,6 +95,51 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AssessmentQuestions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QuestionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetMajor = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    IsRequired = table.Column<bool>(type: "bit", nullable: false),
+                    OptionsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MinValue = table.Column<int>(type: "int", nullable: true),
+                    MaxValue = table.Column<int>(type: "int", nullable: true),
+                    HelpText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConditionalLogicJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ValidationPattern = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssessmentQuestions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CareerQuizAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AnswersJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CareerQuizAttempts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DailyReflections",
                 columns: table => new
                 {
@@ -158,6 +203,8 @@ namespace Mentora.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -317,14 +364,20 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CareerPlans",
+                name: "AssessmentAttempts",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Summary = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Major = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StudyLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TotalTimeMinutes = table.Column<int>(type: "int", nullable: true),
+                    CompletionPercentage = table.Column<int>(type: "int", nullable: false),
+                    ContextJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -332,9 +385,34 @@ namespace Mentora.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CareerPlans", x => x.Id);
+                    table.PrimaryKey("PK_AssessmentAttempts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CareerPlans_AspNetUsers_UserId",
+                        name: "FK_AssessmentAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlannerEvents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventDateTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsAttended = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlannerEvents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlannerEvents_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -394,16 +472,95 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StudyQuizAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AnswersJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GeneratedPlan = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyQuizAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyQuizAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TodoItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TodoItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TodoItems_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserNotes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserNotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserNotes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserProfiles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     University = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Major = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CurrentLevel = table.Column<int>(type: "int", nullable: false),
                     ExpectedGraduationYear = table.Column<int>(type: "int", nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CurrentLevel = table.Column<int>(type: "int", nullable: false),
+                    Timezone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GraduationYear = table.Column<int>(type: "int", nullable: true),
+                    LinkedInUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GitHubUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -448,6 +605,43 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CareerPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CareerQuizAttemptId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Summary = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProgressPercentage = table.Column<int>(type: "int", nullable: false),
+                    TimelineMonths = table.Column<int>(type: "int", nullable: false),
+                    CurrentStepIndex = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CareerPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CareerPlans_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CareerPlans_CareerQuizAttempts_CareerQuizAttemptId",
+                        column: x => x.CareerQuizAttemptId,
+                        principalTable: "CareerQuizAttempts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserSkills",
                 columns: table => new
                 {
@@ -478,13 +672,17 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CareerPlanSkills",
+                name: "AssessmentResponses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CareerPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TargetLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssessmentAttemptId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResponseValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResponseTimeSeconds = table.Column<int>(type: "int", nullable: true),
+                    IsSkipped = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -492,46 +690,25 @@ namespace Mentora.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CareerPlanSkills", x => x.Id);
+                    table.PrimaryKey("PK_AssessmentResponses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CareerPlanSkills_CareerPlans_CareerPlanId",
-                        column: x => x.CareerPlanId,
-                        principalTable: "CareerPlans",
+                        name: "FK_AssessmentResponses_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CareerPlanSkills_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
+                        name: "FK_AssessmentResponses_AssessmentAttempts_AssessmentAttemptId",
+                        column: x => x.AssessmentAttemptId,
+                        principalTable: "AssessmentAttempts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CareerSteps",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CareerPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrderIndex = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ResourcesLinks = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CareerSteps", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CareerSteps_CareerPlans_CareerPlanId",
-                        column: x => x.CareerPlanId,
-                        principalTable: "CareerPlans",
+                        name: "FK_AssessmentResponses_AssessmentQuestions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "AssessmentQuestions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -558,6 +735,231 @@ namespace Mentora.Infrastructure.Migrations
                         principalTable: "StudyPlans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserProfileSkills",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProficiencyLevel = table.Column<int>(type: "int", nullable: false),
+                    AcquisitionMethod = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    StartedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    YearsOfExperience = table.Column<int>(type: "int", nullable: true),
+                    IsFeatured = table.Column<bool>(type: "bit", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfileSkills", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserProfileSkills_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserProfileSkills_UserProfiles_UserProfileId",
+                        column: x => x.UserProfileId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AiStudyPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssessmentAttemptId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CareerPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Summary = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetCompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EstimatedHours = table.Column<int>(type: "int", nullable: false),
+                    DifficultyLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProgressPercentage = table.Column<int>(type: "int", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    AiModel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AiRequestLogId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RawAiResponseJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AiStudyPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AiStudyPlans_AiRequestLogs_AiRequestLogId",
+                        column: x => x.AiRequestLogId,
+                        principalTable: "AiRequestLogs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_AiStudyPlans_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AiStudyPlans_AssessmentAttempts_AssessmentAttemptId",
+                        column: x => x.AssessmentAttemptId,
+                        principalTable: "AssessmentAttempts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_AiStudyPlans_CareerPlans_CareerPlanId",
+                        column: x => x.CareerPlanId,
+                        principalTable: "CareerPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CareerSteps",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CareerPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    DurationWeeks = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProgressPercentage = table.Column<int>(type: "int", nullable: false),
+                    ResourcesLinks = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CareerSteps", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CareerSteps_CareerPlans_CareerPlanId",
+                        column: x => x.CareerPlanId,
+                        principalTable: "CareerPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudyPlanSkills",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudyPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TargetProficiency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Importance = table.Column<int>(type: "int", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    IsPrerequisite = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProficiencyGap = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyPlanSkills", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanSkills_AiStudyPlans_StudyPlanId",
+                        column: x => x.StudyPlanId,
+                        principalTable: "AiStudyPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanSkills_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudyPlanSteps",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudyPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    EstimatedHours = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProgressPercentage = table.Column<int>(type: "int", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ObjectivesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrerequisitesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyPlanSteps", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanSteps_AiStudyPlans_StudyPlanId",
+                        column: x => x.StudyPlanId,
+                        principalTable: "AiStudyPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CareerPlanSkills",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CareerPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CareerStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CareerPlanSkills", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CareerPlanSkills_CareerPlans_CareerPlanId",
+                        column: x => x.CareerPlanId,
+                        principalTable: "CareerPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CareerPlanSkills_CareerSteps_CareerStepId",
+                        column: x => x.CareerStepId,
+                        principalTable: "CareerSteps",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_CareerPlanSkills_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -612,12 +1014,57 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StudyPlanResources",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudyPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudyPlanStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResourceType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstimatedHours = table.Column<int>(type: "int", nullable: true),
+                    DifficultyLevel = table.Column<int>(type: "int", nullable: true),
+                    IsFree = table.Column<bool>(type: "bit", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserRating = table.Column<int>(type: "int", nullable: true),
+                    UserNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TagsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyPlanResources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanResources_AiStudyPlans_StudyPlanId",
+                        column: x => x.StudyPlanId,
+                        principalTable: "AiStudyPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanResources_StudyPlanSteps_StudyPlanStepId",
+                        column: x => x.StudyPlanStepId,
+                        principalTable: "StudyPlanSteps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudyTasks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CareerStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StudyPlanStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -647,10 +1094,53 @@ namespace Mentora.Infrastructure.Migrations
                         principalTable: "CareerSteps",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_StudyTasks_StudyPlanSteps_StudyPlanStepId",
+                        column: x => x.StudyPlanStepId,
+                        principalTable: "StudyPlanSteps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
                         name: "FK_StudyTasks_StudyPlans_StudyPlanId",
                         column: x => x.StudyPlanId,
                         principalTable: "StudyPlans",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudyPlanCheckpoints",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudyPlanStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    EstimatedMinutes = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StudyTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsMandatory = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyPlanCheckpoints", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanCheckpoints_StudyPlanSteps_StudyPlanStepId",
+                        column: x => x.StudyPlanStepId,
+                        principalTable: "StudyPlanSteps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudyPlanCheckpoints_StudyTasks_StudyTaskId",
+                        column: x => x.StudyTaskId,
+                        principalTable: "StudyTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -705,6 +1195,26 @@ namespace Mentora.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AiStudyPlans_AiRequestLogId",
+                table: "AiStudyPlans",
+                column: "AiRequestLogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AiStudyPlans_AssessmentAttemptId",
+                table: "AiStudyPlans",
+                column: "AssessmentAttemptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AiStudyPlans_CareerPlanId",
+                table: "AiStudyPlans",
+                column: "CareerPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AiStudyPlans_User_Active_Status",
+                table: "AiStudyPlans",
+                columns: new[] { "UserId", "IsActive", "Status" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -744,9 +1254,45 @@ namespace Mentora.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AssessmentAttempts_User_Status",
+                table: "AssessmentAttempts",
+                columns: new[] { "UserId", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssessmentQuestions_Active_Order",
+                table: "AssessmentQuestions",
+                columns: new[] { "IsActive", "OrderIndex" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssessmentQuestions_TargetMajor",
+                table: "AssessmentQuestions",
+                column: "TargetMajor");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssessmentResponses_Attempt_Question_Unique",
+                table: "AssessmentResponses",
+                columns: new[] { "AssessmentAttemptId", "QuestionId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssessmentResponses_QuestionId",
+                table: "AssessmentResponses",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssessmentResponses_UserId",
+                table: "AssessmentResponses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AvailabilitySlots_StudyPlanId",
                 table: "AvailabilitySlots",
                 column: "StudyPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CareerPlans_CareerQuizAttemptId",
+                table: "CareerPlans",
+                column: "CareerQuizAttemptId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CareerPlans_UserId",
@@ -757,6 +1303,11 @@ namespace Mentora.Infrastructure.Migrations
                 name: "IX_CareerPlanSkills_CareerPlanId",
                 table: "CareerPlanSkills",
                 column: "CareerPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CareerPlanSkills_CareerStepId",
+                table: "CareerPlanSkills",
+                column: "CareerStepId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CareerPlanSkills_SkillId",
@@ -774,6 +1325,11 @@ namespace Mentora.Infrastructure.Migrations
                 column: "CareerStepId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PlannerEvents_UserId",
+                table: "PlannerEvents",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
@@ -784,8 +1340,56 @@ namespace Mentora.Infrastructure.Migrations
                 column: "CareerStepId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanCheckpoints_StudyPlanStepId",
+                table: "StudyPlanCheckpoints",
+                column: "StudyPlanStepId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanCheckpoints_StudyTaskId",
+                table: "StudyPlanCheckpoints",
+                column: "StudyTaskId",
+                unique: true,
+                filter: "[StudyTaskId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanResources_StudyPlanId",
+                table: "StudyPlanResources",
+                column: "StudyPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanResources_StudyPlanStepId",
+                table: "StudyPlanResources",
+                column: "StudyPlanStepId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudyPlans_UserId",
                 table: "StudyPlans",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanSkills_Plan_Skill_Unique",
+                table: "StudyPlanSkills",
+                columns: new[] { "StudyPlanId", "SkillId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanSkills_SkillId",
+                table: "StudyPlanSkills",
+                column: "SkillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanSkills_Status",
+                table: "StudyPlanSkills",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyPlanSteps_Plan_Order",
+                table: "StudyPlanSteps",
+                columns: new[] { "StudyPlanId", "OrderIndex" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudyQuizAttempts_UserId",
+                table: "StudyQuizAttempts",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -804,6 +1408,11 @@ namespace Mentora.Infrastructure.Migrations
                 column: "StudyPlanId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudyTasks_StudyPlanStepId",
+                table: "StudyTasks",
+                column: "StudyPlanStepId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudyTasks_UserId",
                 table: "StudyTasks",
                 column: "UserId");
@@ -815,15 +1424,56 @@ namespace Mentora.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_TodoItems_UserId",
+                table: "TodoItems",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserAchievements_AchievementId",
                 table: "UserAchievements",
                 column: "AchievementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserNotes_UserId",
+                table: "UserNotes",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_UserId",
                 table: "UserProfiles",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_DisplayOrder",
+                table: "UserProfileSkills",
+                column: "DisplayOrder");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_IsFeatured",
+                table: "UserProfileSkills",
+                column: "IsFeatured");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_ProficiencyLevel",
+                table: "UserProfileSkills",
+                column: "ProficiencyLevel");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_SkillId",
+                table: "UserProfileSkills",
+                column: "SkillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_UserProfile_Skill_Unique",
+                table: "UserProfileSkills",
+                columns: new[] { "UserProfileId", "SkillId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfileSkills_UserProfileId",
+                table: "UserProfileSkills",
+                column: "UserProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSkills_SkillId",
@@ -846,9 +1496,6 @@ namespace Mentora.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AiRequestLogs");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -862,6 +1509,9 @@ namespace Mentora.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "AssessmentResponses");
 
             migrationBuilder.DropTable(
                 name: "AvailabilitySlots");
@@ -882,10 +1532,25 @@ namespace Mentora.Infrastructure.Migrations
                 name: "PasswordResetTokens");
 
             migrationBuilder.DropTable(
+                name: "PlannerEvents");
+
+            migrationBuilder.DropTable(
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "StepCheckpoints");
+
+            migrationBuilder.DropTable(
+                name: "StudyPlanCheckpoints");
+
+            migrationBuilder.DropTable(
+                name: "StudyPlanResources");
+
+            migrationBuilder.DropTable(
+                name: "StudyPlanSkills");
+
+            migrationBuilder.DropTable(
+                name: "StudyQuizAttempts");
 
             migrationBuilder.DropTable(
                 name: "StudySessions");
@@ -894,13 +1559,19 @@ namespace Mentora.Infrastructure.Migrations
                 name: "TaskFeedbackLogs");
 
             migrationBuilder.DropTable(
+                name: "TodoItems");
+
+            migrationBuilder.DropTable(
                 name: "UserAchievements");
 
             migrationBuilder.DropTable(
                 name: "UserDiagnosticResponses");
 
             migrationBuilder.DropTable(
-                name: "UserProfiles");
+                name: "UserNotes");
+
+            migrationBuilder.DropTable(
+                name: "UserProfileSkills");
 
             migrationBuilder.DropTable(
                 name: "UserSkills");
@@ -912,10 +1583,16 @@ namespace Mentora.Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "AssessmentQuestions");
+
+            migrationBuilder.DropTable(
                 name: "StudyTasks");
 
             migrationBuilder.DropTable(
                 name: "Achievements");
+
+            migrationBuilder.DropTable(
+                name: "UserProfiles");
 
             migrationBuilder.DropTable(
                 name: "Skills");
@@ -924,13 +1601,28 @@ namespace Mentora.Infrastructure.Migrations
                 name: "CareerSteps");
 
             migrationBuilder.DropTable(
+                name: "StudyPlanSteps");
+
+            migrationBuilder.DropTable(
                 name: "StudyPlans");
+
+            migrationBuilder.DropTable(
+                name: "AiStudyPlans");
+
+            migrationBuilder.DropTable(
+                name: "AiRequestLogs");
+
+            migrationBuilder.DropTable(
+                name: "AssessmentAttempts");
 
             migrationBuilder.DropTable(
                 name: "CareerPlans");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "CareerQuizAttempts");
         }
     }
 }

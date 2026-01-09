@@ -36,4 +36,8 @@
 
     public enum SkillCategory
     { Technical, Soft }
+
+    // Note: Assessment Module enums (QuestionType, AssessmentStatus, StudyPlanStatus, etc.) 
+    // are defined in their respective entity files under Mentora.Domain.Entities.Assessment namespace
+    // to avoid naming conflicts and maintain proper encapsulation per SRS Section 3
 }

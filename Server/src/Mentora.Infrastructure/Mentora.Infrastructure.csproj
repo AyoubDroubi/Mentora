@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Mentora.Domain\Mentora.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
