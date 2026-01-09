@@ -99,6 +99,546 @@ namespace Mentora.Infrastructure.Migrations
                     b.ToTable("AiRequestLogs");
                 });
 
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AiStudyPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AiModel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("AiRequestLogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AssessmentAttemptId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CareerPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DifficultyLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstimatedHours")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProgressPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RawAiResponseJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("TargetCompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AiRequestLogId");
+
+                    b.HasIndex("AssessmentAttemptId")
+                        .HasDatabaseName("IX_AiStudyPlans_AssessmentAttemptId");
+
+                    b.HasIndex("CareerPlanId")
+                        .HasDatabaseName("IX_AiStudyPlans_CareerPlanId");
+
+                    b.HasIndex("UserId", "IsActive", "Status")
+                        .HasDatabaseName("IX_AiStudyPlans_User_Active_Status");
+
+                    b.ToTable("AiStudyPlans");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CompletionPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContextJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Major")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("StudyLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TotalTimeMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Status")
+                        .HasDatabaseName("IX_AssessmentAttempts_User_Status");
+
+                    b.ToTable("AssessmentAttempts");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentQuestion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConditionalLogicJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HelpText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MaxValue")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinValue")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OptionsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QuestionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetMajor")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ValidationPattern")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetMajor")
+                        .HasDatabaseName("IX_AssessmentQuestions_TargetMajor");
+
+                    b.HasIndex("IsActive", "OrderIndex")
+                        .HasDatabaseName("IX_AssessmentQuestions_Active_Order");
+
+                    b.ToTable("AssessmentQuestions");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentResponse", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AssessmentAttemptId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSkipped")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ResponseTimeSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponseValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_AssessmentResponses_UserId");
+
+                    b.HasIndex("AssessmentAttemptId", "QuestionId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AssessmentResponses_Attempt_Question_Unique");
+
+                    b.ToTable("AssessmentResponses");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanCheckpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsMandatory")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StudyPlanStepId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("StudyTaskId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudyPlanStepId");
+
+                    b.HasIndex("StudyTaskId")
+                        .IsUnique()
+                        .HasFilter("[StudyTaskId] IS NOT NULL");
+
+                    b.ToTable("StudyPlanCheckpoints");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanResource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DifficultyLevel")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EstimatedHours")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFree")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResourceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StudyPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("StudyPlanStepId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TagsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserRating")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudyPlanId");
+
+                    b.HasIndex("StudyPlanStepId");
+
+                    b.ToTable("StudyPlanResources");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Importance")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPrerequisite")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProficiencyGap")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SkillId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("StudyPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetProficiency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_StudyPlanSkills_Status");
+
+                    b.HasIndex("StudyPlanId", "SkillId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_StudyPlanSkills_Plan_Skill_Unique");
+
+                    b.ToTable("StudyPlanSkills");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstimatedHours")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ObjectivesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PrerequisitesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProgressPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StudyPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudyPlanId", "OrderIndex")
+                        .HasDatabaseName("IX_StudyPlanSteps_Plan_Order");
+
+                    b.ToTable("StudyPlanSteps");
+                });
+
             modelBuilder.Entity("Mentora.Domain.Entities.Auth.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -637,6 +1177,10 @@ namespace Mentora.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -957,6 +1501,9 @@ namespace Mentora.Infrastructure.Migrations
                     b.Property<Guid?>("StudyPlanId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("StudyPlanStepId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -976,6 +1523,8 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasIndex("CareerStepId");
 
                     b.HasIndex("StudyPlanId");
+
+                    b.HasIndex("StudyPlanStepId");
 
                     b.HasIndex("UserId");
 
@@ -1448,6 +1997,142 @@ namespace Mentora.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AiStudyPlan", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.AiRequestLog", "AiRequestLog")
+                        .WithMany()
+                        .HasForeignKey("AiRequestLogId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AssessmentAttempt", "AssessmentAttempt")
+                        .WithMany("GeneratedStudyPlans")
+                        .HasForeignKey("AssessmentAttemptId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Mentora.Domain.Entities.CareerPlan", "CareerPlan")
+                        .WithMany()
+                        .HasForeignKey("CareerPlanId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AiRequestLog");
+
+                    b.Navigation("AssessmentAttempt");
+
+                    b.Navigation("CareerPlan");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentAttempt", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentResponse", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AssessmentAttempt", "AssessmentAttempt")
+                        .WithMany("Responses")
+                        .HasForeignKey("AssessmentAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AssessmentQuestion", "Question")
+                        .WithMany("Responses")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentAttempt");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanCheckpoint", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Assessment.StudyPlanStep", "StudyPlanStep")
+                        .WithMany("Checkpoints")
+                        .HasForeignKey("StudyPlanStepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mentora.Domain.Entities.StudyTask", "StudyTask")
+                        .WithOne()
+                        .HasForeignKey("Mentora.Domain.Entities.Assessment.StudyPlanCheckpoint", "StudyTaskId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("StudyPlanStep");
+
+                    b.Navigation("StudyTask");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanResource", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AiStudyPlan", "StudyPlan")
+                        .WithMany("Resources")
+                        .HasForeignKey("StudyPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mentora.Domain.Entities.Assessment.StudyPlanStep", "StudyPlanStep")
+                        .WithMany()
+                        .HasForeignKey("StudyPlanStepId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("StudyPlan");
+
+                    b.Navigation("StudyPlanStep");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanSkill", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AiStudyPlan", "StudyPlan")
+                        .WithMany("RequiredSkills")
+                        .HasForeignKey("StudyPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("StudyPlan");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanStep", b =>
+                {
+                    b.HasOne("Mentora.Domain.Entities.Assessment.AiStudyPlan", "StudyPlan")
+                        .WithMany("Steps")
+                        .HasForeignKey("StudyPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudyPlan");
+                });
+
             modelBuilder.Entity("Mentora.Domain.Entities.AvailabilitySlot", b =>
                 {
                     b.HasOne("Mentora.Domain.Entities.StudyPlan", "StudyPlan")
@@ -1622,6 +2307,11 @@ namespace Mentora.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("StudyPlanId");
 
+                    b.HasOne("Mentora.Domain.Entities.Assessment.StudyPlanStep", "StudyPlanStep")
+                        .WithMany("Tasks")
+                        .HasForeignKey("StudyPlanStepId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1631,6 +2321,8 @@ namespace Mentora.Infrastructure.Migrations
                     b.Navigation("CareerStep");
 
                     b.Navigation("StudyPlan");
+
+                    b.Navigation("StudyPlanStep");
 
                     b.Navigation("User");
                 });
@@ -1766,6 +2458,34 @@ namespace Mentora.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AiStudyPlan", b =>
+                {
+                    b.Navigation("RequiredSkills");
+
+                    b.Navigation("Resources");
+
+                    b.Navigation("Steps");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentAttempt", b =>
+                {
+                    b.Navigation("GeneratedStudyPlans");
+
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.AssessmentQuestion", b =>
+                {
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("Mentora.Domain.Entities.Assessment.StudyPlanStep", b =>
+                {
+                    b.Navigation("Checkpoints");
+
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Mentora.Domain.Entities.Auth.User", b =>

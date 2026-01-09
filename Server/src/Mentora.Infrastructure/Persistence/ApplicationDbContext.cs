@@ -1,5 +1,6 @@
 ﻿using Mentora.Domain.Common;
 using Mentora.Domain.Entities;
+using Mentora.Domain.Entities.Assessment;
 using Mentora.Domain.Entities.Auth;
 using Mentora.Domain.Entities.StudyPlanner;
 using Microsoft.AspNetCore.Identity;
@@ -33,6 +34,16 @@ namespace Mentora.Infrastructure.Persistence
         public DbSet<CareerQuizAttempt> CareerQuizAttempts { get; set; }
         public DbSet<StepCheckpoint> StepCheckpoints { get; set; }
         public DbSet<LearningResource> LearningResources { get; set; }
+
+        // AI Assessment & Study Plan Module per SRS Section 3 & 4
+        public DbSet<AssessmentQuestion> AssessmentQuestions { get; set; }
+        public DbSet<AssessmentResponse> AssessmentResponses { get; set; }
+        public DbSet<AssessmentAttempt> AssessmentAttempts { get; set; }
+        public DbSet<AiStudyPlan> AiStudyPlans { get; set; }
+        public DbSet<StudyPlanStep> StudyPlanSteps { get; set; }
+        public DbSet<StudyPlanCheckpoint> StudyPlanCheckpoints { get; set; }
+        public DbSet<StudyPlanResource> StudyPlanResources { get; set; }
+        public DbSet<StudyPlanSkill> StudyPlanSkills { get; set; }
 
         // Scheduler Module
         public DbSet<StudyPlan> StudyPlans { get; set; }
@@ -75,8 +86,22 @@ namespace Mentora.Infrastructure.Persistence
             builder.Entity<Skill>().Property(s => s.Category).HasConversion<string>();
             builder.Entity<CareerQuizAttempt>().Property(q => q.Status).HasConversion<string>();
 
+            // Assessment Module enums per SRS Section 3
+            builder.Entity<AssessmentQuestion>().Property(q => q.QuestionType).HasConversion<string>();
+            builder.Entity<AssessmentAttempt>().Property(a => a.Status).HasConversion<string>();
+            builder.Entity<AssessmentAttempt>().Property(a => a.StudyLevel).HasConversion<string>();
+            builder.Entity<AiStudyPlan>().Property(p => p.DifficultyLevel).HasConversion<string>();
+            builder.Entity<AiStudyPlan>().Property(p => p.Status).HasConversion<string>();
+            builder.Entity<StudyPlanStep>().Property(s => s.Status).HasConversion<string>();
+            builder.Entity<StudyPlanResource>().Property(r => r.ResourceType).HasConversion<string>();
+            builder.Entity<StudyPlanSkill>().Property(s => s.TargetProficiency).HasConversion<string>();
+            builder.Entity<StudyPlanSkill>().Property(s => s.Status).HasConversion<string>();
+
             // UserProfileSkill Configuration per SRS 2.3.1
             ConfigureUserProfileSkills(builder);
+
+            // Assessment Module Configuration per SRS Section 3 & 4
+            ConfigureAssessmentModule(builder);
 
             // User Relationships
             
@@ -184,6 +209,13 @@ namespace Mentora.Infrastructure.Persistence
                 .HasForeignKey(t => t.CareerStepId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            // StudyTask -> StudyPlanStep (Many-to-One) per SRS 5.1
+            builder.Entity<StudyTask>()
+                .HasOne(t => t.StudyPlanStep)
+                .WithMany(s => s.Tasks)
+                .HasForeignKey(t => t.StudyPlanStepId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Soft Delete Query Filter per SRS 8.2
             foreach (var entityType in builder.Model.GetEntityTypes())
             {
@@ -280,6 +312,177 @@ namespace Mentora.Infrastructure.Persistence
                 .WithOne(ups => ups.Skill)
                 .HasForeignKey(ups => ups.SkillId)
                 .OnDelete(DeleteBehavior.Restrict); // Restrict deletion per SRS 8.3
+        }
+
+        /// <summary>
+        /// Configure Assessment Module entities per SRS Section 3 & 4
+        /// Includes relationships, constraints, and indexes per SRS 8.4 & 8.5
+        /// </summary>
+        private void ConfigureAssessmentModule(ModelBuilder builder)
+        {
+            // AssessmentQuestion Indexes per SRS 8.5
+            builder.Entity<AssessmentQuestion>()
+                .HasIndex(q => q.TargetMajor)
+                .HasDatabaseName("IX_AssessmentQuestions_TargetMajor");
+
+            builder.Entity<AssessmentQuestion>()
+                .HasIndex(q => new { q.IsActive, q.OrderIndex })
+                .HasDatabaseName("IX_AssessmentQuestions_Active_Order");
+
+            // AssessmentResponse Unique Constraint per SRS 8.4
+            builder.Entity<AssessmentResponse>()
+                .HasIndex(r => new { r.AssessmentAttemptId, r.QuestionId })
+                .IsUnique()
+                .HasDatabaseName("IX_AssessmentResponses_Attempt_Question_Unique");
+
+            // AssessmentResponse Indexes per SRS 8.5
+            builder.Entity<AssessmentResponse>()
+                .HasIndex(r => r.UserId)
+                .HasDatabaseName("IX_AssessmentResponses_UserId");
+
+            // AssessmentAttempt Indexes per SRS 8.5
+            builder.Entity<AssessmentAttempt>()
+                .HasIndex(a => new { a.UserId, a.Status })
+                .HasDatabaseName("IX_AssessmentAttempts_User_Status");
+
+            // AiStudyPlan Indexes per SRS 8.5
+            builder.Entity<AiStudyPlan>()
+                .HasIndex(p => new { p.UserId, p.IsActive, p.Status })
+                .HasDatabaseName("IX_AiStudyPlans_User_Active_Status");
+
+            builder.Entity<AiStudyPlan>()
+                .HasIndex(p => p.AssessmentAttemptId)
+                .HasDatabaseName("IX_AiStudyPlans_AssessmentAttemptId");
+
+            builder.Entity<AiStudyPlan>()
+                .HasIndex(p => p.CareerPlanId)
+                .HasDatabaseName("IX_AiStudyPlans_CareerPlanId");
+
+            // StudyPlanStep Indexes per SRS 8.5
+            builder.Entity<StudyPlanStep>()
+                .HasIndex(s => new { s.StudyPlanId, s.OrderIndex })
+                .HasDatabaseName("IX_StudyPlanSteps_Plan_Order");
+
+            // StudyPlanSkill Unique Constraint per SRS 8.4
+            builder.Entity<StudyPlanSkill>()
+                .HasIndex(s => new { s.StudyPlanId, s.SkillId })
+                .IsUnique()
+                .HasDatabaseName("IX_StudyPlanSkills_Plan_Skill_Unique");
+
+            // StudyPlanSkill Indexes per SRS 8.5
+            builder.Entity<StudyPlanSkill>()
+                .HasIndex(s => s.Status)
+                .HasDatabaseName("IX_StudyPlanSkills_Status");
+
+            // Relationships per SRS Section 3 & 4
+
+            // User -> AssessmentAttempts (One-to-Many)
+            builder.Entity<User>()
+                .HasMany<AssessmentAttempt>()
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // User -> AssessmentResponses (One-to-Many)
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
+            builder.Entity<User>()
+                .HasMany<AssessmentResponse>()
+                .WithOne(r => r.User)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // User -> AiStudyPlans (One-to-Many) - NoAction to avoid cascade cycles per SRS 8.3
+            builder.Entity<User>()
+                .HasMany<AiStudyPlan>()
+                .WithOne(p => p.User)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.NoAction); // Changed from Cascade to avoid multiple cascade paths
+
+            // AssessmentAttempt -> AssessmentResponses (One-to-Many)
+            builder.Entity<AssessmentAttempt>()
+                .HasMany(a => a.Responses)
+                .WithOne(r => r.AssessmentAttempt)
+                .HasForeignKey(r => r.AssessmentAttemptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // AssessmentAttempt -> AiStudyPlans (One-to-Many)
+            builder.Entity<AssessmentAttempt>()
+                .HasMany(a => a.GeneratedStudyPlans)
+                .WithOne(p => p.AssessmentAttempt)
+                .HasForeignKey(p => p.AssessmentAttemptId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // AssessmentQuestion -> AssessmentResponses (One-to-Many)
+            builder.Entity<AssessmentQuestion>()
+                .HasMany(q => q.Responses)
+                .WithOne(r => r.Question)
+                .HasForeignKey(r => r.QuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // CareerPlan -> AiStudyPlans (One-to-Many) per SRS 5.1
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
+            builder.Entity<CareerPlan>()
+                .HasMany<AiStudyPlan>()
+                .WithOne(p => p.CareerPlan)
+                .HasForeignKey(p => p.CareerPlanId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // AiStudyPlan -> StudyPlanSteps (One-to-Many) per SRS 3.2.2
+            builder.Entity<AiStudyPlan>()
+                .HasMany(p => p.Steps)
+                .WithOne(s => s.StudyPlan)
+                .HasForeignKey(s => s.StudyPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // AiStudyPlan -> StudyPlanResources (One-to-Many) per SRS 3.2.3
+            builder.Entity<AiStudyPlan>()
+                .HasMany(p => p.Resources)
+                .WithOne(r => r.StudyPlan)
+                .HasForeignKey(r => r.StudyPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // AiStudyPlan -> StudyPlanSkills (One-to-Many) per SRS 3.3
+            builder.Entity<AiStudyPlan>()
+                .HasMany(p => p.RequiredSkills)
+                .WithOne(s => s.StudyPlan)
+                .HasForeignKey(s => s.StudyPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // StudyPlanStep -> StudyPlanCheckpoints (One-to-Many) per SRS 3.2.2
+            builder.Entity<StudyPlanStep>()
+                .HasMany(s => s.Checkpoints)
+                .WithOne(c => c.StudyPlanStep)
+                .HasForeignKey(c => c.StudyPlanStepId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // StudyPlanStep -> StudyPlanResources (One-to-Many)
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
+            builder.Entity<StudyPlanStep>()
+                .HasMany<StudyPlanResource>()
+                .WithOne(r => r.StudyPlanStep)
+                .HasForeignKey(r => r.StudyPlanStepId)
+                .OnDelete(DeleteBehavior.NoAction); // Changed from SetNull to avoid cascade conflict
+
+            // StudyPlanCheckpoint -> StudyTask (One-to-One) per SRS 5.1.2
+            builder.Entity<StudyPlanCheckpoint>()
+                .HasOne(c => c.StudyTask)
+                .WithOne()
+                .HasForeignKey<StudyPlanCheckpoint>(c => c.StudyTaskId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // StudyPlanSkill -> Skill (Many-to-One) per SRS 3.3.2
+            builder.Entity<StudyPlanSkill>()
+                .HasOne(s => s.Skill)
+                .WithMany()
+                .HasForeignKey(s => s.SkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // AiStudyPlan -> AiRequestLog (Many-to-One) per SRS 7.1
+            builder.Entity<AiStudyPlan>()
+                .HasOne(p => p.AiRequestLog)
+                .WithMany()
+                .HasForeignKey(p => p.AiRequestLogId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

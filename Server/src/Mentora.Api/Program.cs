@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +99,9 @@ builder.Services.AddScoped<INotesRepository, NotesRepository>();
 builder.Services.AddScoped<IStudyQuizRepository, StudyQuizRepository>();
 builder.Services.AddScoped<IStudySessionsRepository, StudySessionsRepository>();
 
+// Assessment Module Repositories per SRS Section 3
+builder.Services.AddScoped<IAssessmentRepository, AssessmentRepository>();
+
 // 7. Dependency Injection - Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -112,11 +117,20 @@ builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 // Career Builder Services per SRS
 builder.Services.AddScoped<ICareerPlanService, Mentora.Application.Services.CareerPlanService>();
 
+// Assessment Module Services per SRS Section 3 & 4
+builder.Services.AddScoped<Mentora.Application.Services.IAssessmentService, Mentora.Application.Services.AssessmentService>();
+builder.Services.AddScoped<Mentora.Application.Services.IStudyPlanService, Mentora.Application.Services.StudyPlanService>();
+
 // AI Services - Choose one (Google Gemini recommended)
 builder.Services.AddHttpClient(); // Required for AI services
 builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.GeminiAiCareerService>(); // Google Gemini (FREE)
+builder.Services.AddScoped<Mentora.Application.Interfaces.Services.IAiStudyPlanService, Mentora.Application.Services.GeminiAiStudyPlanService>(); // Study Plan AI
 // builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.OpenAiCareerService>(); // OpenAI (Paid)
 // builder.Services.AddScoped<IAiCareerService, Mentora.Application.Services.MockAiCareerService>(); // Mock (Development)
+
+// AI Helper Services (Singletons for performance)
+builder.Services.AddSingleton<Mentora.Application.Services.AI.AssessmentContextBuilder>();
+builder.Services.AddSingleton<Mentora.Application.Services.AI.StudyPlanPromptTemplate>();
 
 Console.WriteLine("?? AI Service: Google Gemini 2.0 Flash");
 
@@ -127,6 +141,13 @@ builder.Services.AddControllers()
         // Support UTF-8 for Arabic text
         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
     });
+
+// Add FluentValidation per SRS 2.3.8.1
+builder.Services.AddValidatorsFromAssemblyContaining<Mentora.Application.Validators.SubmitAssessmentResponseValidator>();
+
+// Add Global Exception Handler per SRS 9.5
+builder.Services.AddExceptionHandler<Mentora.Api.Middleware.GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // 9. Swagger Documentation (Always enabled)
 builder.Services.AddSwaggerDocumentation();
@@ -183,6 +204,9 @@ app.UseSwaggerDocumentation();
 
 // Enable static files for custom Swagger CSS
 app.UseStaticFiles();
+
+// Use Global Exception Handler per SRS 9.5
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

@@ -44,6 +44,9 @@ namespace Mentora.Infrastructure.Data
                 // Seed Achievements
                 var achievements = await SeedAchievementsAsync(context, logger);
 
+                // Seed Assessment Questions per SRS 3.1.1
+                await SeedAssessmentQuestionsAsync(context, logger);
+
                 // Seed Users
                 var saad = await SeedSaadAsync(userManager, context, skills, achievements, logger);
                 var maria = await SeedMariaAsync(userManager, context, skills, achievements, logger);
@@ -140,6 +143,21 @@ namespace Mentora.Infrastructure.Data
 
             logger.LogInformation($"Seeded {achievements.Count} achievements");
             return achievements;
+        }
+
+        /// <summary>
+        /// Seed assessment questions per SRS 3.1.1
+        /// </summary>
+        private static async Task SeedAssessmentQuestionsAsync(ApplicationDbContext context, ILogger logger)
+        {
+            logger.LogInformation("Seeding Assessment Questions...");
+
+            var questions = AssessmentQuestionSeeder.GetInitialQuestions();
+            
+            await context.AssessmentQuestions.AddRangeAsync(questions);
+            await context.SaveChangesAsync();
+
+            logger.LogInformation($"? Seeded {questions.Count} assessment questions");
         }
 
         private static async Task<User> SeedSaadAsync(
@@ -520,8 +538,8 @@ namespace Mentora.Infrastructure.Data
                 {
                     Id = Guid.NewGuid(),
                     CareerPlanId = mariaCareerPlan.Id,
-                    Title = "?????? ??????? ?? ??????",
-                    Description = "?????? ?? NLP ?? Computer Vision ??????? ?????? ??????",
+                    Title = "Advanced Topics",
+                    Description = "Specialize in NLP or Computer Vision and apply for positions",
                     OrderIndex = 4,
                     DurationWeeks = 12,
                     Status = CareerStepStatus.NotStarted

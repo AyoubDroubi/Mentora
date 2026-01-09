@@ -6,6 +6,7 @@ namespace Mentora.Domain.Entities
     {
         public string Name { get; set; } = string.Empty;
         public SkillCategory Category { get; set; } = SkillCategory.Technical;
+        public string Description { get; set; } = string.Empty; // Added per SRS 3.3.2
         
         // Navigation Properties
         /// <summary>
