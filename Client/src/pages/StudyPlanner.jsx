@@ -1,4 +1,4 @@
-﻿// StudyPlanner.jsx
+// StudyPlanner.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
@@ -13,18 +13,12 @@ import {
   Target,
   TrendingUp
 } from 'lucide-react';
-import {
-  todoService,
-  plannerService,
-  notesService,
-  studySessionsService,
-  attendanceService
-} from '../services';
+import { plannerService, todoService } from '../services';
 import Calendar from '../components/Calendar';
 
 export default function StudyPlanner() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
 
   const M = {
     primary: '#6B9080',
@@ -36,17 +30,7 @@ export default function StudyPlanner() {
     muted: '#5A7A6B',
   };
 
-  // State
-  const [stats, setStats] = useState({
-    todosPending: 0,
-    todosTotal: 0,
-    notesCount: 0,
-    eventsCount: 0,
-    upcomingEvents: 0,
-    totalStudyTime: '0h 0m',
-    attendanceRate: 0,
-    progressPercentage: 0
-  });
+  // State for page-specific data only
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [calendarData, setCalendarData] = useState({
@@ -54,44 +38,19 @@ export default function StudyPlanner() {
     tasks: []
   });
 
-  // Fetch all dashboard data on mount
+  // Fetch only page-specific data (calendar data)
   useEffect(() => {
-    fetchDashboardData();
+    fetchCalendarData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchCalendarData = async () => {
     setLoading(true);
     try {
-      // Fetch all data in parallel
-      const [
-        todoSummaryRes,
-        allTodosRes,
-        notesRes,
-        eventsRes,
-        upcomingRes,
-        studyTimeRes,
-        attendanceRes
-      ] = await Promise.all([
-        todoService.getSummary(),
-        todoService.getAllTodos('all'), // Get all todos for calendar
-        notesService.getAllNotes(),
+      // Only fetch calendar-specific data - stats come from UserContext
+      const [eventsRes, allTodosRes] = await Promise.all([
         plannerService.getAllEvents(),
-        plannerService.getUpcomingEvents(),
-        studySessionsService.getSummary(),
-        attendanceService.getSummary()
+        todoService.getAllTodos('all')
       ]);
-
-      // Update stats
-      setStats({
-        todosPending: todoSummaryRes.success ? todoSummaryRes.data.pendingTasks : 0,
-        todosTotal: todoSummaryRes.success ? todoSummaryRes.data.totalTasks : 0,
-        notesCount: notesRes.success ? notesRes.data.length : 0,
-        eventsCount: eventsRes.success ? eventsRes.data.length : 0,
-        upcomingEvents: upcomingRes.success ? upcomingRes.data.length : 0,
-        totalStudyTime: studyTimeRes.success ? studyTimeRes.data.formatted : '0h 0m',
-        attendanceRate: attendanceRes.success ? attendanceRes.data.attendanceRate : 0,
-        progressPercentage: attendanceRes.success ? attendanceRes.data.progressPercentage : 0
-      });
 
       // Update calendar data
       setCalendarData({
@@ -99,11 +58,23 @@ export default function StudyPlanner() {
         tasks: allTodosRes.success ? allTodosRes.data : []
       });
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data');
+      console.error('Error fetching calendar data:', err);
+      setError('Failed to load calendar data');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Use stats from UserContext
+  const stats = {
+    todosPending: user.todosPending || 0,
+    todosTotal: user.todosTotal || 0,
+    notesCount: user.notesCount || 0,
+    eventsCount: user.eventsCount || 0,
+    upcomingEvents: user.upcomingEvents || 0,
+    totalStudyTime: user.totalHours || '0h 0m',
+    attendanceRate: user.attendanceRate || 0,
+    progressPercentage: user.progressPercentage || 0
   };
 
   const handleDayClick = (date, data) => {
@@ -112,7 +83,9 @@ export default function StudyPlanner() {
     // You can add modal or navigate to specific page
   };
 
-  if (loading) {
+  const isLoading = userLoading || loading;
+
+  if (isLoading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
         <SharedHeader title="Mentora - Study Planner" />
@@ -137,7 +110,7 @@ export default function StudyPlanner() {
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
             {error}
-            <button onClick={() => setError(null)} className="float-right font-bold">×</button>
+            <button onClick={() => setError(null)} className="float-right font-bold">�</button>
           </div>
         )}
 
@@ -147,11 +120,11 @@ export default function StudyPlanner() {
           style={{ borderColor: M.bg3, background: `linear-gradient(135deg, ${M.bg1}, white)` }}
         >
           <h1 className="text-3xl font-bold text-[#2C3E3F] mb-2">
-            Welcome back, {user?.firstName || 'Student'}! 👋
+            Welcome back, {user?.firstName || 'Student'}! ??
           </h1>
           <p className="text-[#5A7A6B] mb-4">Your personal study companion for academic excellence</p>
           
-          {/* Quick Stats */}
+          {/* Quick Stats - Using UserContext data */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard
               icon={<Clock className="w-5 h-5" style={{ color: M.primary }} />}
@@ -180,7 +153,7 @@ export default function StudyPlanner() {
           </div>
         </section>
 
-        {/* Progress Overview */}
+        {/* Progress Overview - Using UserContext data */}
         <section className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-6 h-6" style={{ color: M.primary }} />
