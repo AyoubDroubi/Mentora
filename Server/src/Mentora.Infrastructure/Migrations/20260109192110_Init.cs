@@ -695,8 +695,7 @@ namespace Mentora.Infrastructure.Migrations
                         name: "FK_AssessmentResponses_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AssessmentResponses_AssessmentAttempts_AssessmentAttemptId",
                         column: x => x.AssessmentAttemptId,
@@ -823,8 +822,7 @@ namespace Mentora.Infrastructure.Migrations
                         name: "FK_AiStudyPlans_CareerPlans_CareerPlanId",
                         column: x => x.CareerPlanId,
                         principalTable: "CareerPlans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1053,8 +1051,7 @@ namespace Mentora.Infrastructure.Migrations
                         name: "FK_StudyPlanResources_StudyPlanSteps_StudyPlanStepId",
                         column: x => x.StudyPlanStepId,
                         principalTable: "StudyPlanSteps",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

@@ -55,7 +55,16 @@ export const AssessmentProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
+      
+      console.log('?? Starting assessment with data:', data);
+      
       const attempt = await assessmentService.startAssessment(data);
+      
+      console.log('? Assessment attempt created:', attempt);
+      console.log('   - ID:', attempt.id);
+      console.log('   - Major:', attempt.major);
+      console.log('   - StudyLevel:', attempt.studyLevel);
+      
       setCurrentAttempt(attempt);
       setResponses({});
       setCurrentQuestionIndex(0);
@@ -65,6 +74,8 @@ export const AssessmentProvider = ({ children }) => {
       
       return attempt;
     } catch (err) {
+      console.error('? Failed to start assessment:', err);
+      console.error('   - Response:', err.response?.data);
       setError(err.response?.data?.message || 'Failed to start assessment');
       throw err;
     } finally {
@@ -98,22 +109,34 @@ export const AssessmentProvider = ({ children }) => {
 
   const submitResponses = useCallback(async () => {
     if (!currentAttempt) {
+      console.error('? No active assessment attempt!');
       throw new Error('No active assessment attempt');
     }
+
+    console.log('?? Submitting responses...');
+    console.log('   - Attempt ID:', currentAttempt.id);
+    console.log('   - Responses count:', Object.keys(responses).length);
 
     try {
       setLoading(true);
       setError(null);
       
       const responsesArray = Object.values(responses);
+      
+      console.log('   - Responses array:', responsesArray);
+      
       const result = await assessmentService.submitAssessmentResponses(
         currentAttempt.id,
         responsesArray
       );
       
+      console.log('? Responses submitted successfully:', result);
+      
       setCurrentAttempt(result);
       return result;
     } catch (err) {
+      console.error('? Failed to submit responses:', err);
+      console.error('   - Response:', err.response?.data);
       setError(err.response?.data?.message || 'Failed to submit responses');
       throw err;
     } finally {

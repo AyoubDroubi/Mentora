@@ -384,11 +384,12 @@ namespace Mentora.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Cascade);
 
             // User -> AssessmentResponses (One-to-Many)
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
             builder.Entity<User>()
                 .HasMany<AssessmentResponse>()
                 .WithOne(r => r.User)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // User -> AiStudyPlans (One-to-Many) - NoAction to avoid cascade cycles per SRS 8.3
             builder.Entity<User>()
@@ -419,11 +420,12 @@ namespace Mentora.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             // CareerPlan -> AiStudyPlans (One-to-Many) per SRS 5.1
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
             builder.Entity<CareerPlan>()
                 .HasMany<AiStudyPlan>()
                 .WithOne(p => p.CareerPlan)
                 .HasForeignKey(p => p.CareerPlanId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // AiStudyPlan -> StudyPlanSteps (One-to-Many) per SRS 3.2.2
             builder.Entity<AiStudyPlan>()
@@ -454,11 +456,12 @@ namespace Mentora.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Cascade);
 
             // StudyPlanStep -> StudyPlanResources (One-to-Many)
+            // Changed to NoAction to avoid multiple cascade paths per SRS 8.3
             builder.Entity<StudyPlanStep>()
                 .HasMany<StudyPlanResource>()
                 .WithOne(r => r.StudyPlanStep)
                 .HasForeignKey(r => r.StudyPlanStepId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction); // Changed from SetNull to avoid cascade conflict
 
             // StudyPlanCheckpoint -> StudyTask (One-to-One) per SRS 5.1.2
             builder.Entity<StudyPlanCheckpoint>()

@@ -142,9 +142,49 @@ namespace Mentora.Application.Services
             Guid userId,
             BulkAssessmentSubmissionDto submission)
         {
+            _logger.LogInformation($"?? Bulk submit - User: {userId}, AttemptId: {submission.AssessmentAttemptId}, Responses: {submission.Responses.Count}");
+            
+            // First, verify the attempt exists
             var attempt = await _assessmentRepo.GetAttemptByIdAsync(submission.AssessmentAttemptId, includeResponses: true);
-            if (attempt == null || attempt.UserId != userId)
-                throw new UnauthorizedAccessException("Invalid assessment attempt");
+            
+            if (attempt == null)
+            {
+                _logger.LogError($"? Assessment attempt {submission.AssessmentAttemptId} not found!");
+                
+                // Debug: Show recent attempts for this user
+                var userAttempts = await _assessmentRepo.GetUserAttemptsAsync(userId);
+                _logger.LogInformation($"?? User {userId} has {userAttempts.Count} total attempts");
+                
+                if (userAttempts.Any())
+                {
+                    var latestAttempt = userAttempts.First();
+                    _logger.LogInformation($"   Latest attempt: {latestAttempt.Id} (Status: {latestAttempt.Status}, Created: {latestAttempt.CreatedAt})");
+                }
+                
+                throw new InvalidOperationException($"Assessment attempt {submission.AssessmentAttemptId} not found. Please start a new assessment.");
+            }
+            
+            // Verify ownership
+            if (attempt.UserId != userId)
+            {
+                _logger.LogError($"? Unauthorized access - Attempt belongs to User: {attempt.UserId}, Request from User: {userId}");
+                throw new UnauthorizedAccessException("You don't have permission to submit responses for this assessment attempt.");
+            }
+            
+            _logger.LogInformation($"? Attempt verified - Status: {attempt.Status}, Existing responses: {attempt.Responses.Count}");
+
+            // Validate attempt status
+            if (attempt.Status == AssessmentStatus.Completed)
+            {
+                _logger.LogWarning($"?? Attempt {attempt.Id} is already completed");
+                throw new InvalidOperationException("This assessment has already been completed.");
+            }
+
+            if (attempt.Status == AssessmentStatus.Abandoned)
+            {
+                _logger.LogWarning($"?? Attempt {attempt.Id} has been abandoned");
+                throw new InvalidOperationException("This assessment has been abandoned. Please start a new one.");
+            }
 
             var responses = submission.Responses.Select(r => new AssessmentResponse
             {
@@ -157,6 +197,8 @@ namespace Mentora.Application.Services
             }).ToList();
 
             await _assessmentRepo.BulkCreateResponsesAsync(responses);
+            
+            _logger.LogInformation($"?? Successfully saved {responses.Count} responses");
 
             // Update attempt progress
             await UpdateAttemptProgress(attempt);

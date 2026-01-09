@@ -28,7 +28,6 @@ import CareerPlan from "./pages/CareerPlan";
 import CareerProgress from "./pages/CareerProgress";
 import CareerSkills from "./pages/CareerSkills";
 import SkillsManagement from "./pages/SkillsManagement";
-import Quiz from "./pages/Quiz";
 import TestAuth from "./pages/TestAuth";
 
 // Assessment Module Pages
@@ -173,16 +172,16 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
+                {/* Assessment Module Routes - /quiz and /assessment both use AssessmentQuiz */}
                 <Route
                   path="/quiz"
                   element={
                     <ProtectedRoute>
-                      <Quiz />
+                      <AssessmentQuiz />
                     </ProtectedRoute>
                   }
                 />
-
-                {/* Assessment Module Routes */}
                 <Route
                   path="/assessment"
                   element={

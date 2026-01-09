@@ -36,7 +36,13 @@ export const getAssessmentQuestions = async (targetMajor = null) => {
  */
 export const startAssessment = async (data) => {
   try {
-    const response = await api.post('/assessment/start', data);
+    // Send as query parameters to match backend expectation
+    const response = await api.post('/assessment/start', null, {
+      params: {
+        major: data.major,
+        studyLevel: data.studyLevel
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error starting assessment:', error);
@@ -45,14 +51,18 @@ export const startAssessment = async (data) => {
 };
 
 /**
- * Submit responses for an assessment attempt
+ * Submit responses for an assessment attempt (bulk)
  * @param {string} attemptId - Assessment attempt ID
  * @param {Array} responses - Array of { questionId, responseValue, responseTimeSeconds?, notes? }
- * @returns {Promise} Updated assessment attempt
+ * @returns {Promise} Assessment completion response
  */
 export const submitAssessmentResponses = async (attemptId, responses) => {
   try {
-    const response = await api.post(`/assessment/${attemptId}/submit`, { responses });
+    // Use bulk submission endpoint to send all responses at once
+    const response = await api.post('/assessment/responses/bulk', {
+      assessmentAttemptId: attemptId,
+      responses: responses
+    });
     return response.data;
   } catch (error) {
     console.error('Error submitting assessment responses:', error);

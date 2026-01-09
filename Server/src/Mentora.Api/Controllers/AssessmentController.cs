@@ -28,19 +28,19 @@ namespace Mentora.Api.Controllers
         /// <summary>
         /// Get assessment questions by major per SRS 3.1.1
         /// </summary>
-        /// <param name="major">Student's major</param>
+        /// <param name="targetMajor">Optional: Student's major to filter questions</param>
         /// <returns>List of assessment questions</returns>
         /// <response code="200">Questions retrieved successfully</response>
         /// <response code="401">Unauthorized</response>
         [HttpGet("questions")]
         [ProducesResponseType(typeof(List<AssessmentQuestionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<List<AssessmentQuestionDto>>> GetQuestions([FromQuery] string major)
+        public async Task<ActionResult<List<AssessmentQuestionDto>>> GetQuestions([FromQuery] string? targetMajor = null)
         {
             try
             {
-                _logger.LogInformation($"?? Getting assessment questions for major: {major}");
-                var questions = await _assessmentService.GetQuestionsByMajorAsync(major);
+                _logger.LogInformation($"?? Getting assessment questions for major: {targetMajor ?? "All"}");
+                var questions = await _assessmentService.GetQuestionsByMajorAsync(targetMajor);
                 return Ok(questions);
             }
             catch (Exception ex)
@@ -57,16 +57,29 @@ namespace Mentora.Api.Controllers
         /// <param name="studyLevel">Student's study level (Freshman, Sophomore, etc.)</param>
         /// <returns>Assessment attempt details</returns>
         /// <response code="201">Assessment started successfully</response>
+        /// <response code="400">Invalid request data</response>
         /// <response code="401">Unauthorized</response>
         [HttpPost("start")]
         [ProducesResponseType(typeof(AssessmentAttemptDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<AssessmentAttemptDto>> StartAssessment(
-            [FromQuery] string major,
-            [FromQuery] string studyLevel)
+            [FromQuery] string? major,
+            [FromQuery] string? studyLevel)
         {
             try
             {
+                // Validate required parameters
+                if (string.IsNullOrWhiteSpace(major))
+                {
+                    return BadRequest(new { message = "Major is required" });
+                }
+                
+                if (string.IsNullOrWhiteSpace(studyLevel))
+                {
+                    return BadRequest(new { message = "Study level is required" });
+                }
+                
                 var userId = GetUserId();
                 _logger.LogInformation($"?? User {userId} starting assessment for {major}");
                 
@@ -150,25 +163,35 @@ namespace Mentora.Api.Controllers
         /// <response code="200">Responses submitted successfully</response>
         /// <response code="400">Invalid submission data</response>
         /// <response code="403">Access denied</response>
+        /// <response code="404">Assessment attempt not found</response>
         [HttpPost("responses/bulk")]
         [ProducesResponseType(typeof(AssessmentCompletionResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AssessmentCompletionResponseDto>> BulkSubmitResponses(
             [FromBody] BulkAssessmentSubmissionDto submission)
         {
             try
             {
                 var userId = GetUserId();
-                _logger.LogInformation($"?? User {userId} bulk submitting {submission.Responses.Count} responses");
+                _logger.LogInformation($"?? User {userId} bulk submitting {submission.Responses.Count} responses for attempt {submission.AssessmentAttemptId}");
                 
                 var result = await _assessmentService.BulkSubmitResponsesAsync(userId, submission);
+                
+                _logger.LogInformation($"? Bulk submission successful - {result.AnsweredQuestions}/{result.TotalQuestions} answered");
+                
                 return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Invalid operation during bulk submission");
+                return BadRequest(new { message = ex.Message });
             }
             catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning(ex, "Unauthorized access to assessment");
-                return Forbid();
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (Exception ex)
             {

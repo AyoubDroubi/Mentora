@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mentora.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260109184259_Init")]
-    partial class Init
+    [Migration("20260109203046_Add")]
+    partial class Add
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2015,7 +2015,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasOne("Mentora.Domain.Entities.CareerPlan", "CareerPlan")
                         .WithMany()
                         .HasForeignKey("CareerPlanId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
                         .WithMany()
@@ -2060,7 +2060,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasOne("Mentora.Domain.Entities.Auth.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("AssessmentAttempt");
@@ -2099,7 +2099,7 @@ namespace Mentora.Infrastructure.Migrations
                     b.HasOne("Mentora.Domain.Entities.Assessment.StudyPlanStep", "StudyPlanStep")
                         .WithMany()
                         .HasForeignKey("StudyPlanStepId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("StudyPlan");
 

@@ -116,8 +116,8 @@ export default function AssessmentQuiz() {
         await submitResponses();
         await completeCurrentAssessment();
         
-        // Navigate to study plan generation page
-        navigate('/study-plan-generated');
+        // Navigate to study planner page
+        navigate('/study-planner');
       } catch (err) {
         console.error('Failed to complete assessment:', err);
       }

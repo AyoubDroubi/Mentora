@@ -19,6 +19,15 @@ namespace Mentora.Application.DTOs.Assessment
     }
 
     /// <summary>
+    /// DTO for starting a new assessment
+    /// </summary>
+    public class StartAssessmentRequestDto
+    {
+        public string Major { get; set; } = string.Empty;
+        public string StudyLevel { get; set; } = string.Empty;
+    }
+
+    /// <summary>
     /// DTO for submitting assessment responses per SRS 3.1.2
     /// </summary>
     public class SubmitAssessmentResponseDto

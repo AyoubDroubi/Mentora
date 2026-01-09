@@ -4,6 +4,27 @@ using FluentValidation;
 namespace Mentora.Application.Validators
 {
     /// <summary>
+    /// Validator for starting a new assessment
+    /// </summary>
+    public class StartAssessmentRequestValidator : AbstractValidator<StartAssessmentRequestDto>
+    {
+        public StartAssessmentRequestValidator()
+        {
+            RuleFor(x => x.Major)
+                .NotEmpty()
+                .WithMessage("Major is required")
+                .MaximumLength(100)
+                .WithMessage("Major cannot exceed 100 characters");
+
+            RuleFor(x => x.StudyLevel)
+                .NotEmpty()
+                .WithMessage("Study level is required")
+                .Must(level => new[] { "Freshman", "Sophomore", "Junior", "Senior", "Graduate" }.Contains(level))
+                .WithMessage("Study level must be one of: Freshman, Sophomore, Junior, Senior, Graduate");
+        }
+    }
+
+    /// <summary>
     /// Validator for assessment response submission per SRS 2.3.8.1
     /// </summary>
     public class SubmitAssessmentResponseValidator : AbstractValidator<SubmitAssessmentResponseDto>
