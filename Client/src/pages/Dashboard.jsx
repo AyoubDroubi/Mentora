@@ -13,11 +13,11 @@ import {
   BookOpenCheck,
   User
 } from 'lucide-react';
-import { todoService, plannerService, attendanceService, studySessionsService } from '../services';
+import { todoService, plannerService } from '../services';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
 
   // Theme colors
   const M = {
@@ -30,50 +30,27 @@ export default function Dashboard() {
     muted: '#5A7A6B',
   };
 
-  // State for dashboard data
+  // State for page-specific data only
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({
-    totalHours: '0h 0m',
-    completedTasks: 0,
-    studyStreak: 0,
-    attendancePercentage: 0
-  });
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pendingTasks, setPendingTasks] = useState([]);
 
-  // Fetch dashboard data on mount
+  // Fetch only page-specific data (upcoming events and tasks)
   useEffect(() => {
-    fetchDashboardData();
+    fetchPageData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchPageData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Fetch all data in parallel
-      const [
-        studyTimeRes,
-        todoSummaryRes,
-        attendanceSummaryRes,
-        upcomingEventsRes,
-        todosRes
-      ] = await Promise.all([
-        studySessionsService.getSummary().catch(() => ({ success: false })),
-        todoService.getSummary().catch(() => ({ success: false })),
-        attendanceService.getSummary().catch(() => ({ success: false })),
+      // Only fetch page-specific data - stats come from UserContext
+      const [upcomingEventsRes, todosRes] = await Promise.all([
         plannerService.getUpcomingEvents().catch(() => ({ success: false })),
         todoService.getAllTodos('active').catch(() => ({ success: false }))
       ]);
-
-      // Update stats
-      setStats({
-        totalHours: studyTimeRes.success ? studyTimeRes.data.formatted : '0h 0m',
-        completedTasks: todoSummaryRes.success ? todoSummaryRes.data.completedTasks : 0,
-        studyStreak: user.studyStreak || 0, // ?? user context
-        attendancePercentage: attendanceSummaryRes.success ? attendanceSummaryRes.data.attendanceRate : 0
-      });
 
       // Update upcoming events
       if (upcomingEventsRes.success) {
@@ -93,7 +70,17 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
+  // Use stats from UserContext
+  const stats = {
+    totalHours: user.totalHours || '0h 0m',
+    completedTasks: (user.todosTotal || 0) - (user.todosPending || 0),
+    studyStreak: user.studyStreak || 0,
+    attendancePercentage: user.attendanceRate || 0
+  };
+
+  const isLoading = userLoading || loading;
+
+  if (isLoading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
         <SharedHeader title="Mentora - Dashboard" />
@@ -116,7 +103,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Using UserContext data */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-2xl p-4 shadow-lg border hover:scale-105 transition-transform" style={{ borderColor: M.bg3 }}>
             <div className="flex items-center justify-between">
