@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import masterSkillsService from '../../services/masterSkillsService';
 
 const AddSkillModal = ({ skill, onClose, onSave }) => {
   // Theme colors
@@ -24,18 +25,22 @@ const AddSkillModal = ({ skill, onClose, onSave }) => {
     displayOrder: 0
   });
 
-  const [availableSkills] = useState([
-    // Mock skills - ?? ?????? ??? ???? ???? ?? API
-    { id: '1', name: 'JavaScript', category: 'Technical' },
-    { id: '2', name: 'React', category: 'Technical' },
-    { id: '3', name: 'Node.js', category: 'Technical' },
-    { id: '4', name: 'Python', category: 'Technical' },
-    { id: '5', name: 'Communication', category: 'Soft' },
-    { id: '6', name: 'Leadership', category: 'Soft' },
-    { id: '7', name: 'Project Management', category: 'Business' },
-    { id: '8', name: 'Design Thinking', category: 'Creative' }
-  ]);
+  // Master skills library state
+  const [availableSkills, setAvailableSkills] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
+  // Load master skills and categories
+  useEffect(() => {
+    loadSkillsLibrary();
+    loadCategories();
+  }, []);
+
+  // Update form data if editing existing skill
   useEffect(() => {
     if (skill) {
       setFormData({
@@ -51,17 +56,102 @@ const AddSkillModal = ({ skill, onClose, onSave }) => {
     }
   }, [skill]);
 
+  // Filter skills when search or category changes
+  useEffect(() => {
+    filterSkills();
+  }, [searchTerm, selectedCategory, availableSkills]);
+
+  const loadSkillsLibrary = async () => {
+    try {
+      setLoading(true);
+      const response = await masterSkillsService.getAllSkills();
+      if (response.success) {
+        setAvailableSkills(response.data || []);
+        setFilteredSkills(response.data || []);
+      }
+    } catch (err) {
+      console.error('Error loading skills:', err);
+      setError('Failed to load skills library');
+      // Fallback to mock data if API fails
+      const mockSkills = [
+        { id: '1', name: 'JavaScript', category: 'Technical', description: 'Programming language' },
+        { id: '2', name: 'React', category: 'Technical', description: 'Frontend framework' },
+        { id: '3', name: 'Node.js', category: 'Technical', description: 'Backend runtime' },
+        { id: '4', name: 'Python', category: 'Technical', description: 'Programming language' },
+        { id: '5', name: 'Communication', category: 'Soft', description: 'Interpersonal skill' },
+      ];
+      setAvailableSkills(mockSkills);
+      setFilteredSkills(mockSkills);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await masterSkillsService.getCategories();
+      if (response.success) {
+        setCategories(response.data || []);
+      }
+    } catch (err) {
+      console.error('Error loading categories:', err);
+    }
+  };
+
+  const filterSkills = () => {
+    let filtered = availableSkills;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(s =>
+        s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (s.description && s.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(s => s.category === selectedCategory);
+    }
+
+    setFilteredSkills(filtered);
+  };
+
+  const handleSkillSelect = (skillId) => {
+    setFormData({ ...formData, skillId });
+    setError('');
+  };
+
+  const getSelectedSkillName = () => {
+    const selected = availableSkills.find(s => s.id === formData.skillId);
+    return selected ? selected.name : 'None selected';
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+    setError('');
+
+    // Validation
+    if (!formData.skillId) {
+      setError('Please select a skill from the library');
+      return;
+    }
+
     const payload = {
-      ...formData,
+      skillId: formData.skillId,
+      proficiencyLevel: parseInt(formData.proficiencyLevel),
+      acquisitionMethod: formData.acquisitionMethod || null,
+      startedDate: formData.startedDate || null,
       yearsOfExperience: formData.yearsOfExperience ? parseInt(formData.yearsOfExperience) : null,
-      startedDate: formData.startedDate || null
+      isFeatured: formData.isFeatured,
+      notes: formData.notes || null,
+      displayOrder: parseInt(formData.displayOrder) || 0
     };
 
     onSave(payload);
   };
+
+  const proficiencyLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -81,36 +171,92 @@ const AddSkillModal = ({ skill, onClose, onSave }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+              {error}
+            </div>
+          )}
+
           {/* Skill Selection */}
           {!skill && (
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: M.text }}>
-                Select Skill *
+                Select Skill <span className="text-red-500">*</span>
               </label>
-              <select
-                required
-                value={formData.skillId}
-                onChange={(e) => setFormData({ ...formData, skillId: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
-                style={{ borderColor: M.bg3, focusRing: M.primary }}
-              >
-                <option value="">Choose a skill...</option>
-                {availableSkills.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} ({s.category})
-                  </option>
-                ))}
-              </select>
+              
+              {/* Selected Skill Display */}
+              <div className="mb-3 p-3 bg-gray-50 rounded-lg border" style={{ borderColor: M.bg3 }}>
+                <span className="text-sm" style={{ color: M.muted }}>Selected: </span>
+                <span className="font-medium" style={{ color: M.text }}>{getSelectedSkillName()}</span>
+              </div>
+
+              {/* Search and Filter */}
+              <div className="mb-3 flex gap-3">
+                <div className="flex-1 relative">
+                  <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: M.muted }} />
+                  <input
+                    type="text"
+                    placeholder="Search skills..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                    style={{ borderColor: M.bg3 }}
+                  />
+                </div>
+                {categories.length > 0 && (
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="px-4 py-2 border rounded-lg"
+                    style={{ borderColor: M.bg3 }}
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map(cat => (
+                      <option key={cat.value} value={cat.value}>{cat.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Skills List */}
+              <div className="border rounded-lg max-h-64 overflow-y-auto" style={{ borderColor: M.bg3 }}>
+                {loading ? (
+                  <div className="p-4 text-center" style={{ color: M.muted }}>Loading skills...</div>
+                ) : filteredSkills.length === 0 ? (
+                  <div className="p-4 text-center" style={{ color: M.muted }}>No skills found</div>
+                ) : (
+                  <div className="divide-y" style={{ borderColor: M.bg3 }}>
+                    {filteredSkills.map(skillOption => (
+                      <button
+                        key={skillOption.id}
+                        type="button"
+                        onClick={() => handleSkillSelect(skillOption.id)}
+                        className={`w-full text-left p-3 hover:bg-gray-50 transition ${
+                          formData.skillId === skillOption.id ? 'bg-blue-50' : ''
+                        }`}
+                      >
+                        <div className="font-medium" style={{ color: M.text }}>{skillOption.name}</div>
+                        <div className="text-sm flex items-center gap-2 mt-1">
+                          <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{skillOption.category}</span>
+                          {skillOption.description && (
+                            <span style={{ color: M.muted }} className="text-xs">{skillOption.description}</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {/* Proficiency Level */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: M.text }}>
-              Proficiency Level *
+              Proficiency Level <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-4 gap-3">
-              {['Beginner', 'Intermediate', 'Advanced', 'Expert'].map((level, index) => (
+              {proficiencyLevels.map((level, index) => (
                 <button
                   key={level}
                   type="button"
@@ -202,7 +348,7 @@ const AddSkillModal = ({ skill, onClose, onSave }) => {
                 type="number"
                 min="0"
                 value={formData.displayOrder}
-                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
                 style={{ borderColor: M.bg3 }}
               />

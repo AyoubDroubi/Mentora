@@ -66,27 +66,66 @@ namespace Mentora.Infrastructure.Data
 
             var skills = new List<Skill>
             {
-                new Skill { Id = Guid.NewGuid(), Name = "C#" },
-                new Skill { Id = Guid.NewGuid(), Name = "JavaScript" },
-                new Skill { Id = Guid.NewGuid(), Name = "Python" },
-                new Skill { Id = Guid.NewGuid(), Name = "SQL" },
-                new Skill { Id = Guid.NewGuid(), Name = "React" },
-                new Skill { Id = Guid.NewGuid(), Name = "ASP.NET Core" },
-                new Skill { Id = Guid.NewGuid(), Name = "Node.js" },
-                new Skill { Id = Guid.NewGuid(), Name = "Docker" },
-                new Skill { Id = Guid.NewGuid(), Name = "Git" },
-                new Skill { Id = Guid.NewGuid(), Name = "Azure" },
-                new Skill { Id = Guid.NewGuid(), Name = "Machine Learning" },
-                new Skill { Id = Guid.NewGuid(), Name = "Data Analysis" },
-                new Skill { Id = Guid.NewGuid(), Name = "UI/UX Design" },
-                new Skill { Id = Guid.NewGuid(), Name = "Project Management" },
-                new Skill { Id = Guid.NewGuid(), Name = "Communication" }
+                // Programming Languages
+                new Skill { Id = Guid.NewGuid(), Name = "C#", Category = SkillCategory.Technical, Description = "Object-oriented programming language for .NET development" },
+                new Skill { Id = Guid.NewGuid(), Name = "JavaScript", Category = SkillCategory.Technical, Description = "Dynamic programming language for web development" },
+                new Skill { Id = Guid.NewGuid(), Name = "Python", Category = SkillCategory.Technical, Description = "High-level programming language for data science and web development" },
+                new Skill { Id = Guid.NewGuid(), Name = "Java", Category = SkillCategory.Technical, Description = "Object-oriented programming language for enterprise applications" },
+                new Skill { Id = Guid.NewGuid(), Name = "TypeScript", Category = SkillCategory.Technical, Description = "Typed superset of JavaScript" },
+                
+                // Databases
+                new Skill { Id = Guid.NewGuid(), Name = "SQL", Category = SkillCategory.Technical, Description = "Structured Query Language for database management" },
+                new Skill { Id = Guid.NewGuid(), Name = "PostgreSQL", Category = SkillCategory.Technical, Description = "Advanced open-source relational database" },
+                new Skill { Id = Guid.NewGuid(), Name = "MongoDB", Category = SkillCategory.Technical, Description = "NoSQL document database" },
+                new Skill { Id = Guid.NewGuid(), Name = "Redis", Category = SkillCategory.Technical, Description = "In-memory data structure store" },
+                
+                // Frontend Frameworks
+                new Skill { Id = Guid.NewGuid(), Name = "React", Category = SkillCategory.Technical, Description = "JavaScript library for building user interfaces" },
+                new Skill { Id = Guid.NewGuid(), Name = "Angular", Category = SkillCategory.Technical, Description = "TypeScript-based web application framework" },
+                new Skill { Id = Guid.NewGuid(), Name = "Vue.js", Category = SkillCategory.Technical, Description = "Progressive JavaScript framework" },
+                
+                // Backend Frameworks
+                new Skill { Id = Guid.NewGuid(), Name = "ASP.NET Core", Category = SkillCategory.Technical, Description = "Cross-platform web framework for .NET" },
+                new Skill { Id = Guid.NewGuid(), Name = "Node.js", Category = SkillCategory.Technical, Description = "JavaScript runtime for server-side development" },
+                new Skill { Id = Guid.NewGuid(), Name = "Django", Category = SkillCategory.Technical, Description = "Python web framework" },
+                new Skill { Id = Guid.NewGuid(), Name = "Spring Boot", Category = SkillCategory.Technical, Description = "Java framework for building microservices" },
+                
+                // DevOps & Cloud
+                new Skill { Id = Guid.NewGuid(), Name = "Docker", Category = SkillCategory.Technical, Description = "Containerization platform" },
+                new Skill { Id = Guid.NewGuid(), Name = "Kubernetes", Category = SkillCategory.Technical, Description = "Container orchestration platform" },
+                new Skill { Id = Guid.NewGuid(), Name = "Git", Category = SkillCategory.Technical, Description = "Distributed version control system" },
+                new Skill { Id = Guid.NewGuid(), Name = "Azure", Category = SkillCategory.Technical, Description = "Microsoft cloud computing platform" },
+                new Skill { Id = Guid.NewGuid(), Name = "AWS", Category = SkillCategory.Technical, Description = "Amazon Web Services cloud platform" },
+                new Skill { Id = Guid.NewGuid(), Name = "CI/CD", Category = SkillCategory.Technical, Description = "Continuous Integration and Deployment" },
+                
+                // Data Science & AI
+                new Skill { Id = Guid.NewGuid(), Name = "Machine Learning", Category = SkillCategory.Technical, Description = "AI algorithms and model training" },
+                new Skill { Id = Guid.NewGuid(), Name = "Data Analysis", Category = SkillCategory.Technical, Description = "Statistical analysis and data interpretation" },
+                new Skill { Id = Guid.NewGuid(), Name = "TensorFlow", Category = SkillCategory.Technical, Description = "Machine learning framework" },
+                new Skill { Id = Guid.NewGuid(), Name = "PyTorch", Category = SkillCategory.Technical, Description = "Deep learning framework" },
+                
+                // Soft Skills
+                new Skill { Id = Guid.NewGuid(), Name = "Communication", Category = SkillCategory.Soft, Description = "Effective verbal and written communication" },
+                new Skill { Id = Guid.NewGuid(), Name = "Leadership", Category = SkillCategory.Soft, Description = "Team leadership and management" },
+                new Skill { Id = Guid.NewGuid(), Name = "Problem Solving", Category = SkillCategory.Soft, Description = "Analytical thinking and solution finding" },
+                new Skill { Id = Guid.NewGuid(), Name = "Time Management", Category = SkillCategory.Soft, Description = "Efficient task prioritization and scheduling" },
+                new Skill { Id = Guid.NewGuid(), Name = "Teamwork", Category = SkillCategory.Soft, Description = "Collaboration and team coordination" },
+                
+                // Business Skills
+                new Skill { Id = Guid.NewGuid(), Name = "Project Management", Category = SkillCategory.Business, Description = "Planning and executing projects" },
+                new Skill { Id = Guid.NewGuid(), Name = "Agile Methodology", Category = SkillCategory.Business, Description = "Iterative project management approach" },
+                new Skill { Id = Guid.NewGuid(), Name = "Business Analysis", Category = SkillCategory.Business, Description = "Requirements gathering and analysis" },
+                
+                // Creative Skills
+                new Skill { Id = Guid.NewGuid(), Name = "UI/UX Design", Category = SkillCategory.Creative, Description = "User interface and experience design" },
+                new Skill { Id = Guid.NewGuid(), Name = "Graphic Design", Category = SkillCategory.Creative, Description = "Visual design and branding" },
+                new Skill { Id = Guid.NewGuid(), Name = "Content Writing", Category = SkillCategory.Creative, Description = "Creating engaging written content" }
             };
 
             await context.Skills.AddRangeAsync(skills);
             await context.SaveChangesAsync();
 
-            logger.LogInformation($"Seeded {skills.Count} skills");
+            logger.LogInformation($"Seeded {skills.Count} skills with categories and descriptions");
             return skills;
         }
 
