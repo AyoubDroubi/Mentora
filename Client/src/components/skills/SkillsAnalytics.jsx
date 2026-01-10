@@ -4,7 +4,15 @@ import {
   ChartBarIcon,
   AcademicCapIcon,
   TrophyIcon,
-  ClockIcon
+  ClockIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  LightBulbIcon,
+  CodeBracketIcon,
+  ChatBubbleLeftRightIcon,
+  BriefcaseIcon,
+  SparklesIcon,
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 const SkillsAnalytics = () => {
@@ -50,6 +58,17 @@ const SkillsAnalytics = () => {
     }
   };
 
+  const getCategoryIcon = (category) => {
+    const icons = {
+      Technical: CodeBracketIcon,
+      Soft: ChatBubbleLeftRightIcon,
+      Business: BriefcaseIcon,
+      Creative: SparklesIcon
+    };
+    const Icon = icons[category] || CodeBracketIcon;
+    return <Icon className="w-5 h-5" style={{ color: M.muted }} />;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -62,7 +81,7 @@ const SkillsAnalytics = () => {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-3xl p-6 border" style={{ borderColor: M.bg3 }}>
+        <div className="bg-white rounded-3xl p-6 border shadow-lg" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center justify-between mb-4">
             <ChartBarIcon className="w-8 h-8" style={{ color: M.primary }} />
             <span className="text-3xl font-bold" style={{ color: M.text }}>{summary?.totalSkills || 0}</span>
@@ -73,7 +92,7 @@ const SkillsAnalytics = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border" style={{ borderColor: M.bg3 }}>
+        <div className="bg-white rounded-3xl p-6 border shadow-lg" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center justify-between mb-4">
             <AcademicCapIcon className="w-8 h-8" style={{ color: M.secondary }} />
             <span className="text-3xl font-bold" style={{ color: M.text }}>{summary?.featuredSkillsCount || 0}</span>
@@ -84,7 +103,7 @@ const SkillsAnalytics = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border" style={{ borderColor: M.bg3 }}>
+        <div className="bg-white rounded-3xl p-6 border shadow-lg" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center justify-between mb-4">
             <ClockIcon className="w-8 h-8" style={{ color: M.primary }} />
             <span className="text-3xl font-bold" style={{ color: M.text }}>{summary?.totalExperienceYears || 0}</span>
@@ -95,7 +114,7 @@ const SkillsAnalytics = () => {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border" style={{ borderColor: M.bg3 }}>
+        <div className="bg-white rounded-3xl p-6 border shadow-lg" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center justify-between mb-4">
             <TrophyIcon className="w-8 h-8" style={{ color: M.secondary }} />
             <span className="text-3xl font-bold" style={{ color: M.text }}>{coverage?.coverageScore || 0}</span>
@@ -111,7 +130,8 @@ const SkillsAnalytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Proficiency Distribution */}
         <div className="bg-white rounded-3xl shadow-lg p-6 border" style={{ borderColor: M.bg3 }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: M.text }}>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: M.text }}>
+            <ArrowTrendingUpIcon className="w-5 h-5" />
             Proficiency Distribution
           </h3>
           <div className="space-y-4">
@@ -137,24 +157,20 @@ const SkillsAnalytics = () => {
 
         {/* Category Breakdown */}
         <div className="bg-white rounded-3xl shadow-lg p-6 border" style={{ borderColor: M.bg3 }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: M.text }}>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: M.text }}>
+            <ChartBarIcon className="w-5 h-5" />
             Category Breakdown
           </h3>
           <div className="space-y-4">
             {Object.entries(summary?.categoryBreakdown || {}).map(([category, count]) => {
               const total = summary?.totalSkills || 1;
               const percentage = (count / total) * 100;
-              const icons = {
-                Technical: '??',
-                Soft: '??',
-                Business: '??',
-                Creative: '??'
-              };
               return (
                 <div key={category}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium" style={{ color: M.text }}>
-                      {icons[category] || '??'} {category}
+                    <span className="text-sm font-medium flex items-center gap-2" style={{ color: M.text }}>
+                      {getCategoryIcon(category)}
+                      {category}
                     </span>
                     <span className="text-sm" style={{ color: M.muted }}>{count} skills</span>
                   </div>
@@ -177,7 +193,8 @@ const SkillsAnalytics = () => {
       {/* Coverage Analysis */}
       {coverage && (
         <div className="bg-white rounded-3xl shadow-lg p-6 border" style={{ borderColor: M.bg3 }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: M.text }}>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: M.text }}>
+            <TrophyIcon className="w-5 h-5" />
             Skills Coverage Analysis
           </h3>
           
@@ -185,13 +202,14 @@ const SkillsAnalytics = () => {
             {/* Strong Categories */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">??</span>
+                <CheckCircleIcon className="w-6 h-6 text-green-600" />
                 <h4 className="font-medium" style={{ color: M.text }}>Strong Areas</h4>
               </div>
               <div className="space-y-2">
                 {coverage.strongCategories.length > 0 ? (
                   coverage.strongCategories.map((cat) => (
-                    <div key={cat} className="px-3 py-2 rounded-lg text-sm" style={{ background: M.bg3, color: M.text }}>
+                    <div key={cat} className="px-3 py-2 rounded-lg text-sm flex items-center gap-2" style={{ background: M.bg3, color: M.text }}>
+                      {getCategoryIcon(cat)}
                       {cat}
                     </div>
                   ))
@@ -204,13 +222,14 @@ const SkillsAnalytics = () => {
             {/* Weak Categories */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">??</span>
+                <ExclamationCircleIcon className="w-6 h-6 text-yellow-600" />
                 <h4 className="font-medium" style={{ color: M.text }}>Areas to Improve</h4>
               </div>
               <div className="space-y-2">
                 {coverage.weakCategories.length > 0 ? (
                   coverage.weakCategories.map((cat) => (
-                    <div key={cat} className="px-3 py-2 bg-yellow-50 text-yellow-800 rounded-lg text-sm">
+                    <div key={cat} className="px-3 py-2 bg-yellow-50 text-yellow-800 rounded-lg text-sm flex items-center gap-2">
+                      {getCategoryIcon(cat)}
                       {cat}
                     </div>
                   ))
@@ -223,7 +242,7 @@ const SkillsAnalytics = () => {
             {/* Recommendations */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">??</span>
+                <LightBulbIcon className="w-6 h-6 text-blue-600" />
                 <h4 className="font-medium" style={{ color: M.text }}>Recommendations</h4>
               </div>
               <div className="space-y-2">
@@ -245,7 +264,8 @@ const SkillsAnalytics = () => {
       {/* Timeline */}
       {timeline?.timeline && timeline.timeline.length > 0 && (
         <div className="bg-white rounded-3xl shadow-lg p-6 border" style={{ borderColor: M.bg3 }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: M.text }}>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: M.text }}>
+            <ClockIcon className="w-5 h-5" />
             Skills Learning Timeline
           </h3>
           <div className="space-y-6">
@@ -263,10 +283,11 @@ const SkillsAnalytics = () => {
                         {month.skills.map((skill, idx) => (
                           <span
                             key={idx}
-                            className="px-3 py-1 bg-white border rounded-full text-sm"
+                            className="px-3 py-1 bg-white border rounded-full text-sm flex items-center gap-2"
                             style={{ borderColor: M.bg3 }}
                           >
-                            {skill.name} • {skill.proficiency}
+                            <AcademicCapIcon className="w-4 h-4" />
+                            {skill.name} - {skill.proficiency}
                           </span>
                         ))}
                       </div>

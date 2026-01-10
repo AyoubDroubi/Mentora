@@ -6,7 +6,10 @@ import {
   StarIcon,
   ChartBarIcon,
   FunnelIcon,
-  ArrowsUpDownIcon
+  ArrowsUpDownIcon,
+  ClockIcon,
+  CalendarIcon,
+  AcademicCapIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import skillsService from '../services/skillsService';
@@ -239,7 +242,7 @@ const SkillsManagement = () => {
         {/* Skills Grid */}
         {skills.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 shadow-lg border text-center" style={{ borderColor: M.bg3 }}>
-            <div className="text-6xl mb-4">??</div>
+            <AcademicCapIcon className="w-16 h-16 mx-auto mb-4" style={{ color: M.muted }} />
             <h3 className="text-xl font-semibold mb-2" style={{ color: M.text }}>No skills yet</h3>
             <p className="mb-4" style={{ color: M.muted }}>Start building your skills portfolio</p>
             <button
@@ -304,19 +307,19 @@ const SkillsManagement = () => {
                 <div className="space-y-2 text-sm mb-4" style={{ color: M.muted }}>
                   {skill.acquisitionMethod && (
                     <div className="flex items-center gap-2">
-                      <span>??</span>
+                      <AcademicCapIcon className="w-4 h-4" />
                       <span>{skill.acquisitionMethod}</span>
                     </div>
                   )}
                   {skill.yearsOfExperience && (
                     <div className="flex items-center gap-2">
-                      <span>??</span>
+                      <ClockIcon className="w-4 h-4" />
                       <span>{skill.yearsOfExperience} years experience</span>
                     </div>
                   )}
                   {skill.startedDate && (
                     <div className="flex items-center gap-2">
-                      <span>??</span>
+                      <CalendarIcon className="w-4 h-4" />
                       <span>Since {new Date(skill.startedDate).getFullYear()}</span>
                     </div>
                   )}
