@@ -13,12 +13,12 @@ import {
   Target,
   TrendingUp
 } from 'lucide-react';
-import { plannerService, todoService } from '../services';
+import { plannerService, todoService, notesService, studySessionsService, attendanceService } from '../services';
 import Calendar from '../components/Calendar';
 
 export default function StudyPlanner() {
   const navigate = useNavigate();
-  const { user, loading: userLoading } = useUser();
+  const { user } = useUser();
 
   const M = {
     primary: '#6B9080',
@@ -30,51 +30,78 @@ export default function StudyPlanner() {
     muted: '#5A7A6B',
   };
 
-  // State for page-specific data only
+  // Local state for all data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    todosPending: 0,
+    todosTotal: 0,
+    notesCount: 0,
+    eventsCount: 0,
+    upcomingEvents: 0,
+    totalStudyTime: '0h 0m',
+    attendanceRate: 0,
+    progressPercentage: 0
+  });
   const [calendarData, setCalendarData] = useState({
     events: [],
     tasks: []
   });
 
-  // Fetch only page-specific data (calendar data)
+  // Fetch ALL data when component mounts
   useEffect(() => {
-    fetchCalendarData();
+    fetchAllData();
   }, []);
 
-  const fetchCalendarData = async () => {
+  const fetchAllData = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      // Only fetch calendar-specific data - stats come from UserContext
-      const [eventsRes, allTodosRes] = await Promise.all([
-        plannerService.getAllEvents(),
-        todoService.getAllTodos('all')
+      // Fetch all data in parallel
+      const [
+        todoSummary,
+        notesRes,
+        eventsRes,
+        upcomingRes,
+        studyTime,
+        attendance,
+        allTodosRes
+      ] = await Promise.all([
+        todoService.getSummary().catch(() => ({ success: false })),
+        notesService.getAllNotes().catch(() => ({ success: false })),
+        plannerService.getAllEvents().catch(() => ({ success: false })),
+        plannerService.getUpcomingEvents().catch(() => ({ success: false })),
+        studySessionsService.getSummary().catch(() => ({ success: false })),
+        attendanceService.getSummary().catch(() => ({ success: false })),
+        todoService.getAllTodos('all').catch(() => ({ success: false }))
       ]);
+
+      // Update stats
+      setStats({
+        todosPending: todoSummary.success ? todoSummary.data.pendingTasks : 0,
+        todosTotal: todoSummary.success ? todoSummary.data.totalTasks : 0,
+        notesCount: notesRes.success ? notesRes.data.length : 0,
+        eventsCount: eventsRes.success ? eventsRes.data.length : 0,
+        upcomingEvents: upcomingRes.success ? upcomingRes.data.length : 0,
+        totalStudyTime: studyTime.success ? studyTime.data.formatted : '0h 0m',
+        attendanceRate: attendance.success ? attendance.data.attendanceRate : 0,
+        progressPercentage: attendance.success ? attendance.data.progressPercentage : 0,
+      });
 
       // Update calendar data
       setCalendarData({
         events: eventsRes.success ? eventsRes.data : [],
         tasks: allTodosRes.success ? allTodosRes.data : []
       });
+
+      console.log('? Study Planner data loaded successfully');
     } catch (err) {
-      console.error('Error fetching calendar data:', err);
-      setError('Failed to load calendar data');
+      console.error('? Error fetching study planner data:', err);
+      setError('Failed to load study data. Please refresh the page.');
     } finally {
       setLoading(false);
     }
-  };
-
-  // Use stats from UserContext
-  const stats = {
-    todosPending: user.todosPending || 0,
-    todosTotal: user.todosTotal || 0,
-    notesCount: user.notesCount || 0,
-    eventsCount: user.eventsCount || 0,
-    upcomingEvents: user.upcomingEvents || 0,
-    totalStudyTime: user.totalHours || '0h 0m',
-    attendanceRate: user.attendanceRate || 0,
-    progressPercentage: user.progressPercentage || 0
   };
 
   const handleDayClick = (date, data) => {
@@ -83,9 +110,7 @@ export default function StudyPlanner() {
     // You can add modal or navigate to specific page
   };
 
-  const isLoading = userLoading || loading;
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
         <SharedHeader title="Mentora - Study Planner" />
@@ -124,7 +149,7 @@ export default function StudyPlanner() {
           </h1>
           <p className="text-[#5A7A6B] mb-4">Your personal study companion for academic excellence</p>
           
-          {/* Quick Stats - Using UserContext data */}
+          {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard
               icon={<Clock className="w-5 h-5" style={{ color: M.primary }} />}
@@ -153,7 +178,7 @@ export default function StudyPlanner() {
           </div>
         </section>
 
-        {/* Progress Overview - Using UserContext data */}
+        {/* Progress Overview */}
         <section className="bg-white rounded-3xl p-6 shadow-lg border mb-6" style={{ borderColor: M.bg3 }}>
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-6 h-6" style={{ color: M.primary }} />
