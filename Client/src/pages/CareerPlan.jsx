@@ -17,7 +17,8 @@ import {
   AlertCircle,
   TrendingUp as TrendingUpIcon,
   CheckCircle,
-  BarChart3
+  BarChart3,
+  Briefcase
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7000/api';

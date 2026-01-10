@@ -25,6 +25,7 @@ import Attendance from "./pages/Attendance";
 import CareerBuilder from "./pages/CareerBuilder";
 import CreateCareerBuilder from "./pages/CreateCareerBuilder";
 import CareerPlan from "./pages/CareerPlan";
+import CareerPlansList from "./pages/CareerPlansList";
 import CareerProgress from "./pages/CareerProgress";
 import CareerSkills from "./pages/CareerSkills";
 import SkillsManagement from "./pages/SkillsManagement";
@@ -137,6 +138,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <CreateCareerBuilder />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/career-plan"
+                  element={
+                    <ProtectedRoute>
+                      <CareerPlansList />
                     </ProtectedRoute>
                   }
                 />

@@ -33,9 +33,42 @@ export default function CareerProgress() {
   const [skillsData, setSkillsData] = useState(null);
   const [progressData, setProgressData] = useState(null);
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-700';
+      case 'pending':
+        return 'bg-gray-100 text-gray-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'in_progress':
+        return <ClockIcon className="w-4 h-4" />;
+      case 'pending':
+        return <AlertCircle className="w-4 h-4" />;
+      default:
+        return <AlertCircle className="w-4 h-4" />;
+    }
+  };
+
   useEffect(() => {
     const fetchSkills = async () => {
       try {
+        // Check if user data exists
+        if (!user || !user.careerGoal) {
+          console.warn('User data not available, using mock data');
+          setSkillsData(getMockSkillsData());
+          return;
+        }
+
         const response = await fetch('/api/ai/career-skills', {
           method: 'POST',
           headers: {
@@ -43,69 +76,48 @@ export default function CareerProgress() {
           },
           body: JSON.stringify({
             careerGoal: user.careerGoal,
-            skills: user.skills,
-            level: user.level,
+            skills: user.skills || [],
+            level: user.level || 'beginner',
           }),
         });
+        
         if (response.ok) {
           const data = await response.json();
           setSkillsData(data);
         } else {
           console.error('Failed to fetch skills');
-          // Provide mock data when API fails
-          const mockData = {
-            topSkills: [
-              { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
-              { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
-              { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
-              { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
-              { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 }
-            ],
-            allSkills: [
-              { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
-              { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
-              { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
-              { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
-              { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 },
-              { name: 'Communication', type: 'Soft', status: 'Achieved', priority: 6 },
-              { name: 'Problem Solving', type: 'Soft', status: 'In Progress', priority: 7 },
-              { name: 'Team Work', type: 'Soft', status: 'Achieved', priority: 8 },
-              { name: 'Time Management', type: 'Soft', status: 'In Progress', priority: 9 },
-              { name: 'Adaptability', type: 'Soft', status: 'Missing', priority: 10 }
-            ]
-          };
-          setSkillsData(mockData);
+          setSkillsData(getMockSkillsData());
         }
       } catch (error) {
         console.error('Error fetching skills:', error);
-        // Provide mock data when API fails
-        const mockData = {
-          topSkills: [
-            { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
-            { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
-            { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
-            { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
-            { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 }
-          ],
-          allSkills: [
-            { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
-            { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
-            { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
-            { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
-            { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 },
-            { name: 'Communication', type: 'Soft', status: 'Achieved', priority: 6 },
-            { name: 'Problem Solving', type: 'Soft', status: 'In Progress', priority: 7 },
-            { name: 'Team Work', type: 'Soft', status: 'Achieved', priority: 8 },
-            { name: 'Time Management', type: 'Soft', status: 'In Progress', priority: 9 },
-            { name: 'Adaptability', type: 'Soft', status: 'Missing', priority: 10 }
-          ]
-        };
-        setSkillsData(mockData);
+        setSkillsData(getMockSkillsData());
       }
     };
 
     fetchSkills();
   }, [user]);
+
+  const getMockSkillsData = () => ({
+    topSkills: [
+      { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
+      { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
+      { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
+      { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
+      { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 }
+    ],
+    allSkills: [
+      { name: 'JavaScript/TypeScript', type: 'Technical', status: 'Achieved', priority: 1 },
+      { name: 'React/Vue.js', type: 'Technical', status: 'In Progress', priority: 2 },
+      { name: 'Node.js', type: 'Technical', status: 'In Progress', priority: 3 },
+      { name: 'Database Design', type: 'Technical', status: 'Missing', priority: 4 },
+      { name: 'API Development', type: 'Technical', status: 'Missing', priority: 5 },
+      { name: 'Communication', type: 'Soft', status: 'Achieved', priority: 6 },
+      { name: 'Problem Solving', type: 'Soft', status: 'In Progress', priority: 7 },
+      { name: 'Team Work', type: 'Soft', status: 'Achieved', priority: 8 },
+      { name: 'Time Management', type: 'Soft', status: 'In Progress', priority: 9 },
+      { name: 'Adaptability', type: 'Soft', status: 'Missing', priority: 10 }
+    ]
+  });
 
   useEffect(() => {
     if (skillsData) {
@@ -164,7 +176,7 @@ export default function CareerProgress() {
   const calculateMilestoneProgress = (allSkills, requiredSkills) => {
     const relevantSkills = allSkills.filter(skill => requiredSkills.includes(skill.name));
     const achievedCount = relevantSkills.filter(skill => skill.status === 'Achieved').length;
-    return Math.round((achievedCount / relevantSkills.length) * 100);
+    return relevantSkills.length > 0 ? Math.round((achievedCount / relevantSkills.length) * 100) : 0;
   };
 
   const getMilestoneStatus = (progress) => {
