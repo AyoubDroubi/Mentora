@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import authService from '../services/authService';
 
 const UserContext = createContext();
 
@@ -11,41 +12,62 @@ export const useUser = () => {
 };
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Load user from localStorage if available
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch (e) {
-        console.error('Error parsing stored user:', e);
-      }
-    }
-    
-    // Default user state - basic info only
-    return {
-      id: null,
-      firstName: '',
-      lastName: '',
-      email: '',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
-    };
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Update user and persist to localStorage
-  const updateUser = useCallback((updates) => {
+  // Fetch basic user profile data on mount (independent of auth flow)
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        // Check if authenticated
+        if (authService.isAuthenticated()) {
+          // Fetch basic user info from API
+          const result = await authService.getCurrentUser();
+          if (result.success) {
+            // Store only basic profile data
+            const basicUserData = {
+              id: result.data.userId,
+              firstName: result.data.firstName || '',
+              lastName: result.data.lastName || '',
+              email: result.data.email || '',
+              avatar: result.data.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
+            };
+            setUser(basicUserData);
+            localStorage.setItem('user', JSON.stringify(basicUserData));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // Update user profile data
+  const updateUser = (updates) => {
     setUser(prev => {
       const updated = { ...prev, ...updates };
       localStorage.setItem('user', JSON.stringify(updated));
       return updated;
     });
-  }, []);
+  };
+
+  // Clear user data (called on logout)
+  const clearUser = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
 
   return (
     <UserContext.Provider value={{ 
       user, 
+      loading,
       setUser, 
-      updateUser
+      updateUser,
+      clearUser
     }}>
       {children}
     </UserContext.Provider>

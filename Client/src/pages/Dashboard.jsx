@@ -13,11 +13,11 @@ import {
   BookOpenCheck,
   User
 } from 'lucide-react';
-import { todoService, plannerService } from '../services';
+import { todoService, plannerService, studySessionsService, attendanceService } from '../services';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, loading: userLoading } = useUser();
+  const { user } = useUser();
 
   // Theme colors
   const M = {
@@ -30,27 +30,52 @@ export default function Dashboard() {
     muted: '#5A7A6B',
   };
 
-  // State for page-specific data only
+  // State for ALL page data - NO dependency on Context
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    totalHours: '0h 0m',
+    completedTasks: 0,
+    totalTasks: 0,
+    studyStreak: 0,
+    attendancePercentage: 0
+  });
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pendingTasks, setPendingTasks] = useState([]);
 
-  // Fetch only page-specific data (upcoming events and tasks)
+  // Fetch ALL data when component mounts - NO CONDITIONS
   useEffect(() => {
-    fetchPageData();
+    fetchAllData();
   }, []);
 
-  const fetchPageData = async () => {
+  const fetchAllData = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Only fetch page-specific data - stats come from UserContext
-      const [upcomingEventsRes, todosRes] = await Promise.all([
+      // Fetch all data in parallel - independent of any context
+      const [
+        todoSummary,
+        upcomingEventsRes, 
+        todosRes,
+        studyTimeRes,
+        attendanceRes
+      ] = await Promise.all([
+        todoService.getSummary().catch(() => ({ success: false })),
         plannerService.getUpcomingEvents().catch(() => ({ success: false })),
-        todoService.getAllTodos('active').catch(() => ({ success: false }))
+        todoService.getAllTodos('active').catch(() => ({ success: false })),
+        studySessionsService.getSummary().catch(() => ({ success: false })),
+        attendanceService.getSummary().catch(() => ({ success: false }))
       ]);
+
+      // Update stats from fresh API data
+      setStats({
+        totalHours: studyTimeRes.success ? studyTimeRes.data.formatted : '0h 0m',
+        completedTasks: todoSummary.success ? (todoSummary.data.totalTasks - todoSummary.data.pendingTasks) : 0,
+        totalTasks: todoSummary.success ? todoSummary.data.totalTasks : 0,
+        studyStreak: studyTimeRes.success ? (studyTimeRes.data.studyStreak || 0) : 0,
+        attendancePercentage: attendanceRes.success ? attendanceRes.data.attendanceRate : 0
+      });
 
       // Update upcoming events
       if (upcomingEventsRes.success) {
@@ -62,30 +87,24 @@ export default function Dashboard() {
         setPendingTasks(todosRes.data.slice(0, 2));
       }
 
+      console.log('? Dashboard data loaded successfully');
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
+      console.error('? Error fetching dashboard data:', err);
       setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
-  // Use stats from UserContext
-  const stats = {
-    totalHours: user.totalHours || '0h 0m',
-    completedTasks: (user.todosTotal || 0) - (user.todosPending || 0),
-    studyStreak: user.studyStreak || 0,
-    attendancePercentage: user.attendanceRate || 0
-  };
-
-  const isLoading = userLoading || loading;
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div style={{ background: `linear-gradient(180deg, ${M.bg1}, ${M.bg2})` }} className="min-h-screen">
         <SharedHeader title="Mentora - Dashboard" />
         <div className="flex items-center justify-center h-screen">
-          <p style={{ color: M.muted }}>Loading dashboard...</p>
+          <div className="text-center">
+            <Clock className="w-12 h-12 mx-auto mb-4 animate-spin" style={{ color: M.primary }} />
+            <p style={{ color: M.muted }}>Loading dashboard...</p>
+          </div>
         </div>
       </div>
     );
@@ -103,7 +122,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Stats Grid - Using UserContext data */}
+        {/* Stats Grid - Using fresh API data */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-2xl p-4 shadow-lg border hover:scale-105 transition-transform" style={{ borderColor: M.bg3 }}>
             <div className="flex items-center justify-between">
