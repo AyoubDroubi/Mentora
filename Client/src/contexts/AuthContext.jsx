@@ -12,37 +12,18 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Initialize auth state on mount
+  // Initialize auth state on mount - ONLY check if authenticated
   useEffect(() => {
     const initAuth = async () => {
       try {
-        if (authService.isAuthenticated()) {
-          const userInfo = authService.getUser();
-          setUser(userInfo);
-          setIsAuthenticated(true);
-
-          // Optionally fetch full user data from API
-          const result = await authService.getCurrentUser();
-          if (result.success) {
-            // Map userId to id for consistency with UserContext
-            const fullUserInfo = { 
-              ...userInfo, 
-              ...result.data,
-              id: result.data.userId // Map userId to id
-            };
-            setUser(fullUserInfo);
-            localStorage.setItem('user', JSON.stringify(fullUserInfo));
-          }
-        }
+        // Simply check if user has valid tokens
+        const authenticated = authService.isAuthenticated();
+        setIsAuthenticated(authenticated);
       } catch (error) {
         console.error('Auth initialization error:', error);
-        // Clear invalid tokens
-        await authService.logout();
-        setUser(null);
         setIsAuthenticated(false);
       } finally {
         setLoading(false);
@@ -59,18 +40,7 @@ export const AuthProvider = ({ children }) => {
       const result = await authService.login({ email, password });
       
       if (result.success) {
-        // Get user info after successful login
-        const userResult = await authService.getCurrentUser();
-        if (userResult.success) {
-          // Map userId to id for consistency with UserContext
-          const userData = {
-            ...userResult.data,
-            id: userResult.data.userId // Map userId to id
-          };
-          setUser(userData);
-          setIsAuthenticated(true);
-          localStorage.setItem('user', JSON.stringify(userData));
-        }
+        setIsAuthenticated(true);
       }
       
       return result;
@@ -110,7 +80,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      setUser(null);
       setIsAuthenticated(false);
       setLoading(false);
     }
@@ -124,27 +93,18 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout all error:', error);
     } finally {
-      setUser(null);
       setIsAuthenticated(false);
       setLoading(false);
     }
   };
 
-  // Update user info
-  const updateUser = (userData) => {
-    setUser((prev) => ({ ...prev, ...userData }));
-    localStorage.setItem('user', JSON.stringify({ ...user, ...userData }));
-  };
-
   const value = {
-    user,
     isAuthenticated,
     loading,
     login,
     register,
     logout,
     logoutAll,
-    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

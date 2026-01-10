@@ -30,7 +30,7 @@ export default function StudyPlanner() {
     muted: '#5A7A6B',
   };
 
-  // Local state for all data
+  // Local state for all data - NO dependency on Context
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
@@ -48,7 +48,7 @@ export default function StudyPlanner() {
     tasks: []
   });
 
-  // Fetch ALL data when component mounts
+  // Fetch ALL data when component mounts - NO CONDITIONS
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -58,7 +58,7 @@ export default function StudyPlanner() {
     setError(null);
     
     try {
-      // Fetch all data in parallel
+      // Fetch all data in parallel - independent of any context
       const [
         todoSummary,
         notesRes,
