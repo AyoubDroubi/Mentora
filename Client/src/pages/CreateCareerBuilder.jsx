@@ -203,7 +203,20 @@ export default function CreateCareerBuilder() {
   ];
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState(() => {
+    // Initialize all answers with proper defaults to prevent uncontrolled input warnings
+    const initial = {};
+    questions.forEach(q => {
+      if (q.type === 'short_answer' || q.type === 'single_choice') {
+        initial[q.id] = '';
+      } else if (q.type === 'multiple_choice') {
+        initial[q.id] = [];
+      } else if (q.type === 'mixed') {
+        initial[q.id] = { option: '', salary: '', time: '' };
+      }
+    });
+    return initial;
+  });
   const [showResult, setShowResult] = useState(false);
   const [status, setStatus] = useState('Draft');
   const [hasCompletedAssessment, setHasCompletedAssessment] = useState(false);
@@ -240,17 +253,17 @@ export default function CreateCareerBuilder() {
     let isValid = false;
 
     if (currentQuestion.type === 'short_answer') {
-      isValid = currentAnswer && currentAnswer.trim() !== '';
+      isValid = currentAnswer && typeof currentAnswer === 'string' && currentAnswer.trim() !== '';
     } else if (currentQuestion.type === 'multiple_choice') {
       if (currentQuestion.maxSelections) {
-        isValid = currentAnswer && currentAnswer.length > 0 && currentAnswer.length <= currentQuestion.maxSelections;
+        isValid = Array.isArray(currentAnswer) && currentAnswer.length > 0 && currentAnswer.length <= currentQuestion.maxSelections;
       } else {
-        isValid = currentAnswer && currentAnswer.length > 0;
+        isValid = Array.isArray(currentAnswer) && currentAnswer.length > 0;
       }
     } else if (currentQuestion.type === 'single_choice') {
-      isValid = currentAnswer && currentAnswer !== '';
+      isValid = currentAnswer && typeof currentAnswer === 'string' && currentAnswer.trim() !== '';
     } else if (currentQuestion.type === 'mixed') {
-      isValid = currentAnswer && currentAnswer.option && currentAnswer.option !== '';
+      isValid = currentAnswer && typeof currentAnswer === 'object' && currentAnswer.option && currentAnswer.option.trim() !== '';
     }
 
     if (isValid) {
