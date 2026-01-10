@@ -28,7 +28,12 @@ export const AuthProvider = ({ children }) => {
           // Optionally fetch full user data from API
           const result = await authService.getCurrentUser();
           if (result.success) {
-            const fullUserInfo = { ...userInfo, ...result.data };
+            // Map userId to id for consistency with UserContext
+            const fullUserInfo = { 
+              ...userInfo, 
+              ...result.data,
+              id: result.data.userId // Map userId to id
+            };
             setUser(fullUserInfo);
             localStorage.setItem('user', JSON.stringify(fullUserInfo));
           }
@@ -57,9 +62,14 @@ export const AuthProvider = ({ children }) => {
         // Get user info after successful login
         const userResult = await authService.getCurrentUser();
         if (userResult.success) {
-          setUser(userResult.data);
+          // Map userId to id for consistency with UserContext
+          const userData = {
+            ...userResult.data,
+            id: userResult.data.userId // Map userId to id
+          };
+          setUser(userData);
           setIsAuthenticated(true);
-          localStorage.setItem('user', JSON.stringify(userResult.data));
+          localStorage.setItem('user', JSON.stringify(userData));
         }
       }
       
